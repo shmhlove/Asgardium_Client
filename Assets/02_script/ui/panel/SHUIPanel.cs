@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SHUIPanel : MonoBehaviour
 {
-    public void SetActive(bool isActive)
+    virtual public void SetActive(bool isActive)
     {
         gameObject.SetActive(isActive);
     }

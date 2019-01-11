@@ -55,14 +55,14 @@ public class SHReply
 
                     if (true == response.Keys.Contains("error"))
                     {
-                        this.error = new SHError((SHErrorCode)(int)response["error"]["code"], (string)response["error"]["message"]);
+                        this.error = new SHError((SHErrorCode)(int)response["error"]["code"], (string)response["error"]["message"], response["error"]["extras"]);
                     }
                 }
             }
             catch
             {
                 this.isSucceed = false;
-                this.error = new SHError(SHErrorCode.Common_JsonParse, "Err Json Parse");
+                this.error = new SHError(SHErrorCode.Common_JsonParse, string.Format("{0}\n{1}", "Err Json Parse With Server ResponseData", request.downloadHandler.text));
             }
         }
 

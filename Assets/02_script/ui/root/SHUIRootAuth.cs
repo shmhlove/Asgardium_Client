@@ -22,6 +22,15 @@ public class SHUIRootAuth : SHUIRoot
         panel.OnloseAction = pCloseAction;
     }
 
+    public void CloseLoginPanel()
+    {
+        var panel = GetPanel<SHUIPanelLogin>();
+        panel.SetActive(false);
+        panel.OnLoginAction = null;
+        panel.OnSigninAction = null;
+        panel.OnloseAction = null;
+    }
+
     public void ShowSigninPanel()
     {
         SetEnableAllPanels(false);

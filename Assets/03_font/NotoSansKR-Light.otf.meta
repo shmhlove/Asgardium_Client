@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 31dbbcba8e52e4581a8973051c3512df
+timeCreated: 1546148319
+licenseType: Pro
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Noto Sans Korean
+  fontNames:
+  - Noto Sans Korean
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class SHUIRoot : MonoBehaviour
 {
-	  public List<SHUIPanel> panels;
+	public List<SHUIPanel> panels;
 
     public T GetPanel<T>() where T : SHUIPanel
     {
@@ -14,6 +14,8 @@ public class SHUIRoot : MonoBehaviour
             if (panel.GetType().Equals(typeof(T)))
               return panel as T;
         }
+
+        // 리소스 동적로드 처리 (싱크방식)
 
         return default(T);
     }

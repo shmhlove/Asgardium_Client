@@ -4,4 +4,8 @@ using UnityEngine;
 
 public class SHUIRootGlobal : SHUIRoot
 {
+    void Awake()
+    {
+        Single.UI.AddRoot(typeof(SHUIRootGlobal), this);
+    }
 }

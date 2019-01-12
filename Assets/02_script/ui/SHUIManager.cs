@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 using System;
 using System.IO;
@@ -38,9 +38,10 @@ public class SHUIManager : SHSingleton<SHUIManager>
         {
             return dicRoots[typeof(T)] as T;
         }
-        else
-        {
-            return default(T);
-        }
+
+        // 리소스 동적로드 처리 
+        // (싱크방식,, 비동기방식으로 하는게 쉬운데.. 쓰기가 불편하니..)
+
+        return default(T);
     }
 }

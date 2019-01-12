@@ -17,7 +17,7 @@ public class SHSceneAuth : MonoBehaviour
                 JsonData json = new JsonData();
                 json["name"] = strId;
                 json["pass"] = strPass;
-                Single.network.POST(SHAPIs.SH_API_LOGIN, json, (reply) =>
+                Single.Network.POST(SHAPIs.SH_API_LOGIN, json, (reply) =>
                 {
                     if (reply.isSucceed)
                     {
@@ -32,7 +32,7 @@ public class SHSceneAuth : MonoBehaviour
                 JsonData json = new JsonData();
                 json["name"] = strId;
                 json["pass"] = strPass;
-                Single.network.POST(SHAPIs.SH_API_SIGNUP, json, (reply) => 
+                Single.Network.POST(SHAPIs.SH_API_SIGNUP, json, (reply) => 
                 {
                     if (reply.isSucceed)
                     {

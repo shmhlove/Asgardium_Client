@@ -5,8 +5,9 @@ using System.Collections.Generic;
 
 public static class Single
 {
-    public static SHUIManager UI { get { return SHUIManager.Instance; } }    
-    public static SHNetwork network { get { return SHNetwork.Instance; } }
+    public static SHResourceManager     Resource    { get { return SHResourceManager.Instance; } }
+    public static SHUIManager           UI          { get { return SHUIManager.Instance; } }    
+    public static SHNetworkManager      Network     { get { return SHNetworkManager.Instance; } }
 }
 
 public abstract class SHSingleton<T> : MonoBehaviour where T : SHSingleton<T>

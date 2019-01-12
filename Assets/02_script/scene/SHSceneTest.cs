@@ -11,7 +11,7 @@ public class SHSceneTest : MonoBehaviour
 {
 	void Start ()
     {
-        Single.network.GET(SHAPIs.SH_API_TEST, null, (reply) =>
+        Single.Network.GET(SHAPIs.SH_API_TEST, null, (reply) =>
         {
             if (reply.isSucceed)
             {
@@ -26,7 +26,7 @@ public class SHSceneTest : MonoBehaviour
         JsonData json = new JsonData();
         json["name"] = "unity test";
         json["pass"] = "1234";
-        Single.network.POST(SHAPIs.SH_API_LOGIN, json, (reply) =>
+        Single.Network.POST(SHAPIs.SH_API_LOGIN, json, (reply) =>
         {
             if (reply.isSucceed)
             {
@@ -40,7 +40,7 @@ public class SHSceneTest : MonoBehaviour
 
         json["name"] = "unity test";
         json["pass"] = "1234";
-        Single.network.POST(SHAPIs.SH_API_SIGNUP, json, (reply) => 
+        Single.Network.POST(SHAPIs.SH_API_SIGNUP, json, (reply) => 
         {
             if (reply.isSucceed)
             {

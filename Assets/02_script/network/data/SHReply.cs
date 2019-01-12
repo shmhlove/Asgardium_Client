@@ -55,7 +55,10 @@ public class SHReply
 
                     if ((true == response.Keys.Contains("error")) && (null != response["error"]))
                     {
-                        this.error = new SHError((SHErrorCode)(int)response["error"]["code"], (string)response["error"]["message"], response["error"]["extras"]);
+                        if (response["error"].Keys.Contains("extras"))
+                            this.error = new SHError((SHErrorCode)(int)response["error"]["code"], (string)response["error"]["message"], response["error"]["extras"]);
+                        else
+                            this.error = new SHError((SHErrorCode)(int)response["error"]["code"], (string)response["error"]["message"]);
                     }
                 }
             }

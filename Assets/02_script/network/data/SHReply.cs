@@ -48,12 +48,12 @@ public class SHReply
                         this.isSucceed = (bool)response["result"];
                     }
 
-                    if (true == response.Keys.Contains("data"))
+                    if ((true == response.Keys.Contains("data")) && (null != response["data"]))
                     {
                         this.data = response["data"];
                     }
 
-                    if (true == response.Keys.Contains("error"))
+                    if ((true == response.Keys.Contains("error")) && (null != response["error"]))
                     {
                         this.error = new SHError((SHErrorCode)(int)response["error"]["code"], (string)response["error"]["message"], response["error"]["extras"]);
                     }

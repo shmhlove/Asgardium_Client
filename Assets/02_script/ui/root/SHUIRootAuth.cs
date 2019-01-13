@@ -13,7 +13,7 @@ public class SHUIRootAuth : SHUIRoot
 
     public void ShowLoginPanel(Action<string, string> pLoginAction, Action<string, string> pSigninAction, Action pCloseAction)
     {
-        SetEnableAllPanels(false);
+        //SetEnableAllPanels(false);
 
         var panel = GetPanel<SHUIPanelLogin>();
         panel.SetActive(true);
@@ -29,11 +29,5 @@ public class SHUIRootAuth : SHUIRoot
         panel.OnLoginAction = null;
         panel.OnSigninAction = null;
         panel.OnloseAction = null;
-    }
-
-    public void ShowSigninPanel()
-    {
-        SetEnableAllPanels(false);
-        GetPanel<SHUIPanelSignin>().SetActive(true);
     }
 }

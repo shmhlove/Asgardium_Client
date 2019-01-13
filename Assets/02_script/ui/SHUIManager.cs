@@ -10,6 +10,11 @@ public class SHUIManager : SHSingleton<SHUIManager>
 {
     Dictionary<Type, SHUIRoot> dicRoots = new Dictionary<Type, SHUIRoot>();
 
+    public override void OnInitialize()
+    {
+        SetDontDestroy();
+    }
+
     public bool AddRoot(Type type, SHUIRoot root)
     {
         if (dicRoots.ContainsKey(type))

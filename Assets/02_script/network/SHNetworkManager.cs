@@ -46,13 +46,14 @@ public class SHNetworkManager : SHSingleton<SHNetworkManager>
 
     public void ConnectWebSocket(Action<SHReply> callback)
     {
-        var test = Socket.Connect(WebHost + "/sockettest");
+        //var test = Socket.Connect(WebHost + "/sockettest");
+        var test = Socket.Connect(WebHost);
 
         // 소켓 연결되었을 때
         test.On(SystemEvents.connect, () =>
         {
             Debug.Log("[LSH] Socket Event : SystemEvents.connect");
-            //test.Emit("message", "i connection now");
+            test.Emit("message", "i connection now");
         });
         // 소켓 연결이 타임아웃 되었을 때
         test.On(SystemEvents.connectTimeOut, () =>
@@ -92,7 +93,7 @@ public class SHNetworkManager : SHSingleton<SHNetworkManager>
         
         test.On("message", (string data) =>
         {
-            Debug.Log("news => " + data);
+            Debug.Log("[RECIVE] " + data);
         });
     }
 

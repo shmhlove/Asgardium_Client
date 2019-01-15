@@ -29,7 +29,7 @@ public class SHReply
 #endif
         {
             this.isSucceed = false;
-            this.error = new SHError(SHErrorCode.HTTP, request.error);
+            this.error = new SHError(eErrorCode.Net_Common_HTTP, request.error);
         }
         else
         {
@@ -39,7 +39,7 @@ public class SHReply
                 if (0 == response.Keys.Count)
                 {
                     this.isSucceed = false;
-                    this.error = new SHError(SHErrorCode.Common_InvalidResponseData, request.downloadHandler.text);
+                    this.error = new SHError(eErrorCode.Net_Common_InvalidResponseData, request.downloadHandler.text);
                 }
                 else
                 {
@@ -56,16 +56,16 @@ public class SHReply
                     if ((true == response.Keys.Contains("error")) && (null != response["error"]))
                     {
                         if (response["error"].Keys.Contains("extras"))
-                            this.error = new SHError((SHErrorCode)(int)response["error"]["code"], (string)response["error"]["message"], response["error"]["extras"]);
+                            this.error = new SHError((eErrorCode)(int)response["error"]["code"], (string)response["error"]["message"], response["error"]["extras"]);
                         else
-                            this.error = new SHError((SHErrorCode)(int)response["error"]["code"], (string)response["error"]["message"]);
+                            this.error = new SHError((eErrorCode)(int)response["error"]["code"], (string)response["error"]["message"]);
                     }
                 }
             }
             catch
             {
                 this.isSucceed = false;
-                this.error = new SHError(SHErrorCode.Common_JsonParse, string.Format("{0}\n{1}", "Err Json Parse With Server ResponseData", request.downloadHandler.text));
+                this.error = new SHError(eErrorCode.Net_Common_JsonParse, string.Format("{0}\n{1}", "Err Json Parse With Server ResponseData", request.downloadHandler.text));
             }
         }
 
@@ -86,5 +86,12 @@ public class SHReply
         }
         
         request.Dispose();
+    }
+
+    public SHReply(SHError error)
+    {
+        this.isSucceed = false;
+        this.data = null;
+        this.error = error;
     }
 }

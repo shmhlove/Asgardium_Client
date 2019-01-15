@@ -6,11 +6,11 @@ using LitJson;
 
 public class SHError
 {
-    public SHErrorCode errorCode;
+    public eErrorCode errorCode;
     public string message;
     public JsonData extras;
 
-    public SHError(SHErrorCode errorCode, string message, JsonData extras = null)
+    public SHError(eErrorCode errorCode, string message, JsonData extras = null)
     {
         this.errorCode = errorCode;
         this.message = message;

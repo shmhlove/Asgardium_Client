@@ -1,0 +1,21 @@
+
+[
+    {
+        "ServerConfigURL": "",
+        "ServiceMode": "Dev",
+        "Version": "1.0.1",
+		
+		"AOS_KeyStoreName": "GoogleKeyStore/kingsadventure.keystore",
+		"AOS_KeyStorePass": "lee35235",
+		"AOS_KeyAliasName": "kingsadventure",
+		"AOS_KeyAliasPass": "lee35235",
+		
+		"IOS_TeamID": "T8263VR796",
+	
+		"FB_StorageBaseURL": "gs://kings-adventure-22251209.appspot.com/",
+
+        "VSyncCount": false,
+        "FrameRate": 60,
+        "CacheSize": 200
+    }
+]

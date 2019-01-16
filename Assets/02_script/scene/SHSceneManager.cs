@@ -101,23 +101,25 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
     
     void PlayFadeIn(Action pCallback)
     {
-        //if (false == Single.UI.Show("Panel_FadeIn", pCallback))
+        // var uiRoot = Single.UI.GetRoot<SHUIRootGlobal>();
+        // if (false == uiRoot.ShowFade("Panel_FadeIn", pCallback))
         {
             if (null != pCallback)
                 pCallback();
         }
 
-        //SHCoroutine.Instance.NextUpdate(() => Single.UI.Close("Panel_FadeOut"));
+        //SHCoroutine.Instance.NextUpdate(() => uiRoot.ShowFade("Panel_FadeOut"));
     }
     
     void PlayFadeOut(Action pCallback)
     {
-        //if (false == Single.UI.Show("Panel_FadeOut", pCallback))
+        // var uiRoot = Single.UI.GetRoot<SHUIRootGlobal>();
+        //if (false == uiRoot.ShowFade("Panel_FadeOut", pCallback))
         {
             if (null != pCallback)
                 pCallback();
         }
-
-        //SHCoroutine.Instance.NextUpdate(() => Single.UI.Close("Panel_FadeIn"));
+        
+        //SHCoroutine.Instance.NextUpdate(() => uiRoot.ShowFade("Panel_FadeIn"));
     }
 }

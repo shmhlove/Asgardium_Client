@@ -29,13 +29,13 @@ public partial class SHTableData : SHBaseData
     {
         var dicLoadList = new Dictionary<string, SHLoadData>();
         
-        SHUtils.ForToDic<Type, SHBaseTable>(m_dicTables, (pKey, pValue) =>
+        foreach (var kvp in m_dicTables)
         {
-            if (true == pValue.IsLoadTable())
-                return;
+            if (true == kvp.Value.IsLoadTable())
+                continue;
 
-            dicLoadList.Add(pValue.m_strFileName, CreateLoadInfo(pValue.m_strFileName));
-        });
+            dicLoadList.Add(kvp.Value.m_strFileName, CreateLoadInfo(kvp.Value.m_strFileName));
+        }
 
         return dicLoadList; 
     }
@@ -54,10 +54,10 @@ public partial class SHTableData : SHBaseData
             yield break;
         }
 
-        SHUtils.ForToList(GetLoadOrder(pTable), (pLoadTable) =>
+        foreach (var pLoadTable in GetLoadOrder(pTable))
         {
             pDone(pInfo.m_strName, new SHLoadEndInfo(pLoadTable()));
-        });
+        }
     }
     
     public SHLoadData CreateLoadInfo(string strName)

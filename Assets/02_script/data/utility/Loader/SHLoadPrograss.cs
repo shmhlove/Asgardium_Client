@@ -45,20 +45,17 @@ public class SHLoadProgress
 
     public void AddLoadDatum(Dictionary<string, SHLoadData> dicLoadDatum)
     {
-        SHUtils.ForToDic(dicLoadDatum, (strName, pData) => 
+        foreach (var kvp in dicLoadDatum)
         {
-            if (null == pData)
+            if (null == kvp.Value)
                 return;
 
-            var pLoadData = GetLoadDataInfo(strName);
+            var pLoadData = GetLoadDataInfo(kvp.Key);
             if (null != pLoadData)
             {
-                Debug.LogErrorFormat("[LSH] 데이터 로드 중 중복파일 발견!!!(FileName : {0})", strName);
-                return;
+                Debug.LogErrorFormat("[LSH] 데이터 로드 중 중복파일 발견!!!(FileName : {0})", kvp.Key);
             }
-            
-            AddLoadData(pData);
-        });
+        }
     }
     
     public SHLoadDataStateInfo GetLoadDataInfo(string strName)
@@ -142,10 +139,10 @@ public class SHLoadProgress
         float fProgress = 0.0f;
 
         // 로드 중인 파일의 진행률 반영
-        SHUtils.ForToList<SHLoadDataStateInfo>(LoadingDatum, (pDataInfo) =>
+        foreach (var pData in LoadingDatum)
         {
-            fProgress += pDataInfo.GetProgress();
-        });
+            fProgress += pData.GetProgress();
+        }
         fProgress /= LoadingDatum.Count;
         
         // 로드 완료된 파일의 진행률 반영

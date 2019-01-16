@@ -272,15 +272,22 @@ public class SHObjectPool : SHSingleton<SHObjectPool>
     }
     private void ClearAll()
     {
-        SHUtils.ForToDic(m_dicActives, (pKey, pValue) =>
+        foreach(var kvp in m_dicActives)
         {
-            SHUtils.ForToList(pValue, (pObject) => pObject.DestroyObject());
-        });
-        SHUtils.ForToDic(m_dicInactives, (pKey, pValue) =>
-        {
-            SHUtils.ForToList(pValue, (pObject) => pObject.DestroyObject());
-        });
+            foreach (var pObject in kvp.Value)
+            {
+                pObject.DestroyObject();
+            }
+        }
 
+        foreach(var kvp in m_dicInactives)
+        {
+            foreach (var pObject in kvp.Value)
+            {
+                pObject.DestroyObject();
+            }
+        }
+        
         m_dicActives.Clear();
         m_dicInactives.Clear();
     }
@@ -296,20 +303,34 @@ public class SHObjectPool : SHSingleton<SHObjectPool>
         if (null == pCallback)
             return;
         
-        SHUtils.ForToDic(m_dicActives, (pKey, pValue) =>
+        foreach (var kvp in m_dicActives)
         {
-            SHUtils.ForToList(pValue, (pItem) => pCallback(pItem));
-        });
+            foreach (var pItem in kvp.Value)
+            {
+                pCallback(pItem);
+            }
+        }
+
+        foreach (var kvp in m_dicActives)
+        {
+            foreach (var pItem in kvp.Value)
+            {
+                pCallback(pItem);
+            }
+        }
     }
     private void ForItemInactives(Action<SHObjectInfo> pCallback)
     {
         if (null == pCallback)
             return;
         
-        SHUtils.ForToDic(m_dicInactives, (pKey, pValue) =>
+        foreach (var kvp in m_dicInactives)
         {
-            SHUtils.ForToList(pValue, (pItem) => pCallback(pItem));
-        });
+            foreach (var pItem in kvp.Value)
+            {
+                pCallback(pItem);
+            }
+        }
     }
     #endregion
 
@@ -333,10 +354,10 @@ public class SHObjectPool : SHSingleton<SHObjectPool>
             }
         });
 
-        SHUtils.ForToList(pReturns, (pItem) =>
+        foreach (var pItem in pReturns)
         {
             SetReturnObject(pItem.GetName(), pItem);
-        });
+        }
     }
     private void CheckAutoDestroyObject(bool bIsChangeScene)
     {
@@ -363,10 +384,10 @@ public class SHObjectPool : SHSingleton<SHObjectPool>
             }
         });
 
-        SHUtils.ForToList(pDestroys, (pItem) =>
+        foreach (var pItem in pDestroys)
         {
             SetDestroyObject(pItem.GetName(), pItem);
-        });
+        }
     }
     #endregion
 

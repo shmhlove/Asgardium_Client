@@ -100,10 +100,10 @@ public class SHSoundManager : SHSingleton<SHSoundManager>
 
     void ClearChannel<T1, T2>(Dictionary<T1, T2> dicChannel) where T2 : UnityEngine.Object
     {
-        SHUtils.ForToDic(dicChannel, (pKey, pValue) =>
+        foreach (var kvp in dicChannel)
         {
-            GameObject.DestroyObject(pValue);
-        });
+            GameObject.DestroyObject(kvp.Value);
+        }
         dicChannel.Clear();
     }
 

@@ -74,10 +74,10 @@ public class SHResourcesLister
             return;
 
         var pResourcesJsonData = new JsonData();
-        SHUtils.ForToDic(dicTable, (pKey, pValue) =>
+        foreach (var kvp in dicTable)
         {
-            pResourcesJsonData.Add(MakeResourceJsonData(pValue));
-        });
+            pResourcesJsonData.Add(MakeResourceJsonData(kvp.Value));
+        }
         
         var pJsonWriter = new JsonWriter();
         pJsonWriter.PrettyPrint = true;
@@ -122,15 +122,15 @@ public class SHResourcesLister
             return;
 
         var pDuplicationJsonData = new JsonData();
-        SHUtils.ForToDic(dicDuplications, (pKey, pValue) =>
+        foreach (var kvp in dicDuplications)
         {
             var pFilesJsonData = new JsonData();
-            SHUtils.ForToList(pValue, (strPath) =>
+            foreach (var strPath in kvp.Value)
             {
                 pFilesJsonData.Add(strPath);
-            });
-            pDuplicationJsonData[string.Format("FileName_{0}", pKey)] = pFilesJsonData;
-        });
+            }
+            pDuplicationJsonData[string.Format("FileName_{0}", kvp.Key)] = pFilesJsonData;
+        }
         
         var pJsonWriter = new JsonWriter();
         pJsonWriter.PrettyPrint = true;

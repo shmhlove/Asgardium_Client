@@ -43,10 +43,10 @@ public partial class SHLoader
 
     void AddLoadDatum(List<Dictionary<string, SHLoadData>> pLoadDatum)
     {
-        SHUtils.ForToList<Dictionary<string, SHLoadData>>(pLoadDatum, (dicLoadData) =>
+        foreach (var pData in pLoadDatum)
         {
-            m_pProgress.AddLoadDatum(dicLoadData);
-        });
+            m_pProgress.AddLoadDatum(pData);
+        }
     }
 
     void AddLoadEvent(Action<SHLoadingInfo> pDone, Action<SHLoadingInfo> pProgress)

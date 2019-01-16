@@ -28,24 +28,24 @@
         "s_Name" : "JsonClientConfig",
         "s_FileName" : "JsonClientConfig.json",
         "s_Extension" : ".json",
-        "s_Size"      : "484",
-        "s_Hash"      : "5A62AA4F8EFFD546BD39C8C040D7D38D",
+        "s_Size"      : "464",
+        "s_Hash"      : "DF4F1F0F6F6B6A56C7F831FF0C220BD3",
         "s_Path"      : "Table/Json/JsonClientConfig"
     },
     {
         "s_Name" : "JsonPreLoadResources",
         "s_FileName" : "JsonPreLoadResources.json",
         "s_Extension" : ".json",
-        "s_Size"      : "77",
-        "s_Hash"      : "23B8E9643DF982F35B80C9682DFA7F51",
+        "s_Size"      : "64",
+        "s_Hash"      : "C0A8FFE820748BB0C8DD1027B3FD362C",
         "s_Path"      : "Table/Json/JsonPreLoadResources"
     },
     {
         "s_Name" : "JsonResourcesInfo",
         "s_FileName" : "JsonResourcesInfo.json",
         "s_Extension" : ".json",
-        "s_Size"      : "1685",
-        "s_Hash"      : "EB07FB20EE67725B989EA50885A95D5C",
+        "s_Size"      : "1684",
+        "s_Hash"      : "E83727008076C349EF2C936B74CF4B8C",
         "s_Path"      : "Table/Json/JsonResourcesInfo"
     }
 ]

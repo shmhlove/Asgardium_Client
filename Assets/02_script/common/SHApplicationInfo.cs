@@ -53,24 +53,6 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
     
     void OnApplicationFocus(bool bIsFocus)
     {
-        //static eBOOL m_eIsFocus = eBOOL.None;
-        //// 초기 실행으로 인해 Focus가 true일때는 체크 무시
-        //if (m_eIsFocus == eBOOL.None)
-        //{
-        //    m_eIsFocus = bIsFocus ? eBOOL.True : eBOOL.False;
-        //    return;
-        //}
-
-        //// Focus가 true일때 아래 기능 동작할 수 있도록
-        //if (eBOOL.True != (m_eIsFocus = bIsFocus ? eBOOL.True : eBOOL.False))
-        //    return;
-
-        //// 서비스 상태 체크 후 Run이 아니면 Intro로 보낸다.
-        //CheckServiceState((eResult) =>
-        //{
-        //    if (eServiceState.Run != eResult)
-        //        Single.Scene.Addtive(eSceneType.Intro, true);
-        //});
     }
     
     public void Update()
@@ -233,13 +215,13 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
     {
         var pJsonData = new JsonData();
         
-        SHUtils.ForToDic(m_dicRealLoadInfo, (pKey, pValue) =>
+        foreach (var kvp in m_dicRealLoadInfo)
         {
-            SHUtils.ForToList(pValue, (pInfo) =>
+            foreach (var pValue in kvp.Value)
             {
-                pJsonData[string.Format("Scene : {0}", pKey)].Add(pInfo);
-            });
-        });
+                pJsonData[string.Format("Scene : {0}", kvp.Key)].Add(pValue);
+            }
+        }
         
         var pJsonWriter = new JsonWriter();
         pJsonWriter.PrettyPrint = true;

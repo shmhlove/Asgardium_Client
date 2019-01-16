@@ -39,21 +39,6 @@ public static partial class SHUtils
 
 
     #region 반복문 관련
-    // For Array
-    public static void ForToArray<T>(T[] pArray, Action<T> pCallback)
-    {
-        if (null == pArray)
-            return;
-
-        if (null == pCallback)
-            return;
-
-        int iMaxCount = pArray.Length;
-        for (int iLoop=0; iLoop < iMaxCount; ++iLoop)
-        {
-            pCallback(pArray[iLoop]);
-        }
-    }
     // For Enum
     public static void ForToEnum<T>(Action<T> pCallback)
     {
@@ -61,124 +46,6 @@ public static partial class SHUtils
         while (pEnumerator.MoveNext())
         {
             pCallback((T)pEnumerator.Current);
-        }
-    }
-    // For List
-    public static void ForToList<T>(List<T> pList, Action<T> pCallback)
-    {
-        if (null == pList)
-            return;
-
-        if (null == pCallback)
-            return;
-
-        int iMaxCount = pList.Count;
-        for (int iLoop = 0; iLoop < iMaxCount; ++iLoop)
-        {
-            pCallback(pList[iLoop]);
-        }
-    }
-    public static void ForToList<T>(List<T> pList, Func<T, bool> pCallback)
-    {
-        if (null == pList)
-            return;
-
-        if (null == pCallback)
-            return;
-
-        int iMaxCount = pList.Count;
-        for (int iLoop = 0; iLoop < iMaxCount; ++iLoop)
-        {
-            if (true == pCallback(pList[iLoop]))
-                break;
-        }
-    }
-    // For Dictionary
-    public static void ForToDic<TKey, TValue>(Dictionary<TKey, TValue> pDic, Action<TKey, TValue> pCallback)
-    {
-        if (null == pDic)
-            return;
-
-        if (null == pCallback)
-            return;
-
-        var pEnumerator = pDic.GetEnumerator();
-        while (pEnumerator.MoveNext())
-        {
-            var kvp = pEnumerator.Current;
-            pCallback(kvp.Key, kvp.Value);
-        }
-    }
-    public static void ForToDic<TKey, TValue>(Dictionary<TKey, TValue> pDic, Func<TKey, TValue, bool> pCallback)
-    {
-        if (null == pDic)
-            return;
-
-        if (null == pCallback)
-            return;
-
-        var pEnumerator = pDic.GetEnumerator();
-        while (pEnumerator.MoveNext())
-        {
-            var kvp = pEnumerator.Current;
-            if (true == pCallback(kvp.Key, kvp.Value))
-                break;
-        }
-    }
-    // For One
-    public static void For(int iStartIndex, int iMaxIndex, Action<int> pCallback)
-    {
-        for (int iLoop = iStartIndex; iLoop<iMaxIndex; ++iLoop)
-        {
-            pCallback(iLoop);
-        }
-    }
-    public static void For(int iStartIndex, int iMaxIndex, Func<int, bool> pCallback)
-    {
-        for (int iLoop = iStartIndex; iLoop < iMaxIndex; ++iLoop)
-        {
-            if (true == pCallback(iLoop))
-                break;
-        }
-    }
-    // For Double
-    public static void ForToDouble(int iMaxToFirst, int iMaxToSecond, Action<int, int> pCallback)
-    {
-        for (int iLoop1 = 0; iLoop1 < iMaxToFirst; ++iLoop1)
-        {
-            for (int iLoop2 = 0; iLoop2 < iMaxToSecond; ++iLoop2)
-                pCallback(iLoop1, iLoop2);
-        }
-    }
-    public static void ForToDouble(int iMaxToFirst, int iMaxToSecond, Func<int, int, bool> pCallback)
-    {
-        for (int iLoop1 = 0; iLoop1 < iMaxToFirst; ++iLoop1)
-        {
-            for (int iLoop2 = 0; iLoop2 < iMaxToSecond; ++iLoop2)
-            {
-                if (true == pCallback(iLoop1, iLoop2))
-                    return;
-            }
-        }
-    }
-    // Inverse For Double
-    public static void ForInverseToDouble(int iMaxToFirst, int iMaxToSecond, Action<int, int> pCallback)
-    {
-        for (int iLoop1 = iMaxToFirst; iLoop1 >= 0; --iLoop1)
-        {
-            for (int iLoop2 = iMaxToSecond; iLoop2 >= 0; --iLoop2)
-                pCallback(iLoop1, iLoop2);
-        }
-    }
-    public static void ForInverseToDouble(int iMaxToFirst, int iMaxToSecond, Func<int, int, bool> pCallback)
-    {
-        for (int iLoop1 = iMaxToFirst; iLoop1 >= 0; --iLoop1)
-        {
-            for (int iLoop2 = iMaxToSecond; iLoop2 >= 0; --iLoop2)
-            {
-                if (true == pCallback(iLoop1, iLoop2))
-                    return;
-            }
         }
     }
     #endregion
@@ -190,17 +57,19 @@ public static partial class SHUtils
     {
 #if UNITY_EDITOR
         var pObjects = Resources.FindObjectsOfTypeAll(typeof(GameObject));
-        SHUtils.ForToArray(pObjects, (pObject) =>
+        foreach (var pObject in pObjects)
         {
             if (null == pObject)
                 return;
 
-            SHUtils.ForToArray((pObject as GameObject).GetComponents<Component>(), (pComponent) => 
+            foreach (var pComponent in (pObject as GameObject).GetComponents<Component>())
             {
                 if (null == pComponent)
+                {
                     UnityEngine.Debug.Log(string.Format("<color=red>[LSH] MissingComponent!!(GameObject{0})</color>", pObject.name));
-            });
-        });
+                }
+            }
+        }
 #endif
     }
     // 유니티 에디터의 Pause를 Toggle합니다.
@@ -244,21 +113,21 @@ public static partial class SHUtils
         if (false == pDirInfo.Exists)
             return;
         
-        SHUtils.ForToArray(pDirInfo.GetDirectories(), (pDir) =>
+        foreach (var pDir in pDirInfo.GetDirectories())
         {
             SearchFiles(pDir, pOutFileList, pCallback);
             SearchDirs(pDir, pOutFileList, pCallback);
-        });
+        }
 #endif
     }
     static void SearchFiles(DirectoryInfo pDirInfo, List<FileInfo> pOutFileList, Action<FileInfo> pCallback)
     {
 #if UNITY_EDITOR
-        SHUtils.ForToArray(pDirInfo.GetFiles(), (pFile) =>
+        foreach (var pFile in pDirInfo.GetFiles())
         {
             pCallback(pFile);
             pOutFileList.Add(pFile);
-        });
+        }
 #endif
     }
     public static void CreateDirectory(string strPath)
@@ -279,13 +148,13 @@ public static partial class SHUtils
             return;
 
         FileInfo[] pFiles = pDirInfo.GetFiles("*.*", SearchOption.AllDirectories);
-        SHUtils.ForToArray(pFiles, (pFile) =>
+        foreach (var pFile in pFiles)
         {
             if (false == pFile.Exists)
                 return;
 
             pFile.Attributes = FileAttributes.Normal;
-        });
+        }
 
         Directory.Delete(strPath, true);
     }
@@ -442,11 +311,11 @@ public static partial class SHUtils
     {
         var pCallStack      = new StackTrace();
         var strCallStack    = string.Empty;
-        SHUtils.ForToArray(pCallStack.GetFrames(), (pFrame) =>
+        foreach (var pFrame in pCallStack.GetFrames())
         {
             strCallStack += string.Format("{0}({1}) : {2}\n",
                 pFrame.GetMethod(), pFrame.GetFileLineNumber(), pFrame.GetFileName());
-        });
+        }
 
         return strCallStack;
     }

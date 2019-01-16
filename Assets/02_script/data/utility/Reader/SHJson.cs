@@ -24,7 +24,7 @@ public class SHJson
         strFileName = Path.GetFileNameWithoutExtension(strFileName);
 
         // 1차 : PersistentDataPath에 Json데이터가 있으면 그걸 로드하도록 한다.
-        // 2차 : 없으면 StreamingAssets에서 로드하도록 한다.
+        // 2차 : 없으면 패키지에서 로드하도록 한다.
 
         if (null != (m_pJsonNode = LoadToPersistent(strFileName)))
             return;

@@ -94,25 +94,25 @@ class SHBuildScript
 
     static void UploadAssetBundles(BuildTarget eTarget)
     {
-        var strExportPath = string.Format("{0}/{1}/{2}", SHPath.GetBuild(), SHHard.GetPlatformStringByEnum(eTarget), "AssetBundle");
-        var strUploadRoot = string.Format("{0}/{1}", SHHard.GetPlatformStringByEnum(eTarget), "AssetBundle");
-        var pFileList = SHUtils.Search(strExportPath, (FileInfo pFile) =>
-        {
-            // var strUploadPath = string.Format("{0}/{1}", 
-            //     strUploadRoot, pFile.FullName.Substring(pFile.FullName.IndexOf("AssetBundle") + "AssetBundle".Length + 1)).Replace("\\", "/");
+        // var strExportPath = string.Format("{0}/{1}/{2}", SHPath.GetBuild(), SHHard.GetPlatformStringByEnum(eTarget), "AssetBundle");
+        // var strUploadRoot = string.Format("{0}/{1}", SHHard.GetPlatformStringByEnum(eTarget), "AssetBundle");
+        // var pFileList = SHUtils.Search(strExportPath, (FileInfo pFile) =>
+        // {
+        //     var strUploadPath = string.Format("{0}/{1}", 
+        //         strUploadRoot, pFile.FullName.Substring(pFile.FullName.IndexOf("AssetBundle") + "AssetBundle".Length + 1)).Replace("\\", "/");
             
-            // Single.Firebase.Storage.Upload(pFile.FullName.Replace("\\", "/"), strUploadPath, (pReply) => 
-            // {
-            //     if (pReply.IsSucceed)
-            //     {
-            //         Debug.LogFormat("SUCCEED!! UploadPath : {0}", strUploadPath);
-            //     }
-            //     else
-            //     {
-            //         Debug.LogFormat("FAILED!! UploadPath : {0}", strUploadPath);
-            //     }
-            // });
-        });
+        //     Single.Firebase.Storage.Upload(pFile.FullName.Replace("\\", "/"), strUploadPath, (pReply) => 
+        //     {
+        //         if (pReply.IsSucceed)
+        //         {
+        //             Debug.LogFormat("SUCCEED!! UploadPath : {0}", strUploadPath);
+        //         }
+        //         else
+        //         {
+        //             Debug.LogFormat("FAILED!! UploadPath : {0}", strUploadPath);
+        //         }
+        //     });
+        // });
         
         // Single.Firebase.Storage.Upload(pFileList, strUploadRoot, (pReply) => 
         // {

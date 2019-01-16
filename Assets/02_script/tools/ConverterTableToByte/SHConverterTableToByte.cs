@@ -22,28 +22,34 @@ public class SHConverterTableToByte
         if (null == pTableData)
             return;
 
-        SHUtils.ForToDic(pTableData.Tables, (pKey, pValue) =>
+        int iSucceedCnt = 0;
+        foreach (var kvp in pTableData.Tables)
         {
-            ConverterByteFile(pValue, strSavePath);
-        });
+            if (ConverterByteFile(kvp.Value, strSavePath))
+            {
+                ++iSucceedCnt;
+            }
+        }
 
-        Debug.Log("<color=yellow>[LSH] Converter Table To Byte Finish!!!</color>");
+        Debug.LogFormat("<color=yellow>[LSH] Converter Table To Byte Finish!!!(SucceedCnt : {0})</color>", iSucceedCnt);
     }
 
     // 인터페이스 : 바이트파일 컨버터 ( 파일 하나 )
-    public void ConverterByteFile(SHBaseTable pTable, string strSavePath)
+    public bool ConverterByteFile(SHBaseTable pTable, string strSavePath)
     {
         if (null == pTable)
-            return;
+            return false;
 
         byte[] pBytes = pTable.GetBytesTable();
         if (null == pBytes)
-            return;
+            return false;
         
         SHUtils.SaveByte(pBytes, string.Format("{0}/{1}{2}", strSavePath, pTable.m_strByteFileName, ".bytes"));
 
         Debug.Log(string.Format("[LSH] {0} To Converter Byte Files : {1}",
                     (true == pTable.IsLoadTable() ? "<color=yellow>Success</color>" : "<color=red>Fail!!</color>"),
                     pTable.m_strFileName));
+
+        return true;
     }
 }

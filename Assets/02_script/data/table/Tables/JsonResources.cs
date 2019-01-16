@@ -65,17 +65,15 @@ public class JsonResources : SHBaseTable
     
     public void LoadImmediately()
     {
-        // var pTextAsset = Resources.Load<TextAsset>(string.Format("Table/Json/{0}", m_strFileName));
-        // if (null == pTextAsset)
-        // {
-        //     Debug.LogError("[LSH] Error!! not exist JsonResourcesInfo.json, Please Run > SHTool > Update Resources Info");
-        // }
-        // else
-        // {
-        //     var pJson = new SHJson();
-        //     pJson.SetJsonData(JsonMapper.ToJson(pTextAsset.text));
-        //     LoadJsonTable(pJson.Node, m_strFileName);
-        // }
+        var pTextAsset = Resources.Load<TextAsset>(string.Format("Table/Json/{0}", m_strFileName));
+        if (null == pTextAsset)
+        {
+            Debug.LogError("[LSH] Error!! not exist JsonResourcesInfo.json, Please Run > SHTool > Update Resources Info");
+        }
+        else
+        {
+            LoadJsonTable(JsonMapper.ToJson(pTextAsset.text), m_strFileName);
+        }
     }
 
     public SHResourcesInfo GetResouceInfo(string strName)

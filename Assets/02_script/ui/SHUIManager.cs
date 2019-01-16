@@ -49,4 +49,6 @@ public class SHUIManager : SHSingleton<SHUIManager>
 
         return default(T);
     }
+
+    // 씬이 변경될때 한번 털어줘야한다.
 }

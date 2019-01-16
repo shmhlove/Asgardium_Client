@@ -287,14 +287,6 @@ public static partial class SHUtils
 
 
     #region 기타
-    // Action 함수를 예외처리 후 콜해준다.
-    public static void SafeActionCall(Action pAction)
-    {
-        if (null == pAction)
-            return;
-
-        pAction();
-    }
     // WWW.error 메시지로 에러코드 얻기
     public static int GetWWWErrorCode(string strErrorMsg)
     {

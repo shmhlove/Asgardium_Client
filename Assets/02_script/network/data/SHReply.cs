@@ -16,6 +16,20 @@ public class SHReply
     public JsonData data;
     public SHError error;
 
+    public SHReply(JsonData data)
+    {
+        this.isSucceed = true;
+        this.data = data;
+        this.error = null;
+    }
+
+    public SHReply(SHError error)
+    {
+        this.isSucceed = false;
+        this.data = null;
+        this.error = error;
+    }
+
     public SHReply(UnityWebRequest request)
     {
         this.isSucceed = !request.isError;
@@ -86,12 +100,5 @@ public class SHReply
         }
         
         request.Dispose();
-    }
-
-    public SHReply(SHError error)
-    {
-        this.isSucceed = false;
-        this.data = null;
-        this.error = error;
     }
 }

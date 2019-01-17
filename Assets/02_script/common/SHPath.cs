@@ -6,6 +6,7 @@ using UnityEditor;
 using System;
 using System.Net;
 using System.Collections;
+using System.Collections.Generic;
 
 public static partial class SHPath
 {
@@ -117,9 +118,9 @@ public static partial class SHPath
     public static string GetPathToPersistentData()
     {
 // #if UNITY_EDITOR
-//         return string.Format("{0}/{1}", Application.persistentDataPath, SHHard.GetStrToPlatform(UnityEditor.EditorUserBuildSettings.activeBuildTarget));
+//         return string.Format("{0}/{1}", Application.persistentDataPath, SHHard.GetPlatformStringByEnum(UnityEditor.EditorUserBuildSettings.activeBuildTarget));
 // #else
-        return string.Format("{0}/{1}", Application.persistentDataPath, SHHard.GetStrToPlatform(Single.AppInfo.GetRuntimePlatform()));
+        return string.Format("{0}/{1}", Application.persistentDataPath, SHHard.GetPlatformStringByEnum(Single.AppInfo.GetRuntimePlatform()));
 //#endif
     }
 }

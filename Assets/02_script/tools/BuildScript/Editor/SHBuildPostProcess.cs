@@ -2,6 +2,7 @@
 using UnityEditor.Callbacks;
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 class SHBuildPostProcess

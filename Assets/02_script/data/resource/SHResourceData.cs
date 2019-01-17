@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using Object = UnityEngine.Object;
+using UObject = UnityEngine.Object;
 
 using System;
 using System.IO;
@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 public partial class SHResourceData : SHBaseData
 {
-    private Dictionary<string, Object> m_dicResources = new Dictionary<string, Object>();
+    private Dictionary<string, UObject> m_dicResources = new Dictionary<string, UObject>();
     
     public override void OnInitialize()
     {
@@ -65,10 +65,10 @@ public partial class SHResourceData : SHBaseData
         //    else
         //        pDone(pInfo.m_strName, new SHLoadEndInfo(eErrorCode.Succeed));
 
-        //}, LoadAsync<Object>(pResourceInfo));
+        //}, LoadAsync<UObject>(pResourceInfo));
 
         // Sync Load
-        var pObject = LoadSync<Object>(pResourceInfo);
+        var pObject = LoadSync<UObject>(pResourceInfo);
         if (null == pObject)
             pDone(pInfo.m_strName, new SHLoadEndInfo(eErrorCode.Resources_LoadFailed));
         else
@@ -77,12 +77,12 @@ public partial class SHResourceData : SHBaseData
         yield return null;
     }
     
-    public Object GetResources(string strFileName)
+    public UObject GetResources(string strFileName)
     {
-        return GetResources<Object>(strFileName);
+        return GetResources<UObject>(strFileName);
     }
 
-    public T GetResources<T>(string strFileName) where T : Object
+    public T GetResources<T>(string strFileName) where T : UObject
     {
         if (true == string.IsNullOrEmpty(strFileName))
             return null;
@@ -184,7 +184,7 @@ public partial class SHResourceData : SHBaseData
         return pObject.GetComponent<T>();
     }
     
-    public T Instantiate<T>(T pPrefab) where T : Object
+    public T Instantiate<T>(T pPrefab) where T : UObject
     {
         if (true == Single.AppInfo.m_bIsAppQuit)
             return null;
@@ -199,7 +199,7 @@ public partial class SHResourceData : SHBaseData
         DateTime pStartTime = DateTime.Now;
 #endif
 
-        T pGameObject    = Object.Instantiate<T>(pPrefab);
+        T pGameObject    = UObject.Instantiate<T>(pPrefab);
         var strName      = pGameObject.name;
         pGameObject.name = strName.Substring(0, strName.IndexOf("(Clone)"));
         
@@ -239,7 +239,7 @@ public partial class SHResourceData : SHBaseData
         DateTime pStartTime = DateTime.Now;
 #endif
 
-        Object pObject = null;
+        UObject pObject = null;
         //var pBundleData = Single.AssetBundle.GetBundleData(Single.Table.GetBundleInfoToResourceName(pTable.m_strName));
         //if (null != pBundleData)
         //{
@@ -270,7 +270,7 @@ public partial class SHResourceData : SHBaseData
     }
 
     // 유틸 : 싱크로 리소스 로드하기
-    T LoadSync<T>(SHResourcesInfo pTable) where T : Object
+    T LoadSync<T>(SHResourcesInfo pTable) where T : UObject
     {
         if (null == pTable)
             return null;

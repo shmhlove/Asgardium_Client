@@ -5,7 +5,6 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 
-
 public class SHUIManager : SHSingleton<SHUIManager>
 {
     Dictionary<Type, SHUIRoot> dicRoots = new Dictionary<Type, SHUIRoot>();
@@ -13,6 +12,7 @@ public class SHUIManager : SHSingleton<SHUIManager>
     public override void OnInitialize()
     {
         SetDontDestroy();
+        Single.Scene.AddEventForLoadedScene(OnEventLoadedScene);
     }
 
     public bool AddRoot(Type type, SHUIRoot root)
@@ -50,5 +50,8 @@ public class SHUIManager : SHSingleton<SHUIManager>
         return default(T);
     }
 
-    // 씬이 변경될때 한번 털어줘야한다.
+    void OnEventLoadedScene(eSceneType eType)
+    {
+        // 씬이 변경될때 한번 털어줘야한다.
+    }
 }

@@ -34,6 +34,7 @@ public enum eSceneType
 {
     None,
     Intro,
+    Login,
 }
 
 public enum eNationType

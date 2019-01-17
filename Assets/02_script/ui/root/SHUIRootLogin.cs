@@ -4,11 +4,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public class SHUIRootAuth : SHUIRoot
+public class SHUIRootLogin : SHUIRoot
 {
     void Awake()
     {
-        Single.UI.AddRoot(typeof(SHUIRootAuth), this);
+        Single.UI.AddRoot(typeof(SHUIRootLogin), this);
     }
 
     public void ShowLoginPanel(Action<string, string> pLoginAction, Action<string, string> pSigninAction, Action pCloseAction)

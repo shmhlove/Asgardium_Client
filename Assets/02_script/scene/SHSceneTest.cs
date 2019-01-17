@@ -15,11 +15,9 @@ public class SHSceneTest : MonoBehaviour
         {
             if (reply.isSucceed)
             {
-
             }
             else
             {
-
             }
         });
 
@@ -30,11 +28,9 @@ public class SHSceneTest : MonoBehaviour
         {
             if (reply.isSucceed)
             {
-
             }
             else
             {
-
             }
         });
 
@@ -44,11 +40,9 @@ public class SHSceneTest : MonoBehaviour
         {
             if (reply.isSucceed)
             {
-
             }
             else
             {
-
             }
         });
     }

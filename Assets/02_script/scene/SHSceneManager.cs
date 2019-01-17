@@ -6,17 +6,24 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 
+using LitJson;
+
 public class SHSceneManager : SHSingleton<SHSceneManager>
 {
+    private List<eSceneType> loadHistory = new List<eSceneType>();
+    private List<Action<eSceneType>> loadSceneEvents = new List<Action<eSceneType>>();
+    
     public override void OnInitialize()
     {
         SetDontDestroy();
     }
 
-    public void Addtive(eSceneType eType, bool bIsUseFade = false, Action<SHReply> pCallback = null)
+    public void LoadScene(eSceneType eType, LoadSceneMode eMode, bool bIsUseFade = false, Action<SHReply> pCallback = null)
     {
         if (null == pCallback)
+        {
             pCallback = (SHReply pReply) => { };
+        }
 
         if (true == IsLoadedScene(eType))
         {
@@ -28,45 +35,16 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
         {
             Single.Coroutine.CachingWait(()=> 
             {
-            //     Single.Firebase.Storage.DownloadForBundle(eType, (pReply) =>
-            //     {
-            //         if (false == pReply.IsSucceed)
-            //         {
-            //             pCallback(new SHReply(pReply.Error));
-            //             return;
-            //         }
+                LoadProcess(SceneManager.LoadSceneAsync(eType.ToString(), eMode), (pAsyncOperation) =>
+                {
+                    if (true == bIsUseFade)
+                        PlayFadeOut(() => pCallback(new SHReply(JsonMapper.ToObject("{}"))));
+                    else
+                        pCallback(new SHReply(JsonMapper.ToObject("{}")));
 
-            //         var pAsReply  = pReply.GetAs<Firebase.Storage.SHReplyDownloadForBundle>();
-            //         var strScenes = pAsReply.m_pWWW.assetBundle.GetAllScenePaths();
-            //         var strLoadScenePath = string.Empty;
-            //         foreach (string strScene in strScenes)
-            //         {
-            //             if (true == strScene.Contains(eType.ToString()))
-            //             {
-            //                 strLoadScenePath = strScene;
-            //                 break;
-            //             }
-            //         }
-                    
-            //         if (true == string.IsNullOrEmpty(strLoadScenePath))
-            //         {
-            //             Debug.LogErrorFormat("[LSH] Scene bundle Not matching of name");
-            //             pCallback(new SHReply(new SHError(eErrorCode.Failed, "Scene bundle Not matching of name")));
-            //             return;
-            //         }
-                    
-            //         LoadProcess(SceneManager.LoadSceneAsync(strLoadScenePath, LoadSceneMode.Additive), (pAsyncOperation) =>
-            //         {
-            //             pAsReply.m_pWWW.assetBundle.Unload(false);
-            //             pCallback(new SHReply(new SHError(eErrorCode.Failed, "Scene bundle Not matching of name")));
-            //             if (true == bIsUseFade)
-            //                 PlayFadeOut(() => pCallback(new SHReply()));
-            //             else
-            //                 pCallback(new SHReply());
-                    
-            //             CallEventOfAddtiveScene(eType);
-            //         });
-            //     });
+                    loadHistory.Add(eType);
+                    SendLoadEvent(eType);
+                });
             });
         };
 
@@ -76,7 +54,7 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
             LoadScene();
     }
     
-    public void Remove(eSceneType eType)
+    public void UnloadScene(eSceneType eType)
     {
         if (false == IsLoadedScene(eType))
             return;
@@ -84,6 +62,25 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
         SceneManager.UnloadSceneAsync(eType.ToString());
     }
     
+    public void AddEventForLoadedScene(Action<eSceneType> callback)
+    {
+        if (null == callback)
+            return;
+
+        if (true == loadSceneEvents.Contains(callback))
+            return;
+
+        loadSceneEvents.Add(callback);
+    }
+
+    public void DelEventForLoadedScene(Action<eSceneType> callback)
+    {
+        if (false == loadSceneEvents.Contains(callback))
+            return;
+
+        loadSceneEvents.Remove(callback);
+    }
+
     public bool IsLoadedScene(eSceneType eType)
     {
         return SceneManager.GetSceneByName(eType.ToString()).isLoaded;
@@ -94,12 +91,20 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
         return SHHard.GetSceneTypeByString(SceneManager.GetActiveScene().name);
     }
     
-    void LoadProcess(AsyncOperation pAsyncInfo, Action<AsyncOperation> pDone)
+    private void LoadProcess(AsyncOperation pAsyncInfo, Action<AsyncOperation> pDone)
     {
         Single.Coroutine.Async(() => pDone(pAsyncInfo), pAsyncInfo);
     }
     
-    void PlayFadeIn(Action pCallback)
+    private void SendLoadEvent(eSceneType eLoadScene)
+    {
+        foreach (var callback in loadSceneEvents)
+        {
+            callback(eLoadScene);
+        }
+    }
+
+    private void PlayFadeIn(Action pCallback)
     {
         // var uiRoot = Single.UI.GetRoot<SHUIRootGlobal>();
         // if (false == uiRoot.ShowFade("Panel_FadeIn", pCallback))
@@ -111,7 +116,7 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
         //SHCoroutine.Instance.NextUpdate(() => uiRoot.ShowFade("Panel_FadeOut"));
     }
     
-    void PlayFadeOut(Action pCallback)
+    private void PlayFadeOut(Action pCallback)
     {
         // var uiRoot = Single.UI.GetRoot<SHUIRootGlobal>();
         //if (false == uiRoot.ShowFade("Panel_FadeOut", pCallback))

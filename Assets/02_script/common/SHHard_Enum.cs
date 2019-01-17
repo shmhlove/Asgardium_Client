@@ -3,7 +3,9 @@
 using UnityEditor;
 #endif
 
+using System;
 using System.Collections;
+using System.Collections.Generic;
 
 public static partial class SHHard
 {
@@ -12,22 +14,9 @@ public static partial class SHHard
         switch(strType.ToLower())
         {
             case "intro":         return eSceneType.Intro;
+            case "login":         return eSceneType.Login;
         }                        
         return eSceneType.None;
-    }
-
-    public static string GetResourceTypeByEnum(eResourceType eType)
-    {
-        switch(eType)
-        {
-            case eResourceType.Prefab:    return eResourceType.Prefab.ToString();
-            case eResourceType.Animation: return eResourceType.Animation.ToString();
-            case eResourceType.Texture:   return eResourceType.Texture.ToString();
-            case eResourceType.Sound:     return eResourceType.Sound.ToString();
-            case eResourceType.Material:  return eResourceType.Material.ToString();
-            case eResourceType.Text:      return eResourceType.Text.ToString();
-        }
-        return string.Empty;
     }
 
     public static eResourceType GetResourceTypeByExtension(string strExtension)
@@ -61,7 +50,7 @@ public static partial class SHHard
             default:                           return "PC";
         }
     }
-
+    
 #if UNITY_EDITOR
     public static string GetPlatformStringByEnum(BuildTarget eType)
     {
@@ -73,24 +62,4 @@ public static partial class SHHard
         }
     }
 #endif
-    
-    public static string GetNationByEnum(eNationType eMode)
-    {
-        switch (eMode)
-        {
-            case eNationType.Korea: return "KOR";
-        }
-
-        return "KOR";
-    }
-
-    public static string GetStrToPlatform(RuntimePlatform eType)
-    {
-        switch(eType)
-        {
-            case RuntimePlatform.Android:        return "AOS";
-            case RuntimePlatform.IPhonePlayer:   return "IOS";
-            default:                             return "PC";
-        }
-    }
 }

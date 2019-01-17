@@ -9,10 +9,10 @@ public class SHCoroutine : SHSingleton<SHCoroutine>
     public override void OnInitialize()
     {
         SetDontDestroy();
-        // Single.Scene.AddEventOfAddtiveScene(OnEventOfChageScene);
+        Single.Scene.AddEventForLoadedScene(OnEventLoadedScene);
     }
 
-    public void OnEventOfChageScene(object pSender, EventArgs vArgs)
+    public void OnEventLoadedScene(eSceneType eType)
     {
         StopAllCoroutines();
     }

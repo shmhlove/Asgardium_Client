@@ -1,16 +1,18 @@
-﻿using System.Collections;
+﻿using UnityEngine;
+
+using System;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 using LitJson;
 
-public class SHSceneAuth : MonoBehaviour
+public class SHSceneLogin : MonoBehaviour
 {
-    private SHUIRootAuth uiRoot = null;
+    private SHUIRootLogin uiRoot = null;
 
     void Start()
     {
-        uiRoot = Single.UI.GetRoot<SHUIRootAuth>();
+        uiRoot = Single.UI.GetRoot<SHUIRootLogin>();
         uiRoot.ShowLoginPanel(
             (strId, strPass) => 
             {

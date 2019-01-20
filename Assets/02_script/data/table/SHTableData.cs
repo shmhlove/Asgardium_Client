@@ -17,7 +17,6 @@ public partial class SHTableData : SHBaseData
         m_dicTables.Add(typeof(JsonClientConfig),     new JsonClientConfig());
         m_dicTables.Add(typeof(JsonPreloadResources), new JsonPreloadResources());
         m_dicTables.Add(typeof(JsonResources),        new JsonResources());
-        //m_dicTables.Add(typeof(JsonAssetBundleInfo),  new JsonAssetBundleInfo());
     }
 
     public override void OnFinalize()

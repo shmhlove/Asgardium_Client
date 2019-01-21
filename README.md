@@ -167,7 +167,7 @@ expressApp.use(errorHandler);
 # VS Code 단축키
 ### 기본 편집
 키|설명|명령ID
------------
+------|------|-------
 f3|다음 찾기|editor.action.nextMatchFindAction
 shift+f3|이전 찾기|editor.action.previousMatchFindAction
 alt+Enter|모든 일치 항목을 선택|editor.action.selectAllMatches
@@ -176,13 +176,13 @@ shift+alt+a|커서위치에 주석 토글|editor.action.blockComment
 
 ### 언어 편집
 키|설명|명령ID
------------
+------|------|-------
 f12|정의로 이동|editor.action.goToDeclaration
 shift+f12|참조 표시|editor.action.referenceSearch.trigger
 
 ### 네비게이션
 키|설명|명령ID
------------
+------|------|-------
 ctrl+p|빠른 열기, 파일로 이동|workbench.action.quickOpen
 ctrl+shift+m|오류 보기|workbench.actions.view.problems
 alt+왼쪽|뒤로 이동|workbench.action.navigateBack

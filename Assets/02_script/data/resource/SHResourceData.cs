@@ -186,9 +186,6 @@ public partial class SHResourceData : SHBaseData
     
     public T Instantiate<T>(T pPrefab) where T : UObject
     {
-        if (true == Single.AppInfo.m_bIsAppQuit)
-            return null;
-
         if (null == pPrefab)
         {
             Debug.LogErrorFormat("[LSH] 오브젝트 복사중 Null 프리팹이 전달되었습니다!!(Type : {0})", typeof(T));

@@ -35,14 +35,14 @@ public class SHCoroutine : SHSingleton<SHCoroutine>
 
     // yield return new WaitForFixedUpdate() : 다음 FixedUpdate까지 대기
     //-----------------------------------------------
-    public void NextFixed(Action pAction)
+    public void NextFixedUpdate(Action pAction)
     {
         if (null == pAction)
             return;
 
-        StartCoroutine(InvokeToNextFixed(pAction));
+        StartCoroutine(InvokeToNextFixedUpdate(pAction));
     }
-    IEnumerator InvokeToNextFixed(Action pAction)
+    IEnumerator InvokeToNextFixedUpdate(Action pAction)
     {
         yield return new WaitForFixedUpdate();
         pAction.Invoke();
@@ -51,14 +51,14 @@ public class SHCoroutine : SHSingleton<SHCoroutine>
 
     // yield return new WaitForEndOfFrame() : 렌더링 작업이 끝날 때 까지 대기
     //-----------------------------------------------
-    public void NextFrame(Action pAction)
+    public void EndOfFrame(Action pAction)
     {
         if (null == pAction)
             return;
 
-        StartCoroutine(InvokeToNextFrame(pAction));
+        StartCoroutine(InvokeToEndOfFrame(pAction));
     }
-    IEnumerator InvokeToNextFrame(Action pAction)
+    IEnumerator InvokeToEndOfFrame(Action pAction)
     {
         yield return new WaitForEndOfFrame();
         pAction.Invoke();
@@ -105,6 +105,9 @@ public class SHCoroutine : SHSingleton<SHCoroutine>
         while (false == pWWW.isDone);
         return pWWW;
     }
+
+    //(false == Caching.ready) : 캐싱이 완료될때 까지 대기
+    //-----------------------------------------------
     public void CachingWait(Action pAction)
     {
         StartCoroutine(InvokeToCachingWait(pAction));
@@ -133,46 +136,5 @@ public class SHCoroutine : SHSingleton<SHCoroutine>
 
         if (null != pAction)
             pAction.Invoke();
-    }
-    
-
-    //yield return StartCoroutine(IEnumerator) : 다른 코루틴이 끝날 때 까지 대기
-    //-----------------------------------------------
-    public void Routine(Action pAction, IEnumerator pRoutine)
-    {
-        if (null == pAction)
-            return;
-
-        StartCoroutine(InvokeToRoutine(pAction, pRoutine));
-    }
-    IEnumerator InvokeToRoutine(Action pAction, IEnumerator pRoutine)
-    {
-        yield return StartCoroutine(pRoutine);
-        pAction.Invoke();
-    }
-    
-    // StartCoroutine(pRoutine) : 코루틴 함수를 실행시켜준다.
-    // Stop 기능이 필요해서 Routine을 저장해두고 Stop처리할 수 있도록
-    //-----------------------------------------------
-    Dictionary<string, IEnumerator> m_pRoutines = new Dictionary<string, IEnumerator>();
-    public void Routine(string strKey, IEnumerator pRoutine)
-    {
-        if (true == IsRunRoutine(strKey))
-            return;
-
-        StartCoroutine(pRoutine);
-        m_pRoutines.Add(strKey, pRoutine);
-    }
-    public void StopRoutine(string strKey)
-    {
-        if (false == IsRunRoutine(strKey))
-            return;
-        
-        StopCoroutine(m_pRoutines[strKey]);
-        m_pRoutines.Remove(strKey);
-    }
-    public bool IsRunRoutine(string strKey)
-    {
-        return m_pRoutines.ContainsKey(strKey);
     }
 }

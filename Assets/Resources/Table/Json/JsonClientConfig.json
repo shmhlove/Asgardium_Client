@@ -14,7 +14,6 @@
 	
 		"FB_StorageBaseURL": "gs://kings-adventure-22251209.appspot.com/",
 
-        "VSyncCount": false,
         "FrameRate": 60,
         "CacheSize": 200
     }

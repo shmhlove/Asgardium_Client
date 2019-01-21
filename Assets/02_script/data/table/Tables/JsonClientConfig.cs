@@ -22,7 +22,6 @@ public class JsonClientConfig : SHBaseTable
 
     public string FB_StorageBaseURL = string.Empty;
 
-    public bool   VSyncCount       = false;
     public int    FrameRate        = 60;
     public int    CacheSize        = 200;
 
@@ -56,7 +55,6 @@ public class JsonClientConfig : SHBaseTable
 
         FB_StorageBaseURL = GetStrToJson(pDataNode, "FB_StorageBaseURL");
 
-        VSyncCount = GetBoolToJson(pDataNode, "VSyncCount");
         FrameRate = GetIntToJson(pDataNode, "FrameRate");
         CacheSize = GetIntToJson(pDataNode, "CacheSize");
         
@@ -82,7 +80,6 @@ public class JsonClientConfig : SHBaseTable
 
     //    pClientConfigJsonData["IOS_TeamID"] = IOS_TeamID;
 
-    //    pClientConfigJsonData["VSyncCount"] = VSyncCount;
     //    pClientConfigJsonData["FrameRate"] = FrameRate;
     //    pClientConfigJsonData["CacheSize"] = CacheSize;
     

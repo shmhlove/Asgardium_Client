@@ -164,6 +164,30 @@ expressApp.use(expressErrorHandler.httpError(404));
 expressApp.use(errorHandler);
 ```
 --------------------------------------------------------------------------------------------------------------------
+# VS Code 단축키
+### 기본 편집
+키|설명|명령ID
+-----------
+f3|다음 찾기|editor.action.nextMatchFindAction
+shift+f3|이전 찾기|editor.action.previousMatchFindAction
+alt+Enter|모든 일치 항목을 선택|editor.action.selectAllMatches
+ctrl+/|주석 토글|editor.action.commentLine
+shift+alt+a|커서위치에 주석 토글|editor.action.blockComment
+
+### 언어 편집
+키|설명|명령ID
+-----------
+f12|정의로 이동|editor.action.goToDeclaration
+shift+f12|참조 표시|editor.action.referenceSearch.trigger
+
+### 네비게이션
+키|설명|명령ID
+-----------
+ctrl+p|빠른 열기, 파일로 이동|workbench.action.quickOpen
+ctrl+shift+m|오류 보기|workbench.actions.view.problems
+alt+왼쪽|뒤로 이동|workbench.action.navigateBack
+alt+오른쪽|앞으로 이동|workbench.action.navigateForward
+--------------------------------------------------------------------------------------------------------------------
 # 할일
 2017-
 X 라우터로 API를 추가할 수 있는 구조를 만들자.
@@ -171,20 +195,29 @@ X DB 구조를 만들자.
 X 검증용 클라이언트 구현
 
 2018-
+X 레파지토리 분리해야겠다.
 - 동적로드가 필요해지니 클라이언트 프레임워크 구성이 필요해졌다.
 	- 다 들고와서 하나하나 다듬자.
-	- 최대한 종속 없애고, util클래스 사용을 자재하자.
-	- json데이터는 무조건 패키지에서 얻는다. static한 테이블을 서버에 저장해두고 다운로드 받아야한다면 그때가서 생각하자.
-
-	-  SHJson이 문제이다..
-		Resource리스트를 Json으로 관리하다보니 Resources에 있는 Json을 로드하려고 하는데 Resources데이터를 로드하려면 다시 Resource Json이 필요해진다.
-		1. 이 아이는 별도 로드 처리할까? -> 별도처리 되고 있네.. 
-		3. Resource 리스트를 코드화 시킬까? -> 이거 좋은데??
-
-	- 클라 : 리소스매니져
-	- 클라 : 데이터컨버터 툴, 리소스 리스팅 툴, 빌드 스크립트
-	- 클라 : 씬매니져
-	- 클라 : 위의 것들을 도와줄 유틸클래스들,, 경로관리, 코루틴관리, 해시관리, 시리얼라이즈, 기타등등
+		X 유틸리티::AppInfo
+		X 유틸리티::코루틴
+		X 유틸리티::오브젝트풀
+		X 유틸리티::유틸
+		X 글로벌::경로관리
+		X 글로벌::Enum
+		X 글로벌::Hard
+		- 씬 매니져
+		- UI 매니져
+		- 네트워크 매니져
+		- 사운드 매니져
+		- 데이터::리소스
+		- 데이터::테이블
+		- 데이터::로더
+		- 데이터::리더
+			@ SHJson을 StrimingAsstets로드는 옵션으로만 두고, 패키지에서 로드하는걸 베이스로 하자.
+		- 툴::데이터컨버터
+		- 툴::리소스리스팅
+		- 툴::빌드스크립트
+			번들빌드는 추후에 필요할때 작업하자.
 
 - 간단한 인증 프로세스를 만들자.
 	X 서버 : 회원가입 및 로그인 처리
@@ -212,7 +245,4 @@ X 검증용 클라이언트 구현
 	- 주기적으로 데이터 Send
 
 - 피들러 필요하다.
-    
-- 레파지토리 분리해야겠다.
-
 - 외부인증 추가(google, facebook, twitter, naver, kakao, etc...)

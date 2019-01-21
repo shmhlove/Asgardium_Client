@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 
 using LitJson;
 
-using DicRealLoadInfo = System.Collections.Generic.Dictionary<eSceneType, System.Collections.Generic.List<string>>;
+using DicResourceLoadInfo = System.Collections.Generic.Dictionary<eSceneType, System.Collections.Generic.List<string>>;
 
 public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
 {
@@ -22,12 +22,9 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
     [ReadOnlyField]
     [SerializeField] private float              m_fDeltaTime        = 0.0f;
 
-    // 기타(디버그) : 로드 시도된 리소스 리스트
-    [HideInInspector] private DicRealLoadInfo   m_dicRealLoadInfo   = new DicRealLoadInfo();
+    // 기타(디버그) : 실시간 로드 리소스 리스트
+    [HideInInspector] private DicResourceLoadInfo m_pDicResourceLoadInfo   = new DicResourceLoadInfo();
 
-    // 기타 : 앱 종료 여부
-    [HideInInspector] public bool               m_bIsAppQuit        = false;
-    
     public override void OnInitialize()
     {
         SetDontDestroy();
@@ -44,7 +41,6 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
     
     void OnApplicationQuit()
     {
-        m_bIsAppQuit = true;
     }
     
     void OnApplicationPause(bool bIsPause)
@@ -73,7 +69,6 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
     void SetApplicationInfo()
     {
         var pClientConfig = Single.Table.GetTable<JsonClientConfig>();
-        SetVSync((pClientConfig.VSyncCount) ? 1 : 0);
         SetFrameRate(pClientConfig.FrameRate);
         SetCacheInfo(pClientConfig.CacheSize, 30);
         SetSleepMode();
@@ -108,7 +103,7 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
     
     public int GetProcessID()
     {
-        return System.Diagnostics.Process.GetCurrentProcess().Id;
+        return Process.GetCurrentProcess().Id;
     }
     
     public int GetDebugPort()
@@ -124,11 +119,6 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
         m_pDebugText.text = strLog;
     }
     
-    void SetVSync(int iCount)
-    {
-        QualitySettings.vSyncCount = iCount;
-    }
-    
     void SetFrameRate(int iFrame)
     {
         Application.targetFrameRate = iFrame;
@@ -142,10 +132,10 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
     void SetOrientation()
     {
         Screen.orientation = ScreenOrientation.AutoRotation;
-        Screen.autorotateToPortrait = false;
-        Screen.autorotateToPortraitUpsideDown = false;
-        Screen.autorotateToLandscapeRight = true;
-        Screen.autorotateToLandscapeLeft = true;
+        Screen.autorotateToPortrait = true;
+        Screen.autorotateToPortraitUpsideDown = true;
+        Screen.autorotateToLandscapeRight = false;
+        Screen.autorotateToLandscapeLeft = false;
     }
     
     void SetCacheInfo(long lSizeMB, int iExpirationMonth)
@@ -201,12 +191,12 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
     #region 디버그 정보 처리
     public int GetRatioW(int iValue)
     {
-        return (int)(iValue * (Screen.width / 1280.0f));
+        return (int)(iValue * (Screen.width / 720.0f));
     }
 
     public int GetRatioH(int iValue)
     {
-        return (int)(iValue * (Screen.height / 720.0f));
+        return (int)(iValue * (Screen.height / 1280.0f));
     }
 
     // 디버그 : 실시간 로드 리소스 리스트 파일로 출력
@@ -215,7 +205,7 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
     {
         var pJsonData = new JsonData();
         
-        foreach (var kvp in m_dicRealLoadInfo)
+        foreach (var kvp in m_pDicResourceLoadInfo)
         {
             foreach (var pValue in kvp.Value)
             {
@@ -227,15 +217,15 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
         pJsonWriter.PrettyPrint = true;
         JsonMapper.ToJson(pJsonData, pJsonWriter);
 
-        string strSavePath = string.Format("{0}/{1}.json", SHPath.GetAssets(), "RealTimeLoadResource");
+        string strSavePath = string.Format("{0}/{1}.json", SHPath.GetAssets(), "RealTimeResourceLoadInfo");
         SHUtils.SaveFile(pJsonWriter.ToString(), strSavePath);
 
-        System.Diagnostics.Process.Start(strSavePath);
+        Process.Start(strSavePath);
     }
     [FuncButton]
     public void ClearLoadResourceList()
     {
-        m_dicRealLoadInfo.Clear();
+        m_pDicResourceLoadInfo.Clear();
     }
     
     // 디버그 : 앱 정보 출력
@@ -262,13 +252,13 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
     // 디버그 : 실시간 로드 리소스 리스트
     public void SetLoadResource(string strInfo)
     {
-        if (false == m_dicRealLoadInfo.ContainsKey(Single.Scene.GetActiveScene()))
-            m_dicRealLoadInfo.Add(Single.Scene.GetActiveScene(), new List<string>());
+        if (false == m_pDicResourceLoadInfo.ContainsKey(Single.Scene.GetActiveScene()))
+            m_pDicResourceLoadInfo.Add(Single.Scene.GetActiveScene(), new List<string>());
 
         //// 콜스택 남기기
         //strInfo += string.Format("\n< CallStack >\n{0}", SHUtils.GetCallStack());
 
-        m_dicRealLoadInfo[Single.Scene.GetActiveScene()].Add(strInfo);
+        m_pDicResourceLoadInfo[Single.Scene.GetActiveScene()].Add(strInfo);
     }
 
     [FuncButton]

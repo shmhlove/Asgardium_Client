@@ -88,7 +88,7 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
     
     public eSceneType GetActiveScene()
     {
-        return SHHard.GetSceneTypeByString(SceneManager.GetActiveScene().name);
+        return SHUtils.GetSceneTypeByString(SceneManager.GetActiveScene().name);
     }
     
     private void LoadProcess(AsyncOperation pAsyncInfo, Action<AsyncOperation> pDone)

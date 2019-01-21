@@ -5,160 +5,50 @@ using System.Collections;
 using System.Collections.Generic;
 
 using DicRoots  = System.Collections.Generic.Dictionary<int, UnityEngine.Transform>;
-using DicObject = System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<SHObjectInfo>>;
+using DicObject = System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<SHObjectPool>>;
 
-public enum ePoolReturnType
+public class SHObjectPoolManager : SHSingleton<SHObjectPoolManager>
 {
-    None,           // 반환 : 반환안함
-    Disable,        // 반환 : 오브젝트의 Active가 꺼질때 반환
-    ChangeScene,    // 반환 : 씬이 변경될때 반환
-}
-
-public enum ePoolDestroyType
-{
-    None,           // 제거 : 제거안함
-    Return,         // 제거 : 풀에 반환될때 제거
-    ChangeScene,    // 제거 : 씬이 변경될때 제거
-}
-
-public class SHObjectInfo
-{
-    public ePoolReturnType  m_eReturnType    = ePoolReturnType.None;
-    public ePoolDestroyType m_eDestroyType   = ePoolDestroyType.None;
-    public GameObject       m_pObject        = null;
-
-    public Vector3          m_vStartPosition = Vector3.zero;
-    public Quaternion       m_qStartRotate   = Quaternion.identity;
-    public Vector3          m_vStartScale    = Vector3.zero;
-
-    public SHObjectInfo() { }
-    public SHObjectInfo(ePoolReturnType eReturnType, ePoolDestroyType eDestoryType, GameObject pObject)
-    {
-        m_eReturnType  = eReturnType;
-        m_eDestroyType = eDestoryType;
-        m_pObject      = pObject;
-        if (null != m_pObject)
-        {
-            m_vStartPosition = m_pObject.transform.localPosition;
-            m_qStartRotate   = m_pObject.transform.localRotation;
-            m_vStartScale    = m_pObject.transform.localScale;
-        }
-    }
-
-    public void SetParent(Transform pParent)
-    {
-        if (null == m_pObject)
-            return;
-
-        var pLayer = m_pObject.layer;
-        m_pObject.transform.SetParent(pParent);
-        m_pObject.layer = pLayer;
-    }
-
-    public void SetActive(bool bIsActive)
-    {
-        if (null == m_pObject)
-            return;
-
-        if (bIsActive == m_pObject.activeInHierarchy)
-            return;
-
-        m_pObject.SetActive(bIsActive);
-    }
-
-    public void SetStartTransform()
-    {
-        m_pObject.transform.localPosition = m_vStartPosition;
-        m_pObject.transform.localRotation = m_qStartRotate;
-        m_pObject.transform.localScale    = m_vStartScale;
-    }
-
-    public bool IsActive()
-    {
-        if (null == m_pObject)
-            return false;
-
-        return m_pObject.activeInHierarchy;
-    }
-
-    public string GetName()
-    {
-        if (null == m_pObject)
-            return string.Empty;
-
-        return m_pObject.name;
-    }
-
-    public bool IsSameObject(GameObject pObject)
-    {
-        if (null == pObject)
-            return false;
-        if (null == m_pObject)
-            return false;
-
-        return (pObject == m_pObject);
-    }
-
-    public void DestroyObject()
-    {
-        m_eReturnType  = ePoolReturnType.None;
-        m_eDestroyType = ePoolDestroyType.None;
-        if (null == m_pObject)
-            return;
-
-        GameObject.DestroyObject(m_pObject);
-    }
-}
-
-public class SHObjectPool : SHSingleton<SHObjectPool>
-{
-    #region Members
     DicRoots m_dicRoots      = new DicRoots();
 
     DicObject m_dicActives   = new DicObject();
     DicObject m_dicInactives = new DicObject();
 
-    private readonly int CHECK_DELAY_FOR_ACTIVE = 5;
-    #endregion
+    private readonly int DELAY_CHECK_FOR_RECOVERY = 5;
 
-
-    #region virtual Functions
     public override void OnInitialize()
     {
         SetDontDestroy();
 
         ClearAll();
-        //Single.Scene.AddEventOfChangeScene(OnEventOfChangeScene);
+        Single.Scene.AddEventForLoadedScene(OnEventOfLoadedScene);
 
-        StartCoroutine(CoroutineCheckAutoProcess());
+        StartCoroutine(CoroutineCheckAutoRecovery());
     }
+
     public override void OnFinalize()
     {
         StopAllCoroutines();
     }
-    #endregion
 
-
-    #region Interface Functions
     public T Get<T>(
-        string           strName, 
-        ePoolReturnType  eReturnType  = ePoolReturnType.Disable, 
-        ePoolDestroyType eDestroyType = ePoolDestroyType.ChangeScene) where T : Component
+        string                 strName, 
+        eObjectPoolReturnType  eReturnType  = eObjectPoolReturnType.Disable, 
+        eObjectPoolDestroyType eDestroyType = eObjectPoolDestroyType.ChangeScene) where T : Component
     {
         return SHGameObject.GetComponent<T>(Get(strName, eReturnType, eDestroyType));
     }
+
     public GameObject Get(
-        string           strName, 
-        ePoolReturnType  eReturnType  = ePoolReturnType.Disable, 
-        ePoolDestroyType eDestroyType = ePoolDestroyType.ChangeScene)
+        string                 strName, 
+        eObjectPoolReturnType  eReturnType  = eObjectPoolReturnType.Disable, 
+        eObjectPoolDestroyType eDestroyType = eObjectPoolDestroyType.ChangeScene)
     {
         var pObject = GetInactiveObject(eReturnType, eDestroyType, strName);
-        if (null == pObject)
-            return null;
-
         SetActiveObject(strName, pObject);
         return pObject.m_pObject;
     }
+
     public void Return(GameObject pObject)
     {
         var pObjectInfo = GetObjectInfo(pObject);
@@ -167,19 +57,17 @@ public class SHObjectPool : SHSingleton<SHObjectPool>
 
         SetReturnObject(pObjectInfo.GetName(), pObjectInfo);
     }
-    public void SetStartTransform(GameObject pObject)
+
+    public void ResetStartTransform(GameObject pObject)
     {
         var pObjectInfo = GetObjectInfo(pObject);
         if (null == pObjectInfo)
             return;
 
-        pObjectInfo.SetStartTransform();
+        pObjectInfo.ResetStartTransform();
     }
-    #endregion
 
-
-    #region Utility : Get And Return
-    private void SetActiveObject(string strName, SHObjectInfo pObjectInfo)
+    private void SetActiveObject(string strName, SHObjectPool pObjectInfo)
     {
         CheckDictionary(m_dicActives,   strName);
         CheckDictionary(m_dicInactives, strName);
@@ -188,15 +76,16 @@ public class SHObjectPool : SHSingleton<SHObjectPool>
         m_dicInactives[strName].Remove(pObjectInfo);
         
         pObjectInfo.SetParent(GetRoot(pObjectInfo.m_pObject.layer));
-        pObjectInfo.SetStartTransform();
+        pObjectInfo.ResetStartTransform();
         pObjectInfo.SetActive(false);
     }
-    private void SetReturnObject(string strName, SHObjectInfo pObjectInfo)
+
+    private void SetReturnObject(string strName, SHObjectPool pObjectInfo)
     {
         CheckDictionary(m_dicActives,   strName);
         CheckDictionary(m_dicInactives, strName);
 
-        if (ePoolDestroyType.Return == pObjectInfo.m_eDestroyType)
+        if (eObjectPoolDestroyType.Return == pObjectInfo.m_eDestroyType)
         {
             SetDestroyObject(strName, pObjectInfo);
         }
@@ -209,7 +98,8 @@ public class SHObjectPool : SHSingleton<SHObjectPool>
             pObjectInfo.SetActive(false);
         }
     }
-    private void SetDestroyObject(string strName, SHObjectInfo pObjectInfo)
+
+    private void SetDestroyObject(string strName, SHObjectPool pObjectInfo)
     {
         CheckDictionary(m_dicActives,   strName);
         CheckDictionary(m_dicInactives, strName);
@@ -219,23 +109,21 @@ public class SHObjectPool : SHSingleton<SHObjectPool>
 
         pObjectInfo.DestroyObject();
     }
-    #endregion
 
-
-    #region Utility : Helpper
-    private List<SHObjectInfo> GetInactiveObjects(string strName)
+    private List<SHObjectPool> GetInactiveObjects(string strName)
     {
         if (false == m_dicInactives.ContainsKey(strName))
-            return new List<SHObjectInfo>();
+            return new List<SHObjectPool>();
         else
             return m_dicInactives[strName];
     }
-    private SHObjectInfo GetInactiveObject(ePoolReturnType eReturnType, ePoolDestroyType eDestroyType, string strName)
+
+    private SHObjectPool GetInactiveObject(eObjectPoolReturnType eReturnType, eObjectPoolDestroyType eDestroyType, string strName)
     {
         var pObjects = GetInactiveObjects(strName);
         if (0 == pObjects.Count)
         {
-            return new SHObjectInfo(
+            return new SHObjectPool(
                 eReturnType,
                 eDestroyType, 
                 Single.Resources.GetGameObject(strName));
@@ -247,7 +135,8 @@ public class SHObjectPool : SHSingleton<SHObjectPool>
             return pObjects[0];
         }
     }
-    private SHObjectInfo GetObjectInfo(GameObject pObject)
+
+    private SHObjectPool GetObjectInfo(GameObject pObject)
     {
         if (null == pObject)
             return null;
@@ -271,6 +160,7 @@ public class SHObjectPool : SHSingleton<SHObjectPool>
 
         return null;
     }
+
     private void ClearAll()
     {
         foreach(var kvp in m_dicActives)
@@ -292,14 +182,16 @@ public class SHObjectPool : SHSingleton<SHObjectPool>
         m_dicActives.Clear();
         m_dicInactives.Clear();
     }
+
     private void CheckDictionary(DicObject dicObjects, string strName)
     {
         if (true == dicObjects.ContainsKey(strName))
             return;
 
-        dicObjects.Add(strName, new List<SHObjectInfo>());
+        dicObjects.Add(strName, new List<SHObjectPool>());
     }
-    private void ForItemActives(Action<SHObjectInfo> pCallback)
+
+    private void ForLoopActives(Action<SHObjectPool> pCallback)
     {
         if (null == pCallback)
             return;
@@ -320,7 +212,8 @@ public class SHObjectPool : SHSingleton<SHObjectPool>
             }
         }
     }
-    private void ForItemInactives(Action<SHObjectInfo> pCallback)
+
+    private void ForLoopInactives(Action<SHObjectPool> pCallback)
     {
         if (null == pCallback)
             return;
@@ -333,24 +226,25 @@ public class SHObjectPool : SHSingleton<SHObjectPool>
             }
         }
     }
-    #endregion
 
-
-    #region Utility : Auto Return Or Destroy
     private void CheckAutoReturnObject(bool bIsChangeScene)
     {
-        var pReturns = new List<SHObjectInfo>();
-        ForItemActives((pItem) =>
+        var pReturns = new List<SHObjectPool>();
+        ForLoopActives((pItem) =>
         {
             switch (pItem.m_eReturnType)
             {
-                case ePoolReturnType.Disable:
+                case eObjectPoolReturnType.Disable:
                     if (false == pItem.IsActive())
+                    {
                         pReturns.Add(pItem);
+                    }
                     break;
-                case ePoolReturnType.ChangeScene:
+                case eObjectPoolReturnType.ChangeScene:
                     if (true == bIsChangeScene)
+                    {
                         pReturns.Add(pItem);
+                    }
                     break;
             }
         });
@@ -360,27 +254,32 @@ public class SHObjectPool : SHSingleton<SHObjectPool>
             SetReturnObject(pItem.GetName(), pItem);
         }
     }
+
     private void CheckAutoDestroyObject(bool bIsChangeScene)
     {
-        var pDestroys = new List<SHObjectInfo>();
-        ForItemActives((pItem) =>
+        var pDestroys = new List<SHObjectPool>();
+        ForLoopActives((pItem) =>
         {
             switch (pItem.m_eDestroyType)
             {
-                case ePoolDestroyType.ChangeScene:
+                case eObjectPoolDestroyType.ChangeScene:
                     if (true == bIsChangeScene)
+                    {
                         pDestroys.Add(pItem);
+                    }
                     break;
             }
         });
 
-        ForItemInactives((pItem) =>
+        ForLoopInactives((pItem) =>
         {
             switch (pItem.m_eDestroyType)
             {
-                case ePoolDestroyType.ChangeScene:
+                case eObjectPoolDestroyType.ChangeScene:
                     if (true == bIsChangeScene)
+                    {
                         pDestroys.Add(pItem);
+                    }
                     break;
             }
         });
@@ -390,10 +289,7 @@ public class SHObjectPool : SHSingleton<SHObjectPool>
             SetDestroyObject(pItem.GetName(), pItem);
         }
     }
-    #endregion
 
-
-    #region Utility Functions
     Transform GetRoot(int iLayer)
     {
         if (false == m_dicRoots.ContainsKey(iLayer))
@@ -406,24 +302,21 @@ public class SHObjectPool : SHSingleton<SHObjectPool>
 
         return m_dicRoots[iLayer];
     }
-    IEnumerator CoroutineCheckAutoProcess()
+
+    IEnumerator CoroutineCheckAutoRecovery()
     {
         while (true)
         {
-            yield return new WaitForSeconds(CHECK_DELAY_FOR_ACTIVE);
+            yield return new WaitForSeconds(DELAY_CHECK_FOR_RECOVERY);
 
             CheckAutoReturnObject(false);
             CheckAutoDestroyObject(false);
         }
     }
-    #endregion
-
-
-    #region Event Handler
-    public void OnEventOfChangeScene(object pSender, EventArgs vArgs)
+    
+    public void OnEventOfLoadedScene(eSceneType eType)
     {
         CheckAutoReturnObject(true);
         CheckAutoDestroyObject(true);
     }
-    #endregion
 }

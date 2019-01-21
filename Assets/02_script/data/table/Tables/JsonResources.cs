@@ -55,7 +55,7 @@ public class JsonResources : SHBaseTable
             //pData.m_strLastWriteTime    = GetStrToJson(pDataNode, "s_LastWriteTime");
             pData.m_strHash             = GetStrToJson(pDataNode, "s_Hash");
             pData.m_strPath             = GetStrToJson(pDataNode, "s_Path");
-            pData.m_eResourceType       = SHHard.GetResourceTypeByExtension(pData.m_strExtension);
+            pData.m_eResourceType       = SHUtils.GetResourceTypeByExtension(pData.m_strExtension);
 
             AddResources(pData.m_strName, pData);
         }

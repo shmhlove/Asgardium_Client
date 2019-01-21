@@ -69,23 +69,14 @@ public enum eResourceType
     Text,
 }
 
-public enum eObjectPoolDestoryType
-{
-    Never,          // 제거 안함
-    ChangeScene,    // 씬이 바뀔 때
-}
-
 public enum eServiceMode
 {
     None,
-    Live,           // Live
-    Review,         // 리뷰제출용
-    QA,             // QA용
-    DevQA,          // 개발QA용
-    Dev,            // 개발용
+    Live,
+    QA,
+    Dev,
 }
 
-// 번들 패킹 타입
 public enum eBundlePackType
 {
     None,           // 아무것도 안함

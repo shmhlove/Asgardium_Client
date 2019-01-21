@@ -46,7 +46,7 @@ public class SHJson
     // 인터페이스 : Persistent에서 로드
     public JsonData LoadToPersistent(string strFileName)
     {
-        string strSavePath = string.Format("{0}/{1}.json", SHPath.GetPathToPersistentJson(), Path.GetFileNameWithoutExtension(strFileName));
+        string strSavePath = string.Format("{0}/{1}.json", SHPath.GetPersistentDataJson(), Path.GetFileNameWithoutExtension(strFileName));
         if (false == File.Exists(strSavePath))
             return null;
 
@@ -56,7 +56,7 @@ public class SHJson
     // 인터페이스 : Streaming에서 LoaclLoad로 로드
     public JsonData LoadToStreamingForLocal(string strFileName)
     {
-        string strSavePath = string.Format("{0}/{1}.json", SHPath.GetPathToJson(), Path.GetFileNameWithoutExtension(strFileName));
+        string strSavePath = string.Format("{0}/{1}.json", SHPath.GetStreamingAssetsJsonTable(), Path.GetFileNameWithoutExtension(strFileName));
         if (false == File.Exists(strSavePath))
             return null;
 
@@ -129,13 +129,13 @@ public class SHJson
         string strPath = string.Empty;
 
 #if UNITY_EDITOR || UNITY_STANDALONE
-        strPath = string.Format("{0}{1}", "file://", SHPath.GetPathToStreamingAssets());
+        strPath = string.Format("{0}{1}", "file://", SHPath.GetStreamingAssets());
 #elif UNITY_ANDROID
-        strPath = string.Format("{0}{1}{2}", "jar:file://", SHPath.GetPathToAssets(), "!/assets");
+        strPath = string.Format("{0}{1}{2}", "jar:file://", SHPath.GetAssets(), "!/assets");
 #elif UNITY_IOS
-        strPath = string.Format("{0}{1}{2}", "file://", SHPath.GetPathToAssets(), "/Raw");
+        strPath = string.Format("{0}{1}{2}", "file://", SHPath.GetAssets(), "/Raw");
 #endif
 
-        return string.Format("{0}/JSons/{1}.json", strPath, Path.GetFileNameWithoutExtension(strFileName));
+        return string.Format("{0}/Json/{1}.json", strPath, Path.GetFileNameWithoutExtension(strFileName));
     }
 }

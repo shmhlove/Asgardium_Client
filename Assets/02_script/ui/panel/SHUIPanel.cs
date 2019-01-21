@@ -7,7 +7,6 @@ using System.Collections.Generic;
 public class SHUIPanel : MonoBehaviour
 {
     [Header("BaseInfo")]
-    [SerializeField] public  eObjectPoolDestoryType  m_eDestroyType = eObjectPoolDestoryType.ChangeScene;
     [SerializeField] public  bool                m_bStartEnable = true;
     [SerializeField] private GameObject          m_pAnimRoot    = null;
     [SerializeField] private AnimationClip       m_pAnimToOpen  = null;

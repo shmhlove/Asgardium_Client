@@ -12,7 +12,7 @@ public class SHConverterTableToByte
     {
         var pTableData = new SHTableData();
         pTableData.OnInitialize();
-        ConverterTableToByte(pTableData, SHPath.GetResourceBytesTable());
+        ConverterTableToByte(pTableData, SHPath.GetResourceByteTable());
         pTableData.OnFinalize();
     }
 

@@ -104,7 +104,9 @@ public static class SHGameObject
 
         T pComponent = pObject.GetComponent<T>();
         if (null == pComponent)
+        {
             pComponent = pObject.AddComponent<T>();
+        }
 
         return pComponent;
     }

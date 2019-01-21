@@ -4,11 +4,40 @@ using UnityEditor;
 #endif
 
 using System;
+using System.IO;
+using System.Text;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 
-public static partial class SHHard
+public static partial class SHUtils
 {
+    public static T GetStringToEnum<T>(string strEnum)
+    {
+        if (true == string.IsNullOrEmpty(strEnum))
+        {
+            UnityEngine.Debug.LogErrorFormat("[LSH] Enum String is null");
+            return default(T);
+        }
+
+        if (false == Enum.IsDefined(typeof(T), strEnum))
+        {
+            UnityEngine.Debug.LogErrorFormat("[LSH] Not Enum String({0})", strEnum);
+            return default(T);
+        }
+        
+        return (T)Enum.Parse(typeof(T), strEnum);
+    }
+
+    public static void ForToEnum<T>(Action<T> pCallback)
+    {
+        var pEnumerator = Enum.GetValues(typeof(T)).GetEnumerator();
+        while (pEnumerator.MoveNext())
+        {
+            pCallback((T)pEnumerator.Current);
+        }
+    }
+
     public static eSceneType GetSceneTypeByString(string strType)
     {
         switch(strType.ToLower())

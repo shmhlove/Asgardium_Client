@@ -11,27 +11,26 @@ public static class Single
     public static SHResourceData            Resources   { get { return Data.Resources; } }
     
     // 씬
-    public static SHSceneManager            Scene               { get { return SHSceneManager.Instance; } }
+    public static SHSceneManager            Scene       { get { return SHSceneManager.Instance; } }
 
     // UI
-    public static SHUIManager               UI                  { get { return SHUIManager.Instance; } }
+    public static SHUIManager               UI          { get { return SHUIManager.Instance; } }
 
     // 네트워크
-    public static SHNetworkManager          Network            { get { return SHNetworkManager.Instance; } }
+    public static SHNetworkManager          Network     { get { return SHNetworkManager.Instance; } }
 
     // 사운드
-    public static SHSoundManager            Sound               { get { return SHSoundManager.Instance; } }
+    public static SHSoundManager            Sound       { get { return SHSoundManager.Instance; } }
 
     // 플랫폼
-    public static SHFirebaseManager         Firebase            { get { return SHFirebaseManager.Instance; } }
-    public static SHGoogleManager           Google              { get { return SHGoogleManager.Instance; } }
-    public static SHAppleManager            Apple               { get { return SHAppleManager.Instance; } }
+    public static SHFirebaseManager         Firebase    { get { return SHFirebaseManager.Instance; } }
+    public static SHGoogleManager           Google      { get { return SHGoogleManager.Instance; } }
+    public static SHAppleManager            Apple       { get { return SHAppleManager.Instance; } }
 
     // 유틸리티
-    public static SHApplicationInfo         AppInfo             { get { return SHApplicationInfo.Instance; } }
-    public static SHCoroutine               Coroutine           { get { return SHCoroutine.Instance; } }
-    public static SHObjectPool              ObjectPool          { get { return SHObjectPool.Instance; } }
-    public static SHRenderTextureManager    RenderTexture       { get { return SHRenderTextureManager.Instance; } }
+    public static SHApplicationInfo         AppInfo     { get { return SHApplicationInfo.Instance; } }
+    public static SHCoroutine               Coroutine   { get { return SHCoroutine.Instance; } }
+    public static SHObjectPoolManager       ObjectPool  { get { return SHObjectPoolManager.Instance; } }
 }
 
 public abstract class SHSingleton<T> : MonoBehaviour where T : SHSingleton<T>

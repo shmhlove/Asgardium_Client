@@ -13,7 +13,7 @@ public partial class SHLoader
         if (false == IsRemainLoadFiles())
             return;
 
-        Single.Coroutine.NextFrame(CoroutineToLoadProcess);
+        Single.Coroutine.NextUpdate(CoroutineToLoadProcess);
     }
     
     void CoroutineToLoadProgressEvent()
@@ -23,7 +23,7 @@ public partial class SHLoader
         if (true == IsLoadDone())
             return;
 
-        Single.Coroutine.NextFrame(CoroutineToLoadProgressEvent);
+        Single.Coroutine.NextUpdate(CoroutineToLoadProgressEvent);
     }
 
     void LoadCall()

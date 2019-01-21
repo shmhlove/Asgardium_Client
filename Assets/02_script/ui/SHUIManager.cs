@@ -37,17 +37,26 @@ public class SHUIManager : SHSingleton<SHUIManager>
         return false;
     }
 
-    public T GetRoot<T>() where T :  SHUIRoot
+    public void GetRoot<T>(Action<T> pCallback) where T :  SHUIRoot
     {
         if (dicRoots.ContainsKey(typeof(T)))
         {
-            return dicRoots[typeof(T)] as T;
+            pCallback(dicRoots[typeof(T)] as T);
         }
 
-        // 리소스 동적로드 처리 
-        // (싱크방식,, 비동기방식으로 하는게 쉬운데.. 쓰기가 불편하니..)
-
-        return default(T);
+        Single.Resources.GetGameObject(typeof(T).ToString(), (pObject) => 
+        {
+            if (null != pObject)
+            {
+                var tObject = pObject as T;
+                AddRoot(typeof(T), tObject);
+                pCallback(tObject);
+            }
+            else
+            {
+                pCallback(default(T));
+            }
+        });
     }
 
     void OnEventLoadedScene(eSceneType eType)

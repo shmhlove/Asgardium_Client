@@ -22,13 +22,16 @@ public class SHCoroutine : SHSingleton<SHCoroutine>
     public void NextUpdate(Action pAction)
     {
         if (null == pAction)
-            return;
+        {
+            pAction = () => {};
+        }
 
         StartCoroutine(InvokeToNextUpdate(pAction));
     }
-    IEnumerator InvokeToNextUpdate(Action pAction)
+    private IEnumerator InvokeToNextUpdate(Action pAction)
     {
         yield return null;
+
         pAction.Invoke();
     }
 
@@ -38,13 +41,16 @@ public class SHCoroutine : SHSingleton<SHCoroutine>
     public void NextFixedUpdate(Action pAction)
     {
         if (null == pAction)
-            return;
+        {
+            pAction = () => {};
+        }
 
         StartCoroutine(InvokeToNextFixedUpdate(pAction));
     }
-    IEnumerator InvokeToNextFixedUpdate(Action pAction)
+    private IEnumerator InvokeToNextFixedUpdate(Action pAction)
     {
         yield return new WaitForFixedUpdate();
+
         pAction.Invoke();
     }
     
@@ -54,27 +60,32 @@ public class SHCoroutine : SHSingleton<SHCoroutine>
     public void EndOfFrame(Action pAction)
     {
         if (null == pAction)
-            return;
+        {
+            pAction = () => {};
+        }
 
         StartCoroutine(InvokeToEndOfFrame(pAction));
     }
-    IEnumerator InvokeToEndOfFrame(Action pAction)
+    private IEnumerator InvokeToEndOfFrame(Action pAction)
     {
         yield return new WaitForEndOfFrame();
+
         pAction.Invoke();
     }
     
 
     // yield return new WaitForSeconds : 지정한 시간까지 대기
     //-----------------------------------------------
-    public void WaitTime(Action pAction, float fDelay)
+    public void WaitTime(float fDelay, Action pAction)
     {
         if (null == pAction)
-            return;
+        {
+            pAction = () => {};
+        }
 
-        StartCoroutine(InvokeToWaitTime(pAction, fDelay));
+        StartCoroutine(InvokeToWaitTime(fDelay, pAction));
     }
-    IEnumerator InvokeToWaitTime(Action pAction, float fDelay)
+    private IEnumerator InvokeToWaitTime(float fDelay, Action pAction)
     {
         if (0.0f >= fDelay)
             yield return null;
@@ -87,54 +98,70 @@ public class SHCoroutine : SHSingleton<SHCoroutine>
 
     //yield return new WWW(string) : 웹 통신 작업이 끝날 때까지 대기
     //-----------------------------------------------
-    public WWW WWW(Action<WWW> pAction, WWW pWWW)
+    public WWW WWW(WWW pWWW, Action<WWW> pAction)
     {
-        StartCoroutine(InvokeToWWW(pAction, pWWW));
-        return pWWW;
-    }
-    IEnumerator InvokeToWWW(Action<WWW> pAction, WWW pWWW)
-    {
-        yield return pWWW;
+        if (null == pAction)
+        {
+            pAction = (p) => {};
+        }
 
-        if (null != pAction)
-            pAction.Invoke(pWWW);
+        StartCoroutine(InvokeToWWW(pWWW, pAction));
+        return pWWW;
     }
     public WWW WWWOfSync(WWW pWWW)
     {
-        InvokeToWWW(null, pWWW);
+        pWWW = WWW(pWWW, null);
         while (false == pWWW.isDone);
         return pWWW;
+    }
+    private IEnumerator InvokeToWWW(WWW pWWW, Action<WWW> pAction)
+    {
+        yield return pWWW;
+
+        pAction.Invoke(pWWW);
     }
 
     //(false == Caching.ready) : 캐싱이 완료될때 까지 대기
     //-----------------------------------------------
     public void CachingWait(Action pAction)
     {
+        if (null == pAction)
+        {
+            pAction = () => {};
+        }
+
         StartCoroutine(InvokeToCachingWait(pAction));
     }
-    IEnumerator InvokeToCachingWait(Action pAction)
+    private IEnumerator InvokeToCachingWait(Action pAction)
     {
         while (false == Caching.ready)
+        {
             yield return null;
+        }
 
-        if (null != pAction)
-            pAction.Invoke();
+        pAction.Invoke();
     }
 
 
     //yield return new AsyncOperation : 비동기 작업이 끝날 때 까지 대기 (씬로딩)
     //-----------------------------------------------
-    public AsyncOperation Async(Action pAction, AsyncOperation pAsync)
+    public AsyncOperation Async(AsyncOperation pAsync, Action pAction)
     {
-        StartCoroutine(InvokeToAsync(pAction, pAsync));
+        if (null == pAction)
+        {
+            pAction = () => {};
+        }
+
+        StartCoroutine(InvokeToAsync(pAsync, pAction));
         return pAsync;
     }
-    IEnumerator InvokeToAsync(Action pAction, AsyncOperation pAsync)
+    private IEnumerator InvokeToAsync(AsyncOperation pAsync, Action pAction)
     {
         while((null != pAsync) && (false == pAsync.isDone))
+        {
             yield return null;
+        }
 
-        if (null != pAction)
-            pAction.Invoke();
+        pAction.Invoke();
     }
 }

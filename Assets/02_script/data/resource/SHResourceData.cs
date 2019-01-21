@@ -55,18 +55,7 @@ public partial class SHResourceData : SHBaseData
             pDone(pInfo.m_strName, new SHLoadEndInfo(eErrorCode.Resources_NotExsitInTable));
             yield break;
         }
-
-        // Async Load
-        //Single.Coroutine.Routine(() => 
-        //{
-        //    var pResource = GetResources(pInfo.m_strName);
-        //    if (null == pResource)
-        //        pDone(pInfo.m_strName, new SHLoadEndInfo(eErrorCode.Resource_Load_Fail));
-        //    else
-        //        pDone(pInfo.m_strName, new SHLoadEndInfo(eErrorCode.Succeed));
-
-        //}, LoadAsync<UObject>(pResourceInfo));
-
+        
         // Sync Load
         var pObject = LoadSync<UObject>(pResourceInfo);
         if (null == pObject)
@@ -77,15 +66,19 @@ public partial class SHResourceData : SHBaseData
         yield return null;
     }
     
-    public UObject GetResources(string strFileName)
+    public void GetResources(string strFileName, Action<UObject> pCallback)
     {
-        return GetResources<UObject>(strFileName);
+        GetResources<UObject>(strFileName, pCallback);
     }
 
-    public T GetResources<T>(string strFileName) where T : UObject
+    public void GetResources<T>(string strFileName, Action<T> pCallback) where T : UObject
     {
         if (true == string.IsNullOrEmpty(strFileName))
-            return null;
+        {
+            Debug.Log(string.Format("[LSH] 전달받은 리소스 파일 이름이 null 입니다."));
+            pCallback(null);
+            return;
+        }
         
         strFileName = Path.GetFileNameWithoutExtension(strFileName);
         if (false == m_dicResources.ContainsKey(strFileName.ToLower()))
@@ -95,100 +88,100 @@ public partial class SHResourceData : SHBaseData
             if (null == pInfo)
             {
                 Debug.Log(string.Format("[LSH] 리소스 테이블에 {0}가 없습니다.(파일이 없거나 리소스 리스팅이 안되었음)", strFileName));
-                return null;
+                pCallback(null);
+                return;
             }
 
-            return LoadSync<T>(pInfo);
+            LoadAsync<T>(pInfo, pCallback);
         }
 
-        return m_dicResources[strFileName.ToLower()] as T;
+        pCallback(m_dicResources[strFileName.ToLower()] as T);
     }
     
-    public GameObject GetPrefab(string strName)
+    public void GetGameObject(string strName, Action<GameObject> pCallback)
     {
-        return GetResources<GameObject>(strName);
+        GetResources<GameObject>(strName, (pObject) => 
+        {
+            pCallback(Instantiate<GameObject>(pObject));
+        });
     }
     
-    public GameObject GetGameObject(string strName)
+    public void GetTexture(string strName, Action<Texture> pCallback)
     {
-        return Instantiate<GameObject>(GetPrefab(strName));
+        GetResources<Texture>(strName, pCallback);
     }
     
-    public Texture GetTexture(string strName)
+    public void GetTexture2D(string strName, Action<Texture2D> pCallback)
     {
-        return GetResources<Texture>(strName);
+        GetResources<Texture2D>(strName, pCallback);
     }
     
-    public Texture2D GetTexture2D(string strName)
+    public void GetSprite(string strName, Action<Sprite> pCallback)
     {
-        return GetResources<Texture2D>(strName);
+        GetTexture2D(strName, (pTexture) => 
+        {
+            if (null == pTexture)
+            {
+                pCallback(null);
+            }
+            else
+            {
+                pCallback(Sprite.Create(pTexture, new Rect(0.0f, 0.0f, pTexture.width, pTexture.height), new Vector2(0.5f, 0.5f)));
+            }
+        });
     }
     
-    public Sprite GetSprite(string strName)
-    {
-        Texture2D pTexture = GetTexture2D(strName);
-        if (null == pTexture)
-            return null;
-
-        return Sprite.Create(pTexture, new Rect(0.0f, 0.0f, pTexture.width, pTexture.height), new Vector2(0.5f, 0.5f));
-    }
-    
-    public Texture2D GetDownloadTexture(string strURL)
-    {
-        WWW pWWW = Single.Coroutine.WWWOfSync(new WWW(strURL));
-        if (false == string.IsNullOrEmpty(pWWW.error))
-            return null;
-
-        return pWWW.texture;
-    }
     public void GetDownloadTexture(string strURL, Action<Texture2D> pCallback)
     {
-        if (null == pCallback)
-            return;
-
-        Single.Coroutine.WWW((pWWW) =>
+        Single.Coroutine.WWW(new WWW(strURL), (pWWW) => 
         {
             if (false == string.IsNullOrEmpty(pWWW.error))
+            {
                 pCallback(null);
+            }
             else
+            {
                 pCallback(pWWW.texture);
-        }, new WWW(strURL));
+            }
+        });
     }
-    
-    public AnimationClip GetAniamiton(string strName)
-    {
-        return GetResources<AnimationClip>(strName);
-    }
-    
-    public Material GetMaterial(string strName)
-    {
-        return GetResources<Material>(strName);
-    }
-    
-    public AudioClip GetSound(string strName)
-    {
-        return GetResources<AudioClip>(strName);
-    }
-    
-    public TextAsset GetTextAsset(string strName)
-    {
-        return GetResources<TextAsset>(strName);
-    }
-    
-    public T GetComponentByObject<T>(string strName)
-    {
-        GameObject pObject = GetGameObject(strName);
-        if (null == pObject)
-            return default(T);
 
-        return pObject.GetComponent<T>();
+    public void GetAniamiton(string strName, Action<AnimationClip> pCallback)
+    {
+        GetResources<AnimationClip>(strName, pCallback);
+    }
+    
+    public void GetMaterial(string strName, Action<Material> pCallback)
+    {
+        GetResources<Material>(strName, pCallback);
+    }
+    
+    public void GetSound(string strName, Action<AudioClip> pCallback)
+    {
+        GetResources<AudioClip>(strName, pCallback);
+    }
+    
+    public void GetTextAsset(string strName, Action<TextAsset> pCallback)
+    {
+        GetResources<TextAsset>(strName, pCallback);
+    }
+    
+    public void GetComponentByObject<T>(string strName, Action<T> pCallback)
+    {
+        GetGameObject(strName, (pObject) => 
+        {
+            if (null == pObject)
+                pCallback(default(T));
+            else
+                pCallback(pObject.GetComponent<T>());
+        });
     }
     
     public T Instantiate<T>(T pPrefab) where T : UObject
     {
         if (null == pPrefab)
         {
-            Debug.LogErrorFormat("[LSH] 오브젝트 복사중 Null 프리팹이 전달되었습니다!!(Type : {0})", typeof(T));
+            Debug.LogErrorFormat("[LSH] 오브젝트 복사중 null 프리팹이 전달되었습니다!!(Type : {0})", typeof(T));
             return default(T);
         }
 
@@ -224,13 +217,19 @@ public partial class SHResourceData : SHBaseData
     }
     
     // 유틸 : 어싱크로 리소스 로드하기
-    IEnumerator LoadAsync<T>(SHResourcesInfo pTable) where T : UnityEngine.Object
+    IEnumerator LoadAsync<T>(SHResourcesInfo pTable, Action<T> pCallback) where T : UnityEngine.Object
     {
         if (null == pTable)
+        {
+            pCallback(null);
             yield break;
+        }
 
         if (true == m_dicResources.ContainsKey(pTable.m_strName.ToLower()))
+        {
+            pCallback(m_dicResources[pTable.m_strName.ToLower()] as T);
             yield break;
+        }
         
 #if UNITY_EDITOR
         DateTime pStartTime = DateTime.Now;
@@ -256,14 +255,16 @@ public partial class SHResourceData : SHBaseData
         if (null == pObject)
         {
             Debug.LogError(string.Format("[LSH] {0}을 로드하지 못했습니다!!\n리소스 테이블에는 목록이 있으나 실제 파일은 없을 수도 있습니다.", pTable.m_strPath));
+            pCallback(null);
             yield break;
         }
         
 #if UNITY_EDITOR
         Single.AppInfo.SetLoadResource(string.Format("Load : {0}({1}sec)", pTable.m_strName, ((DateTime.Now - pStartTime).TotalMilliseconds / 1000.0f)));
 #endif
-
+        
         m_dicResources.Add(pTable.m_strName.ToLower(), pObject);
+        pCallback(pObject as T);
     }
 
     // 유틸 : 싱크로 리소스 로드하기

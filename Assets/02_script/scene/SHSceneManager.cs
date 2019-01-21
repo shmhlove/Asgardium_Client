@@ -10,7 +10,6 @@ using LitJson;
 
 public class SHSceneManager : SHSingleton<SHSceneManager>
 {
-    private List<eSceneType> loadHistory = new List<eSceneType>();
     private List<Action<eSceneType>> loadSceneEvents = new List<Action<eSceneType>>();
     
     public override void OnInitialize()
@@ -18,7 +17,7 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
         SetDontDestroy();
     }
 
-    public void LoadScene(eSceneType eType, LoadSceneMode eMode, bool bIsUseFade = false, Action<SHReply> pCallback = null)
+    public void LoadScene(eSceneType eType, LoadSceneMode eMode = LoadSceneMode.Single, bool bIsUseFade = false, Action<SHReply> pCallback = null)
     {
         if (null == pCallback)
         {
@@ -27,7 +26,7 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
 
         if (true == IsLoadedScene(eType))
         {
-            pCallback(new SHReply(new SHError(eErrorCode.Scene_Already_Loaded, "Aleady Loaded Scene")));
+            pCallback(new SHReply(new SHError(eErrorCode.Scene_Already_Loaded, "[LSH] Aleady Loaded Scene")));
             return;
         }
 
@@ -42,7 +41,6 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
                     else
                         pCallback(new SHReply(JsonMapper.ToObject("{}")));
 
-                    loadHistory.Add(eType);
                     SendLoadEvent(eType);
                 });
             });
@@ -106,25 +104,25 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
 
     private void PlayFadeIn(Action pCallback)
     {
-        // var uiRoot = Single.UI.GetRoot<SHUIRootGlobal>();
-        // if (false == uiRoot.ShowFade("Panel_FadeIn", pCallback))
+        Single.UI.GetRoot<SHUIRootGlobal>((pUIRoot) => 
         {
-            if (null != pCallback)
-                pCallback();
-        }
-
-        //SHCoroutine.Instance.NextUpdate(() => uiRoot.ShowFade("Panel_FadeOut"));
+            // if (false == pUIRoot.ShowFade("Panel_FadeIn", pCallback))
+            {
+                if (null != pCallback)
+                    pCallback();
+            }
+        });
     }
     
     private void PlayFadeOut(Action pCallback)
     {
-        // var uiRoot = Single.UI.GetRoot<SHUIRootGlobal>();
-        //if (false == uiRoot.ShowFade("Panel_FadeOut", pCallback))
+        Single.UI.GetRoot<SHUIRootGlobal>((pUIRoot) => 
         {
-            if (null != pCallback)
-                pCallback();
-        }
-        
-        //SHCoroutine.Instance.NextUpdate(() => uiRoot.ShowFade("Panel_FadeIn"));
+            //if (false == uiRoot.ShowFade("Panel_FadeOut", pCallback))
+            {
+                if (null != pCallback)
+                    pCallback();
+            }
+        });
     }
 }

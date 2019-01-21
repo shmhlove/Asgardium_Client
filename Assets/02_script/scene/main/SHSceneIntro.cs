@@ -9,12 +9,14 @@ public class SHSceneIntro : MonoBehaviour
 {
     void Start()
     {
-        var pUIRoot = Single.UI.GetRoot<SHUIRootIntro>();
-        pUIRoot.Show(() => 
+        Single.UI.GetRoot<SHUIRootIntro>((pUIRoot) => 
         {
-            Single.Scene.LoadScene(eSceneType.Login, LoadSceneMode.Single, false, (pReply) => 
+            pUIRoot.Show(() => 
             {
+                Single.Scene.LoadScene(eSceneType.Login, pCallback: (pReply) => 
+                {
 
+                });
             });
         });
     }

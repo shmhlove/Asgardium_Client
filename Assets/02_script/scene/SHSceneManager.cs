@@ -91,7 +91,7 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
     
     private void LoadProcess(AsyncOperation pAsyncInfo, Action<AsyncOperation> pDone)
     {
-        Single.Coroutine.Async(() => pDone(pAsyncInfo), pAsyncInfo);
+        Single.Coroutine.Async(pAsyncInfo, () => pDone(pAsyncInfo));
     }
     
     private void SendLoadEvent(eSceneType eLoadScene)

@@ -48,13 +48,16 @@ public class SHSoundManager : SHSingleton<SHSoundManager>
         }
         
         var pInfo = m_dicSoundTable[strName];
-        m_dicBGMChannel[pInfo.m_eBGMChannel].clip   = Single.Resources.GetSound(pInfo.m_strFileName);
-        m_dicBGMChannel[pInfo.m_eBGMChannel].loop   = pInfo.m_bIsLoop;
-        m_dicBGMChannel[pInfo.m_eBGMChannel].volume = 0.0f;
-        m_dicBGMChannel[pInfo.m_eBGMChannel].Play();
-        m_dicBGMChannel[pInfo.m_eBGMChannel].Pause();
-        m_dicBGMChannel[pInfo.m_eBGMChannel].Play();
-        StartCoroutine(CoroutineVolumeUP(m_dicBGMChannel[pInfo.m_eBGMChannel]));
+        Single.Resources.GetSound(pInfo.m_strFileName, (pObject) => 
+        {
+            m_dicBGMChannel[pInfo.m_eBGMChannel].clip   = pObject;
+            m_dicBGMChannel[pInfo.m_eBGMChannel].loop   = pInfo.m_bIsLoop;
+            m_dicBGMChannel[pInfo.m_eBGMChannel].volume = 0.0f;
+            m_dicBGMChannel[pInfo.m_eBGMChannel].Play();
+            m_dicBGMChannel[pInfo.m_eBGMChannel].Pause();
+            m_dicBGMChannel[pInfo.m_eBGMChannel].Play();
+            StartCoroutine(CoroutineVolumeUP(m_dicBGMChannel[pInfo.m_eBGMChannel]));
+        });
     }
 
     public void StopBGM(string strName)
@@ -79,12 +82,15 @@ public class SHSoundManager : SHSingleton<SHSoundManager>
         }
         
         var pInfo = m_dicSoundTable[strName];
-        m_dicEffectChannel[pInfo.m_eEffectChannel].clip   = Single.Resources.GetSound(pInfo.m_strFileName);
-        m_dicEffectChannel[pInfo.m_eEffectChannel].loop   = pInfo.m_bIsLoop;
-        m_dicEffectChannel[pInfo.m_eEffectChannel].volume = 1.0f;
-        m_dicEffectChannel[pInfo.m_eEffectChannel].Play();
-        m_dicEffectChannel[pInfo.m_eEffectChannel].Pause();
-        m_dicEffectChannel[pInfo.m_eEffectChannel].Play();
+        Single.Resources.GetSound(pInfo.m_strFileName, (pObject) => 
+        {
+            m_dicEffectChannel[pInfo.m_eEffectChannel].clip   = pObject;
+            m_dicEffectChannel[pInfo.m_eEffectChannel].loop   = pInfo.m_bIsLoop;
+            m_dicEffectChannel[pInfo.m_eEffectChannel].volume = 1.0f;
+            m_dicEffectChannel[pInfo.m_eEffectChannel].Play();
+            m_dicEffectChannel[pInfo.m_eEffectChannel].Pause();
+            m_dicEffectChannel[pInfo.m_eEffectChannel].Play();
+        });
     }
 
     public void StopEffect(string strName)

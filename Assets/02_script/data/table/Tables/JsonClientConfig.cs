@@ -38,7 +38,7 @@ public class JsonClientConfig : SHBaseTable
     public override eErrorCode LoadJsonTable(JsonData pJson, string strFileName)
     {
         if (null == pJson)
-            return eErrorCode.Table_Load_Fail;
+            return eErrorCode.Table_LoadFailed;
 
         JsonData pDataNode = pJson[0];
 

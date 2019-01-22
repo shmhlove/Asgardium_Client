@@ -68,15 +68,17 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
     
     void SetApplicationInfo()
     {
-        var pClientConfig = Single.Table.GetTable<JsonClientConfig>();
-        SetFrameRate(pClientConfig.FrameRate);
-        SetCacheInfo(pClientConfig.CacheSize, 30);
-        SetSleepMode();
-        SetOrientation();
-        SetCrittercism();
+        Single.Table.GetTable<JsonClientConfig>((pTable) => 
+        {
+            SetFrameRate(pTable.FrameRate);
+            SetCacheInfo(pTable.CacheSize, 30);
+            SetSleepMode();
+            SetOrientation();
+            SetCrittercism();
 
-        UnityEngine.Debug.LogFormat("[LSH] ProcessID : {0}", GetProcessID());
-        UnityEngine.Debug.LogFormat("[LSH] DebugPort : {0}", GetDebugPort());
+            UnityEngine.Debug.LogFormat("[LSH] ProcessID : {0}", GetProcessID());
+            UnityEngine.Debug.LogFormat("[LSH] DebugPort : {0}", GetDebugPort());
+        });
     }
     
     public bool IsEditorMode()
@@ -231,22 +233,23 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
     // 디버그 : 앱 정보 출력
     void DrawAppInformation()
     {
-        var pClientConfig = Single.Table.GetTable<JsonClientConfig>();
+        Single.Table.GetTable<JsonClientConfig>((pTable) => 
+        {
+            GUIStyle pStyle = new GUIStyle(GUI.skin.box);
+            pStyle.fontSize = GetRatioW(20);
 
-        GUIStyle pStyle = new GUIStyle(GUI.skin.box);
-        pStyle.fontSize = GetRatioW(20);
+            // Left Bottom
+            GUI.Box(new Rect(5, (Screen.height - GetRatioH(35)), GetRatioW(350), GetRatioH(30)),
+                string.Format("{0} : {1} Scene", GetRuntimePlatform(), Single.Scene.GetActiveScene()), pStyle);
+            
+            // Center Bottom
+            GUI.Box(new Rect((Screen.width * 0.5f) - (GetRatioW(120) * 0.5f), (Screen.height - GetRatioH(35)), GetRatioW(120), GetRatioH(30)),
+                string.Format("v{0}", pTable.Version), pStyle);
 
-        // Left Bottom
-        GUI.Box(new Rect(5, (Screen.height - GetRatioH(35)), GetRatioW(350), GetRatioH(30)),
-            string.Format("{0} : {1} Scene", GetRuntimePlatform(), Single.Scene.GetActiveScene()), pStyle);
-        
-        // Center Bottom
-        GUI.Box(new Rect((Screen.width * 0.5f) - (GetRatioW(120) * 0.5f), (Screen.height - GetRatioH(35)), GetRatioW(120), GetRatioH(30)),
-            string.Format("v{0}", pClientConfig.Version), pStyle);
-
-        // Right Bottom
-        GUI.Box(new Rect(Screen.width - GetRatioW(355), (Screen.height - GetRatioH(35)), GetRatioW(350), GetRatioH(30)),
-            string.Format("ServiceMode : {0}", pClientConfig.ServiceMode), pStyle);
+            // Right Bottom
+            GUI.Box(new Rect(Screen.width - GetRatioW(355), (Screen.height - GetRatioH(35)), GetRatioW(350), GetRatioH(30)),
+                string.Format("ServiceMode : {0}", pTable.ServiceMode), pStyle);
+        });
     }
     
     // 디버그 : 실시간 로드 리소스 리스트

@@ -85,10 +85,10 @@ public class SHLoadEndInfo
     public bool         m_bIsSuccess;
     public eErrorCode   m_eErrorCode;
 
-    public SHLoadEndInfo(eErrorCode ?errorCode)
+    public SHLoadEndInfo(eErrorCode errorCode)
     {
-        m_bIsSuccess = (null == errorCode);
-        m_eErrorCode = errorCode.Value;
+        m_bIsSuccess = (eErrorCode.Succeed == errorCode);
+        m_eErrorCode = errorCode;
     }
 }
 

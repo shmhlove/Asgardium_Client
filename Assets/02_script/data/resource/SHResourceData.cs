@@ -21,19 +21,21 @@ public partial class SHResourceData : SHBaseData
         m_dicResources.Clear();
     }
     
-    public override Dictionary<string, SHLoadData> GetLoadList(eSceneType eType)
+    public override void GetLoadList(eSceneType eType, Action<Dictionary<string, SHLoadData>> pCallback)
     {
-        var dicLoadList  = new Dictionary<string, SHLoadData>();
-        var PreloadTable = Single.Table.GetTable<JsonPreloadResources>();
-        foreach (var strValue in PreloadTable.GetData(eType))
+        Single.Table.GetTable<JsonPreloadResources>((pTable) => 
         {
-            if (true == m_dicResources.ContainsKey(strValue.ToLower()))
-                continue;
-            
-            dicLoadList.Add(strValue, CreateLoadInfo(strValue));
-        };
+            var dicLoadList  = new Dictionary<string, SHLoadData>();
+            foreach (var strValue in pTable.GetData(eType))
+            {
+                if (true == m_dicResources.ContainsKey(strValue.ToLower()))
+                    continue;
+                
+                dicLoadList.Add(strValue, CreateLoadInfo(strValue));
+            };
 
-        return dicLoadList;
+            pCallback(dicLoadList);
+        });
     }
     
     public override IEnumerator Load(SHLoadData pInfo, Action<string, SHLoadStartInfo> pStart, 
@@ -43,25 +45,28 @@ public partial class SHResourceData : SHBaseData
 
         if (true == m_dicResources.ContainsKey(pInfo.m_strName.ToLower()))
         {
-            pDone(pInfo.m_strName, new SHLoadEndInfo(null));
+            pDone(pInfo.m_strName, new SHLoadEndInfo(eErrorCode.Succeed));
             yield break;
         }
 
-        var pTable = Single.Table.GetTable<JsonResources>(false);
-        var pResourceInfo = pTable.GetResouceInfo(pInfo.m_strName);
-        if (null == pResourceInfo)
+        Single.Table.GetTable<JsonResources>((pTable) => 
         {
-            Debug.LogFormat("[LSH] 리소스 테이블에 {0}가 없습니다.(파일이 없거나 리소스 리스팅이 안되었음)", pInfo.m_strName);
-            pDone(pInfo.m_strName, new SHLoadEndInfo(eErrorCode.Resources_NotExsitInTable));
-            yield break;
-        }
-        
-        // Sync Load
-        var pObject = LoadSync<UObject>(pResourceInfo);
-        if (null == pObject)
-            pDone(pInfo.m_strName, new SHLoadEndInfo(eErrorCode.Resources_LoadFailed));
-        else
-            pDone(pInfo.m_strName, new SHLoadEndInfo(null));
+            var pResourceInfo = pTable.GetResouceInfo(pInfo.m_strName);
+            if (null == pResourceInfo)
+            {
+                Debug.LogFormat("[LSH] 리소스 테이블에 {0}가 없습니다.(파일이 없거나 리소스 리스팅이 안되었음)", pInfo.m_strName);
+                pDone(pInfo.m_strName, new SHLoadEndInfo(eErrorCode.Resources_NotExsitInTable));
+                return;
+            }
+            
+            LoadAsync<UObject>(pResourceInfo, (pObject) => 
+            {
+                if (null == pObject)
+                    pDone(pInfo.m_strName, new SHLoadEndInfo(eErrorCode.Resources_LoadFailed));
+                else
+                    pDone(pInfo.m_strName, new SHLoadEndInfo(eErrorCode.Succeed));
+            });
+        });
 
         yield return null;
     }
@@ -83,19 +88,23 @@ public partial class SHResourceData : SHBaseData
         strFileName = Path.GetFileNameWithoutExtension(strFileName);
         if (false == m_dicResources.ContainsKey(strFileName.ToLower()))
         {
-            var Table = Single.Table.GetTable<JsonResources>(false);
-            var pInfo = Table.GetResouceInfo(strFileName);
-            if (null == pInfo)
+            Single.Table.GetTable<JsonResources>((pTable) => 
             {
-                Debug.Log(string.Format("[LSH] 리소스 테이블에 {0}가 없습니다.(파일이 없거나 리소스 리스팅이 안되었음)", strFileName));
-                pCallback(null);
-                return;
-            }
+                var pInfo = pTable.GetResouceInfo(strFileName);
+                if (null == pInfo)
+                {
+                    Debug.Log(string.Format("[LSH] 리소스 테이블에 {0}가 없습니다.(파일이 없거나 리소스 리스팅이 안되었음)", strFileName));
+                    pCallback(null);
+                    return;
+                }
 
-            LoadAsync<T>(pInfo, pCallback);
+                LoadAsync<T>(pInfo, pCallback);
+            });
         }
-
-        pCallback(m_dicResources[strFileName.ToLower()] as T);
+        else
+        {
+            pCallback(m_dicResources[strFileName.ToLower()] as T);
+        }
     }
     
     public void GetGameObject(string strName, Action<GameObject> pCallback)
@@ -135,14 +144,7 @@ public partial class SHResourceData : SHBaseData
     {
         Single.Coroutine.WWW(new WWW(strURL), (pWWW) => 
         {
-            if (false == string.IsNullOrEmpty(pWWW.error))
-            {
-                pCallback(null);
-            }
-            else
-            {
-                pCallback(pWWW.texture);
-            }
+            pCallback(pWWW.texture);
         });
     }
 
@@ -194,7 +196,7 @@ public partial class SHResourceData : SHBaseData
         pGameObject.name = strName.Substring(0, strName.IndexOf("(Clone)"));
         
 #if UNITY_EDITOR
-        Single.AppInfo.SetLoadResource(string.Format("Instantiate : {0}({1}sec)", pPrefab.name, ((DateTime.Now - pStartTime).TotalMilliseconds / 1000.0f)));
+        Single.AppInfo.SetLoadResource(string.Format("Instantiate : {0}({1}sec)", pPrefab.name, SHUtils.GetElapsedSecond(pStartTime)));
 #endif
 
         return pGameObject;

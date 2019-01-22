@@ -11,22 +11,36 @@ public class SHBytes
 {
     public byte[] m_pBytes = null;
     
-    public SHBytes() { }
-    public SHBytes(string strFileName)
+    public SHBytes(string strFileName, Action<SHBytes> pCallback)
     {
         if (true == string.IsNullOrEmpty(strFileName))
+        {
+            pCallback(this);
             return;
+        }
 
         strFileName = Path.GetFileNameWithoutExtension(strFileName);
 
-        // 1�� : PersistentData�� Byte �����Ͱ� ������ �װ� �ε��ϵ��� �Ѵ�.
-        // 2�� : ������ ��Ű������ �ε��ϵ��� �Ѵ�.
+        // 1차 : PersistentDataPath에 데이터가 있으면 그걸 로드하도록 한다.
+        // 2차 : 없으면 패키지에서 로드하도록 한다.
 
         string strSavePath = string.Format("{0}/{1}.bytes", SHPath.GetPersistentDataBytes(), strFileName);
         if (true == File.Exists(strSavePath))
-            m_pBytes = LoadByPersistent(strSavePath);
+        {
+            LoadByPersistent(strSavePath, (pBytes) => 
+            {
+                m_pBytes = pBytes;
+                pCallback(this);
+            });
+        }
         else
-            m_pBytes = LoadByPackage(strFileName);
+        {
+            LoadByPackage(strFileName, (pBytes) => 
+            {
+                m_pBytes = pBytes;
+                pCallback(this);
+            });
+        }
     }
     
     public bool CheckBytes()
@@ -34,41 +48,42 @@ public class SHBytes
         return (null != m_pBytes);
     }
 
-    public byte[] GetBytes()
+    private void LoadByWWW(string strFilePath, Action<byte[]> pCallback)
     {
-        return m_pBytes;
-    }
-    
-    byte[] LoadByWWW(string strFilePath)
-    {
-        WWW pWWW = Single.Coroutine.WWWOfSync(new WWW(strFilePath));
-        if (true != string.IsNullOrEmpty(pWWW.error))
+        Single.Coroutine.WWW(new WWW(strFilePath), (pWWW) => 
         {
-            Debug.LogError(string.Format("[LSH] Byte(*.bytes)������ �д� �� �����߻�!!(Path:{0}, Error:{1})", strFilePath, pWWW.error));
-            return null;
-        }
-        
-        return pWWW.bytes;
+            if (true != string.IsNullOrEmpty(pWWW.error))
+            {
+                Debug.LogWarningFormat("[LSH] Byte(*.bytes)파일을 읽는 중 오류발생!!(Path:{0}, Error:{1})", strFilePath, pWWW.error);
+            }
+            
+            pCallback(pWWW.bytes); 
+        });
     }
     
-    byte[] LoadByPersistent(string strFilePath)
+    private void LoadByPersistent(string strFilePath, Action<byte[]> pCallback)
     {
         var pBuff = File.ReadAllBytes(strFilePath);
         if (null == pBuff)
         {
-            Debug.LogError(string.Format("[LSH] Byte(*.bytes)������ �д� �� �����߻�!!(Path:{0})", strFilePath));
-            return null;
+            Debug.LogError(string.Format("[LSH] Byte(*.bytes)파일을 읽는 중 오류발생!!(Path:{0})", strFilePath));
         }
 
-        return pBuff;
+        pCallback(pBuff);
     }
 
-    byte[] LoadByPackage(string strFileName)
+    private void LoadByPackage(string strFileName, Action<byte[]> pCallback)
     {
-        var pTextAsset = Single.Resources.GetTextAsset(Path.GetFileNameWithoutExtension(strFileName));
-        if (null == pTextAsset)
-            return null;
-
-        return pTextAsset.bytes;
+        Single.Resources.GetTextAsset(Path.GetFileNameWithoutExtension(strFileName), (pTextAsset) => 
+        {            
+            if (null == pTextAsset)
+            {
+                pCallback(null);
+            }
+            else
+            {
+                pCallback(pTextAsset.bytes);
+            }
+        });
     }
 }

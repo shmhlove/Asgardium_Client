@@ -11,87 +11,98 @@ using LitJson;
 
 public class SHJson
 {
-    private JsonData m_pJsonNode = null;
-    public JsonData Node { get { return m_pJsonNode; } }
+    public JsonData m_pJsonNode = null;
 
-
-    public SHJson() { }
-    public SHJson(string strFileName)
+    public SHJson(string strFileName, Action<SHJson> pCallback)
     {
         if (true == string.IsNullOrEmpty(strFileName))
+        {
+            pCallback(this);
             return;
+        }
 
         strFileName = Path.GetFileNameWithoutExtension(strFileName);
 
-        // 1차 : PersistentDataPath에 Json데이터가 있으면 그걸 로드하도록 한다.
+        // 1차 : PersistentDataPath에 데이터가 있으면 그걸 로드하도록 한다.
         // 2차 : 없으면 패키지에서 로드하도록 한다.
 
-        if (null != (m_pJsonNode = LoadToPersistent(strFileName)))
-            return;
-
-        m_pJsonNode = LoadToStreamingForWWW(strFileName);
-    }
-
-    ~SHJson()
-    {
-        SetJsonNode(null);
-    }
-
-    // 인터페이스 : JsonNode설정
-    public JsonData SetJsonNode(JsonData pNode)
-    {
-        return (m_pJsonNode = pNode);
-    }
-
-    // 인터페이스 : Persistent에서 로드
-    public JsonData LoadToPersistent(string strFileName)
-    {
-        string strSavePath = string.Format("{0}/{1}.json", SHPath.GetPersistentDataJson(), Path.GetFileNameWithoutExtension(strFileName));
-        if (false == File.Exists(strSavePath))
-            return null;
-
-        return SetJsonNode(LoadLocal(strSavePath));
-    }
-
-    // 인터페이스 : Streaming에서 LoaclLoad로 로드
-    public JsonData LoadToStreamingForLocal(string strFileName)
-    {
-        string strSavePath = string.Format("{0}/{1}.json", SHPath.GetStreamingAssetsJsonTable(), Path.GetFileNameWithoutExtension(strFileName));
-        if (false == File.Exists(strSavePath))
-            return null;
-
-        return SetJsonNode(LoadLocal(strSavePath));
-    }
-
-    // 인터페이스 : Streaming에서 WWW로 로드
-    public JsonData LoadToStreamingForWWW(string strFileName)
-    {
-        return SetJsonNode(LoadWWW(GetStreamingPath(strFileName)));
-    }
-
-    // 인터페이스 : Json파일 로드
-    public JsonData LoadWWW(string strFilePath)
-    {
-        WWW pWWW = Single.Coroutine.WWWOfSync(new WWW(strFilePath));
-        if (true != string.IsNullOrEmpty(pWWW.error))
+        string strSavePath = string.Format("{0}/{1}.json", SHPath.GetPersistentDataJson(), strFileName);
+        if (true == File.Exists(strSavePath))
         {
-            Debug.LogWarningFormat("Json(*.json)파일을 읽는 중 오류발생!!(Path:{0}, Error:{1})", strFilePath, pWWW.error);
-            return null;
+            LoadByPersistent(strSavePath, (pJson) => 
+            {
+                m_pJsonNode = pJson;
+                pCallback(this);
+            });
         }
-
-        return GetJsonParseToString(pWWW.text);
+        else
+        {
+            LoadByPackage(strFileName, (pJson) => 
+            {
+                m_pJsonNode = pJson;
+                pCallback(this);
+            });
+        }
     }
     
-    // 인터페이스 : Byte로 Json파싱
-    public JsonData GetJsonParseToByte(byte[] pByte)
+    public bool CheckJson()
+    {
+        return (null != m_pJsonNode);
+    }
+
+    private void LoadByWWW(string strFileName, Action<JsonData> pCallback)
+    {
+        var strFilePath = GetStreamingPath(strFileName);
+        Single.Coroutine.WWW(new WWW(strFilePath), (pWWW) => 
+        {
+            if (true != string.IsNullOrEmpty(pWWW.error))
+            {
+                Debug.LogWarningFormat("[LSH] Json(*.json)파일을 읽는 중 오류발생!!(Path:{0}, Error:{1})", strFilePath, pWWW.error);
+            }
+            
+            pCallback(GetJsonParseToString(pWWW.text));
+        });
+    }
+
+    private void LoadByPersistent(string strFilePath, Action<JsonData> pCallback)
+    {
+        string strBuff = File.ReadAllText(strFilePath);
+        if (true == string.IsNullOrEmpty(strBuff))
+        {
+            Debug.LogWarningFormat("[LSH] Json(*.json)파일을 읽는 중 오류발생!!(Path:{0})", strFilePath);
+        }
+
+        pCallback(GetJsonParseToString(strBuff));
+    }
+
+    private void LoadByPackage(string strFileName, Action<JsonData> pCallback)
+    {
+        Single.Resources.GetTextAsset(Path.GetFileNameWithoutExtension(strFileName), (pTextAsset) => 
+        {
+            if (null == pTextAsset)
+            {
+                pCallback(null);
+            }
+            else
+            {
+                pCallback(GetJsonParseToByte(pTextAsset.bytes));
+            }
+        });
+    }
+    
+    private JsonData GetJsonParseToByte(byte[] pByte)
     {
         System.Text.UTF8Encoding pEncoder = new System.Text.UTF8Encoding();
         return JsonMapper.ToJson(pEncoder.GetString(pByte));
     }
 
-    // 인터페이스 : string으로 Json파싱
-    public JsonData GetJsonParseToString(string strBuff)
+    private JsonData GetJsonParseToString(string strBuff)
     {
+        if (true == string.IsNullOrEmpty(strBuff))
+        {
+            return null;
+        }
+
         MemoryStream pStream = new MemoryStream(Encoding.UTF8.GetBytes(strBuff));
         StreamReader pReader = new StreamReader(pStream, true);
         string strEncodingBuff = pReader.ReadToEnd();
@@ -101,30 +112,7 @@ public class SHJson
         return JsonMapper.ToJson(strEncodingBuff);
     }
 
-    // 인터페이스 : Json파일 로드 체크
-    public bool CheckJson()
-    {
-        return (null != m_pJsonNode);
-    }
-
-    // 유틸 : Json파일 로드
-    public JsonData LoadLocal(string strFilePath)
-    {
-        if (false == File.Exists(strFilePath))
-            return null;
-
-        string strBuff = File.ReadAllText(strFilePath);
-        if (true == string.IsNullOrEmpty(strBuff))
-        {
-            Debug.LogWarningFormat("Json(*.json)파일을 읽는 중 오류발생!!(Path:{0})", strFilePath);
-            return null;
-        }
-
-        return GetJsonParseToString(strBuff);
-    }
-
-    // 유틸 : StreamingPath경로 만들기
-    public static string GetStreamingPath(string strFileName)
+    private static string GetStreamingPath(string strFileName)
     {
         string strPath = string.Empty;
 

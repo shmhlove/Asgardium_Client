@@ -29,7 +29,7 @@ public class JsonPreloadResources : SHBaseTable
     public override eErrorCode LoadJsonTable(JsonData pJson, string strFileName)
     {
         if (null == pJson)
-            return eErrorCode.Table_Load_Fail;
+            return eErrorCode.Table_LoadFailed;
 
         int iMaxTable = pJson.Count;
         for (int iLoop = 0; iLoop < iMaxTable; ++iLoop)
@@ -50,7 +50,7 @@ public class JsonPreloadResources : SHBaseTable
     public List<string> GetData(eSceneType eType)
     {
         if (false == IsLoadTable())
-            LoadJson(m_strFileName);
+            LoadJson(m_strFileName, (errorCode) => {});
 
         if (false == m_pData.ContainsKey(eType))
             return new List<string>();

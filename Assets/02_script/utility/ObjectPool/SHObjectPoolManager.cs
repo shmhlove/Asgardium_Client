@@ -9,9 +9,14 @@ using DicObject = System.Collections.Generic.Dictionary<string, System.Collectio
 
 public class SHObjectPoolManager : SHSingleton<SHObjectPoolManager>
 {
+    // 오브젝트 풀의 관리 포인트로 루트오브젝트를 두고 있다.
+    // Dictionary로 관리하는 이유는 오브젝트 그룹핑을 위해 레이어 구분을 두기 위해서이다.
+    // 즉, 오브젝트 풀의 Root 오브젝트의 이름은 SHObjectPool_LayerNumber로 관리하고 있다.
     DicRoots m_dicRoots      = new DicRoots();
 
+    // 활성화 되어 있는 오브젝트들
     DicObject m_dicActives   = new DicObject();
+    // 비 활성화 되어 있는 오브젝트들
     DicObject m_dicInactives = new DicObject();
 
     private readonly int DELAY_CHECK_FOR_RECOVERY = 5;
@@ -31,22 +36,27 @@ public class SHObjectPoolManager : SHSingleton<SHObjectPoolManager>
         StopAllCoroutines();
     }
 
-    public T Get<T>(
-        string                 strName, 
-        eObjectPoolReturnType  eReturnType  = eObjectPoolReturnType.Disable, 
-        eObjectPoolDestroyType eDestroyType = eObjectPoolDestroyType.ChangeScene) where T : Component
+    public void Get<T>(string  strName, 
+        eObjectPoolReturnType  eReturnType, 
+        eObjectPoolDestroyType eDestroyType,
+        Action<T>              pCallback) where T : Component
     {
-        return SHGameObject.GetComponent<T>(Get(strName, eReturnType, eDestroyType));
+        Get(strName, eReturnType, eDestroyType, (pObject) => 
+        {
+            pCallback(SHGameObject.GetComponent<T>(pObject));
+        });
     }
 
-    public GameObject Get(
-        string                 strName, 
-        eObjectPoolReturnType  eReturnType  = eObjectPoolReturnType.Disable, 
-        eObjectPoolDestroyType eDestroyType = eObjectPoolDestroyType.ChangeScene)
+    public void Get(string     strName, 
+        eObjectPoolReturnType  eReturnType, 
+        eObjectPoolDestroyType eDestroyType,
+        Action<GameObject>     pCallback)
     {
-        var pObject = GetInactiveObject(eReturnType, eDestroyType, strName);
-        SetActiveObject(strName, pObject);
-        return pObject.m_pObject;
+        GetInactiveObject(strName, eReturnType, eDestroyType, (pObject) => 
+        {
+            SetActiveObject(strName, pObject);
+            pCallback(pObject.m_pObject);
+        });
     }
 
     public void Return(GameObject pObject)
@@ -118,21 +128,24 @@ public class SHObjectPoolManager : SHSingleton<SHObjectPoolManager>
             return m_dicInactives[strName];
     }
 
-    private SHObjectPool GetInactiveObject(eObjectPoolReturnType eReturnType, eObjectPoolDestroyType eDestroyType, string strName)
+    private void GetInactiveObject(string   strName, 
+                    eObjectPoolReturnType   eReturnType, 
+                    eObjectPoolDestroyType  eDestroyType,
+                    Action<SHObjectPool>    pCallback)
     {
         var pObjects = GetInactiveObjects(strName);
         if (0 == pObjects.Count)
         {
-            return new SHObjectPool(
-                eReturnType,
-                eDestroyType, 
-                Single.Resources.GetGameObject(strName));
+            Single.Resources.GetGameObject(strName, (pObject) => 
+            {
+                pCallback(new SHObjectPool(eReturnType, eDestroyType, pObject));
+            });
         }
         else
         {
             pObjects[0].m_eReturnType  = eReturnType;
             pObjects[0].m_eDestroyType = eDestroyType;
-            return pObjects[0];
+            pCallback(pObjects[0]);
         }
     }
 

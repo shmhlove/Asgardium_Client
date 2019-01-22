@@ -12,6 +12,11 @@ using System.Diagnostics;
 
 public static partial class SHUtils
 {
+    public static double GetElapsedSecond(DateTime pTime)
+    {
+        return ((DateTime.Now - pTime).TotalMilliseconds / 1000.0);
+    }
+
     public static DateTime GetDateTimeToString(string strDate, string strFormat)
     {
         return DateTime.ParseExact(strDate, strFormat, System.Globalization.CultureInfo.InstalledUICulture);

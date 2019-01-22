@@ -38,21 +38,27 @@ public class SHDataManager : SHSingleton<SHDataManager>
     public void Load(eSceneType eType, Action<SHLoadingInfo> pDone, Action<SHLoadingInfo> pProgress)
     {
         OnEventToLoadStart();
-        
-        m_pLoader.Process(GetLoadList(eType), (pLoadInfo) => 
+
+        GetLoadList(eType, (pLoadList) => 
         {
-            if (null != pDone)
+            m_pLoader.Process(pLoadList, (pLoadInfo) => 
             {
-                pDone(pLoadInfo);
-            }
-            
-            OnEventToLoadDone();
-        }, pProgress);
+                if (null != pDone)
+                {
+                    pDone(pLoadInfo);
+                }
+                
+                OnEventToLoadDone();
+            }, pProgress);
+        });
     }
     
     public void Patch(Action<SHLoadingInfo> pDone, Action<SHLoadingInfo> pProgress)
     {
-        m_pLoader.Process(GetPatchList(), pDone, pProgress);
+        GetPatchList((pPatchList) => 
+        {
+            m_pLoader.Process(pPatchList, pDone, pProgress);
+        });
     }
     
     public bool IsLoadDone()
@@ -70,22 +76,34 @@ public class SHDataManager : SHSingleton<SHDataManager>
         return m_pLoader.IsLoadDone(eType);
     }
     
-    List<Dictionary<string, SHLoadData>> GetLoadList(eSceneType eType)
+    void GetLoadList(eSceneType eType, Action<List<Dictionary<string, SHLoadData>>> pCallback)
     {
-        return new List<Dictionary<string, SHLoadData>>()
+        Table.GetLoadList(eType, (pTableList) => 
         {
-            Table.GetLoadList(eType),
-            Resources.GetLoadList(eType)
-        };
+            Resources.GetLoadList(eType, (pResourcesList) => 
+            {
+                pCallback(new List<Dictionary<string, SHLoadData>>()
+                {
+                    pTableList,
+                    pResourcesList
+                });
+            });
+        });
     }
     
-    List<Dictionary<string, SHLoadData>> GetPatchList()
+    void GetPatchList(Action<List<Dictionary<string, SHLoadData>>> pCallback)
     {
-        return new List<Dictionary<string, SHLoadData>>()
+        Table.GetPatchList((pTableList) => 
         {
-            Table.GetPatchList(),
-            Resources.GetPatchList()
-        };
+            Resources.GetPatchList((pResourcesList) => 
+            {
+                pCallback(new List<Dictionary<string, SHLoadData>>()
+                {
+                    pTableList,
+                    pResourcesList
+                });
+            });
+        });
     }
     
     public void OnEventToLoadStart()

@@ -11,13 +11,13 @@ public class SHBaseData
     public virtual void OnFinalize() { }
     public virtual void FrameMove() { }
 
-    public virtual Dictionary<string, SHLoadData> GetLoadList(eSceneType eType)
+    public virtual void GetLoadList(eSceneType eType, Action<Dictionary<string, SHLoadData>> pCallback)
     {
-        return new Dictionary<string, SHLoadData>();
+        pCallback(new Dictionary<string, SHLoadData>());
     }
-    public virtual Dictionary<string, SHLoadData> GetPatchList()
+    public virtual void GetPatchList(Action<Dictionary<string, SHLoadData>> pCallback)
     {
-        return new Dictionary<string, SHLoadData>();
+        pCallback(new Dictionary<string, SHLoadData>());
     }
 
     // 로드가 성공하든 실패하든 pDone를 반드시 호출해줘야 한다~!!

@@ -12,22 +12,36 @@ public class SHXML
 {
     public string m_strXMLData = string.Empty;
     
-    public SHXML() { }
-    public SHXML(string strFileName)
+    public SHXML(string strFileName, Action<SHXML> pCallback)
     {
         if (true == string.IsNullOrEmpty(strFileName))
+        {
+            pCallback(this);
             return;
+        }
 
         strFileName = Path.GetFileNameWithoutExtension(strFileName);
 
-        // 1�� : PersistentData�� XML �����Ͱ� ������ �װ� �ε��ϵ��� �Ѵ�.
-        // 2�� : ������ ��Ű������ �ε��ϵ��� �Ѵ�.
+        // 1차 : PersistentDataPath에 데이터가 있으면 그걸 로드하도록 한다.
+        // 2차 : 없으면 패키지에서 로드하도록 한다.
 
         string strSavePath = string.Format("{0}/{1}.xml", SHPath.GetPersistentDataXML(), strFileName);
         if (true == File.Exists(strSavePath))
-            SetXMLData(LoadLocal(strSavePath));
+        {
+            LoadByPersistent(strSavePath, (strXML) => 
+            {
+                SetXMLData(strXML);
+                pCallback(this);
+            });
+        }
         else
-            SetXMLData(LoadPackage(strFileName));
+        {
+            LoadByPackage(strFileName, (strXML) => 
+            {
+                SetXMLData(strXML);
+                pCallback(this);
+            });
+        }
     }
     
     public bool CheckXML()
@@ -35,7 +49,12 @@ public class SHXML
         return (false == string.IsNullOrEmpty(m_strXMLData));
     }
     
-    public void SetXMLData(string strBuff)
+    public XmlNodeList GetNodeList(string strTagName)
+    {
+        return GetNodeList(GetNodeToTag(GetDocument(), strTagName, 0));
+    }
+
+    private void SetXMLData(string strBuff)
     {
         if (false == string.IsNullOrEmpty(strBuff))
             return;
@@ -47,23 +66,43 @@ public class SHXML
         pStream.Close();
     }
     
-    public string GetXMLData()
+    private void LoadByPersistent(string strFilePath, Action<string> pCallback)
     {
-        return m_strXMLData;
+        var pBuff = File.ReadAllText(strFilePath);
+        if (null == pBuff)
+        {
+            Debug.LogError(string.Format("[LSH] XML(*.xml)������ �д� �� �����߻�!!(Path:{0})", strFilePath));
+        }
+
+        pCallback(pBuff);
     }
-    
-    public XmlDocument GetDocument()
+
+    private void LoadByPackage(string strFileName, Action<string> pCallback)
     {
-        var strData = GetXMLData();
-        if (true == string.IsNullOrEmpty(strData))
+        Single.Resources.GetTextAsset(Path.GetFileNameWithoutExtension(strFileName), (pTextAsset) => 
+        {
+            if (null == pTextAsset)
+            {
+                pCallback(string.Empty);
+            }
+            else
+            {
+                pCallback(pTextAsset.text);
+            }
+        });
+    }
+
+    private XmlDocument GetDocument()
+    {
+        if (true == string.IsNullOrEmpty(m_strXMLData))
             return null;
 
         var pDocument = new XmlDocument();
-        pDocument.LoadXml(strData);
+        pDocument.LoadXml(m_strXMLData);
         return pDocument;
     }
     
-    public XmlNode GetNodeToTag(XmlDocument pDoc, string strTag, int iItemIndex)
+    private XmlNode GetNodeToTag(XmlDocument pDoc, string strTag, int iItemIndex)
     {
         if (null == pDoc)
             pDoc = GetDocument();
@@ -73,11 +112,6 @@ public class SHXML
 
         return pDoc.GetElementsByTagName(strTag).Item(iItemIndex);
     }
-    
-    public XmlNodeList GetNodeList(string strTagName)
-    {
-        return GetNodeList(GetNodeToTag(GetDocument(), strTagName, 0));
-    }
 
     public XmlNodeList GetNodeList(XmlNode pNode)
     {
@@ -85,26 +119,5 @@ public class SHXML
             return null;
 
         return pNode.ChildNodes;
-    }
-
-    string LoadLocal(string strFilePath)
-    {
-        var pBuff = File.ReadAllText(strFilePath);
-        if (null == pBuff)
-        {
-            Debug.LogError(string.Format("[LSH] XML(*.xml)������ �д� �� �����߻�!!(Path:{0})", strFilePath));
-            return null;
-        }
-
-        return pBuff;
-    }
-
-    string LoadPackage(string strFileName)
-    {
-        var pTextAsset = Single.Resources.GetTextAsset(Path.GetFileNameWithoutExtension(strFileName));
-        if (null == pTextAsset)
-            return null;
-
-        return pTextAsset.text;
     }
 }

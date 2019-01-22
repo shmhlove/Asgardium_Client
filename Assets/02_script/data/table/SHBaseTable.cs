@@ -35,92 +35,121 @@ public abstract class SHBaseTable
 
     // 다양화(로드) : 컨테이너를 시리얼 라이즈해서 Byte파일로 내어주는 함수
     public virtual byte[] GetBytesTable()                                           { return null; }
-
-    //// 다양화(로드) : 컨테이너를 콜렉션형태로 내어주는 함수
-    //public virtual ICollection GetData()                                            { return null; }
     #endregion
-        
 
+    #region Interface Load Functions
     // 인터페이스 : Static 한 데이터 로드
-    public eErrorCode LoadStatic()
+    public void LoadStatic(Action<eErrorCode> pCallback)
     {
         if (eErrorCode.Table_Not_Override == LoadStaticTable())
-            return eErrorCode.Table_Not_Override;
+        {
+            pCallback(eErrorCode.Table_Not_Override);
+        }
         
         Initialize();
 
-        return LoadStaticTable();
+        pCallback(LoadStaticTable());
     }
 
     // 인터페이스 : Json파일 로드
-    public eErrorCode LoadJson(string strFileName) 
+    public void LoadJson(string strFileName, Action<eErrorCode> pCallback)
     {
         if (eErrorCode.Table_Not_Override == LoadJsonTable(null, null))
-            return eErrorCode.Table_Not_Override;
+        {
+            pCallback(eErrorCode.Table_Not_Override);
+            return;
+        }
         
-        SHJson pJson = new SHJson(strFileName);
-        if (false == pJson.CheckJson())
-            return eErrorCode.Table_Not_ExsitFile;
+        new SHJson(strFileName, (pJson) => 
+        {
+            if (false == pJson.CheckJson())
+            {
+                pCallback(eErrorCode.Table_Not_ExsitFile);
+                return;
+            }
 
-        Initialize();
+            Initialize();
 
-        return LoadJsonTable(pJson.Node, m_strFileName);
+            pCallback(LoadJsonTable(pJson.m_pJsonNode, m_strFileName));
+        });
     }
 
     // 인터페이스 : XML파일 로드
-    public eErrorCode LoadXML(string strFileName) 
+    public void LoadXML(string strFileName, Action<eErrorCode> pCallback) 
     {
         if (eErrorCode.Table_Not_Override == LoadXMLTable(null))
-            return eErrorCode.Table_Not_Override;
-        
-        var pXML = new SHXML(strFileName);
-        if (false == pXML.CheckXML())
-            return eErrorCode.Table_Not_ExsitFile;
-        
-        XmlNodeList pNodeList = pXML.GetNodeList(m_strFileName);
-        if (null == pNodeList)
-            return eErrorCode.Table_Error_Grammar;
-
-        Initialize();
-
-        int iMaxNodeCount = pNodeList.Count;
-        for (int iLoop = 0; iLoop < iMaxNodeCount; ++iLoop)
         {
-            var eResult = LoadXMLTable(pNodeList[iLoop]);
-
-            if (eErrorCode.Succeed != eResult)
-                return eResult;
+            pCallback(eErrorCode.Table_Not_Override);
+            return;
         }
+        
+        new SHXML(strFileName, (pXML) => 
+        {
+            if (false == pXML.CheckXML())
+            {
+                pCallback(eErrorCode.Table_Not_ExsitFile);
+                return;
+            }
+            
+            XmlNodeList pNodeList = pXML.GetNodeList(m_strFileName);
+            if (null == pNodeList)
+            {
+                pCallback(eErrorCode.Table_Error_Grammar);
+                return;
+            }
 
-        return eErrorCode.Succeed;
+            Initialize();
+
+            int iMaxNodeCount = pNodeList.Count;
+            for (int iLoop = 0; iLoop < iMaxNodeCount; ++iLoop)
+            {
+                var eResult = LoadXMLTable(pNodeList[iLoop]);
+
+                if (eErrorCode.Succeed != eResult)
+                {
+                    pCallback(eResult);
+                    return;
+                }
+            }
+
+            pCallback(eErrorCode.Succeed);
+        });
     }
     
     // 인터페이스 : Byte파일 로드
-    public eErrorCode LoadByte(string strFileName)
+    public void LoadByte(string strFileName, Action<eErrorCode> pCallback)
     {
         if (eErrorCode.Table_Not_Override == LoadBytesTable(null))
-            return eErrorCode.Table_Not_Override;
+        {
+            pCallback(eErrorCode.Table_Not_Override);
+            return;
+        }
         
-        SHBytes pBytes = new SHBytes(strFileName);
-        if (false == pBytes.CheckBytes())
-            return eErrorCode.Table_Not_ExsitFile;
+        new SHBytes(strFileName, (pBytes) => 
+        {
+            if (false == pBytes.CheckBytes())
+            {
+                pCallback(eErrorCode.Table_Not_ExsitFile);
+                return;
+            }
 
-        Initialize();
+            Initialize();
 
-        return LoadBytesTable(pBytes.GetBytes());
+            pCallback(LoadBytesTable(pBytes.m_pBytes));
+        });
     }
 
     // 인터페이스 : 테이블 타입
     public eTableType GetTableType()
     {
         if (eErrorCode.Table_Not_Override != LoadStaticTable())         return eTableType.Static;
-        if (eErrorCode.Table_Not_Override != LoadXMLTable(null))        return eTableType.XML;
         if (eErrorCode.Table_Not_Override != LoadBytesTable(null))      return eTableType.Byte;
+        if (eErrorCode.Table_Not_Override != LoadXMLTable(null))        return eTableType.XML;
         if (eErrorCode.Table_Not_Override != LoadJsonTable(null, null)) return eTableType.Json;
 
         return eTableType.None;
     }
-
+    #endregion
 
     #region Json Pasing Utility
     // 유틸 : Json에서 String데이터 얻기

@@ -21,7 +21,7 @@ public enum eErrorCode
     Resources_NotExsitInTable = 1001002,
     Resources_LoadFailed = 1001003,
     Table_Not_AddClass = 1002001,
-    Table_Load_Fail = 1002002,
+    Table_LoadFailed = 1002002,
     Table_Not_Override = 1002004,
     Table_Not_ExsitFile = 1002005,
     Table_Error_Grammar = 1002006,

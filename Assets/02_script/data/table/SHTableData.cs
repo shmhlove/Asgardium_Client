@@ -24,7 +24,7 @@ public partial class SHTableData : SHBaseData
         m_dicTables.Clear();
     }
     
-    public override Dictionary<string, SHLoadData> GetLoadList(eSceneType eType)
+    public override void GetLoadList(eSceneType eType, Action<Dictionary<string, SHLoadData>> pCallback)
     {
         var dicLoadList = new Dictionary<string, SHLoadData>();
         
@@ -36,7 +36,7 @@ public partial class SHTableData : SHBaseData
             dicLoadList.Add(kvp.Value.m_strFileName, CreateLoadInfo(kvp.Value.m_strFileName));
         }
 
-        return dicLoadList; 
+        pCallback(dicLoadList);
     }
 
     public override IEnumerator Load(SHLoadData pInfo, 
@@ -45,18 +45,26 @@ public partial class SHTableData : SHBaseData
     {
         pStart(pInfo.m_strName, new SHLoadStartInfo());
 
-        var pTable = GetTable(pInfo.m_strName, false);
-        if (null == pTable)
+        GetTable(pInfo.m_strName, (pTable) => 
         {
-            Debug.LogErrorFormat("[LSH] 등록된 테이블이 아닙니다.!!({0})", pInfo.m_strName);
-            pDone(pInfo.m_strName, new SHLoadEndInfo(eErrorCode.Table_Not_AddClass));
-            yield break;
-        }
+            if (null == pTable)
+            {
+                Debug.LogErrorFormat("[LSH] 등록된 테이블이 아닙니다.!!({0})", pInfo.m_strName);
+                pDone(pInfo.m_strName, new SHLoadEndInfo(eErrorCode.Table_Not_AddClass));
+                return;
+            }
 
-        foreach (var pLoadTable in GetLoadOrder(pTable))
-        {
-            pDone(pInfo.m_strName, new SHLoadEndInfo(pLoadTable()));
-        }
+            if (true == pTable.IsLoadTable())
+            {
+                pDone(pInfo.m_strName, new SHLoadEndInfo(eErrorCode.Succeed));
+            }
+            else
+            {
+                pDone(pInfo.m_strName, new SHLoadEndInfo(eErrorCode.Table_LoadFailed));
+            }
+        });
+
+        yield return null;
     }
     
     public SHLoadData CreateLoadInfo(string strName)
@@ -69,43 +77,62 @@ public partial class SHTableData : SHBaseData
         };
     }
 
-    public T GetTable<T>(bool bIsLoadCheck = true) where T : SHBaseTable
+    public void GetTable<T>(Action<T> pCallback) where T : SHBaseTable
     {
-        return GetTable(typeof(T), bIsLoadCheck) as T;
+        GetTable(typeof(T), (pTable) => 
+        {
+            if (null == pTable)
+            {
+                pCallback(default(T));
+            }
+            else
+            {
+                pCallback(pTable as T);
+            }
+        });
     }
 
-    public SHBaseTable GetTable(Type pType, bool bIsLoadCheck = true)
+    public void GetTable(Type pType, Action<SHBaseTable> pCallback)
     {
         if (0 == m_dicTables.Count)
-            OnInitialize();
-
-        if (false == m_dicTables.ContainsKey(pType))
-            return null;
-
-        var pTable = m_dicTables[pType];
-        if (true == bIsLoadCheck)
         {
-            if (false == pTable.IsLoadTable())
-            {
-                switch(pTable.GetTableType())
-                {
-                    case eTableType.Static: pTable.LoadStatic();                       break;
-                    case eTableType.Byte:   pTable.LoadByte(pTable.m_strByteFileName); break;
-                    case eTableType.XML:    pTable.LoadXML(pTable.m_strFileName);      break;
-                    case eTableType.Json:   pTable.LoadJson(pTable.m_strFileName);     break;
-                }
-            }
+            OnInitialize();
         }
 
-        return pTable;
+        if (false == m_dicTables.ContainsKey(pType))
+        {
+            pCallback(null);
+        }
+        else
+        {
+            var pTable = m_dicTables[pType];
+
+            if (true == pTable.IsLoadTable())
+            {
+                pCallback(pTable);
+            }
+            else
+            {
+                Action<eErrorCode> pAction = (errorCode) => { pCallback(pTable); };
+                switch(pTable.GetTableType())
+                {
+                    case eTableType.Static: pTable.LoadStatic(pAction);                         break;
+                    case eTableType.Byte:   pTable.LoadByte(pTable.m_strByteFileName, pAction); break;
+                    case eTableType.XML:    pTable.LoadXML(pTable.m_strFileName, pAction);      break;
+                    case eTableType.Json:   pTable.LoadJson(pTable.m_strFileName, pAction);     break;
+                }
+            }            
+        }
     }
 
-    public SHBaseTable GetTable(string strFileName, bool bIsLoadCheck = true)
+    public void GetTable(string strFileName, Action<SHBaseTable> pCallback)
     {
         if (true == string.IsNullOrEmpty(strFileName))
-            return null;
+        {
+            pCallback(null);
+        }
 
-        return GetTable(GetTypeToFileName(strFileName), bIsLoadCheck);
+        GetTable(GetTypeToFileName(strFileName), pCallback);
     }
     
     public Type GetTypeToFileName(string strFileName)
@@ -118,26 +145,5 @@ public partial class SHTableData : SHBaseData
         }
 
         return null;
-    }
-    
-    List<Func<eErrorCode>> GetLoadOrder(SHBaseTable pTable)
-    {
-        var pLoadOrder = new List<Func<eErrorCode>>();
-        //if (true == Single.AppInfo.IsEditorMode())
-        //{
-        //    pLoadOrder.Add(() => { return pTable.LoadStatic();                        });
-        //    pLoadOrder.Add(() => { return pTable.LoadXML(pTable.m_strFileName);       });
-        //    pLoadOrder.Add(() => { return pTable.LoadBytes(pTable.m_strByteFileName); });
-        //    pLoadOrder.Add(() => { return pTable.LoadJson(pTable.m_strFileName);      });
-        //}
-        //else
-        {
-            pLoadOrder.Add(() => { return pTable.LoadStatic();                        });
-            pLoadOrder.Add(() => { return pTable.LoadByte(pTable.m_strByteFileName);  });
-            pLoadOrder.Add(() => { return pTable.LoadXML(pTable.m_strFileName);       });
-            pLoadOrder.Add(() => { return pTable.LoadJson(pTable.m_strFileName);      });
-        }
-
-        return pLoadOrder;
     }
 }

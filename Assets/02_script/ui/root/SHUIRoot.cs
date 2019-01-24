@@ -8,6 +8,11 @@ public class SHUIRoot : MonoBehaviour
 {
 	public List<SHUIPanel> panels;
 
+    public virtual void Awake()
+    {
+        Single.UI.AddRoot(this.GetType(), this);
+    }
+
     public T GetPanel<T>() where T : SHUIPanel
     {
         foreach(var panel in panels)

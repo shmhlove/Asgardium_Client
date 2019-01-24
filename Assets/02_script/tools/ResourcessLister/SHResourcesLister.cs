@@ -148,7 +148,6 @@ public class SHResourcesLister
         pJsonData["s_FileName"]  = pInfo.m_strFileName;
         pJsonData["s_Extension"] = pInfo.m_strExtension;
         pJsonData["s_Size"]      = pInfo.m_strSize;
-        //pJsonData["s_LastWriteTime"] = pInfo.m_strLastWriteTime;
         pJsonData["s_Hash"]      = pInfo.m_strHash;
         pJsonData["s_Path"]      = pInfo.m_strPath;
 
@@ -224,7 +223,6 @@ public class SHResourcesLister
         pInfo.m_strFileName         = Path.GetFileName(strFullName);
         pInfo.m_strExtension        = strExtension;
         pInfo.m_strSize             = pFile.Length.ToString();
-        //pInfo.m_strLastWriteTime    = pFile.LastWriteTime.ToString("yyyy-MM-dd-HH:mm:ss.fff");
         pInfo.m_strHash             = SHHash.GetMD5ToFile(pFile.FullName);
         pInfo.m_strPath             = strFullName.Substring(0, strFullName.Length - strExtension.Length);
         

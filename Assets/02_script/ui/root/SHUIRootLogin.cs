@@ -6,11 +6,6 @@ using System.Collections.Generic;
 
 public class SHUIRootLogin : SHUIRoot
 {
-    void Awake()
-    {
-        Single.UI.AddRoot(typeof(SHUIRootLogin), this);
-    }
-
     public void ShowLoginPanel(Action<string, string> pLoginAction, Action<string, string> pSigninAction, Action pCloseAction)
     {
         //SetEnableAllPanels(false);

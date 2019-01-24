@@ -26,7 +26,7 @@ public class JsonPreloadResources : SHBaseTable
         return (0 != m_pData.Count);
     }
 
-    public override eErrorCode LoadJsonTable(JsonData pJson, string strFileName)
+    public override eErrorCode LoadJsonTable(JsonData pJson)
     {
         if (null == pJson)
             return eErrorCode.Table_LoadFailed;

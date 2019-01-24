@@ -77,6 +77,16 @@ public partial class SHTableData : SHBaseData
         };
     }
 
+    public void GetTable(string strFileName, Action<SHBaseTable> pCallback)
+    {
+        if (true == string.IsNullOrEmpty(strFileName))
+        {
+            pCallback(null);
+        }
+
+        GetTable(GetTypeByFileName(strFileName), pCallback);
+    }
+    
     public void GetTable<T>(Action<T> pCallback) where T : SHBaseTable
     {
         GetTable(typeof(T), (pTable) => 
@@ -124,18 +134,8 @@ public partial class SHTableData : SHBaseData
             }            
         }
     }
-
-    public void GetTable(string strFileName, Action<SHBaseTable> pCallback)
-    {
-        if (true == string.IsNullOrEmpty(strFileName))
-        {
-            pCallback(null);
-        }
-
-        GetTable(GetTypeToFileName(strFileName), pCallback);
-    }
     
-    public Type GetTypeToFileName(string strFileName)
+    public Type GetTypeByFileName(string strFileName)
     {
         strFileName = Path.GetFileNameWithoutExtension(strFileName);
         foreach (var kvp in m_dicTables)

@@ -93,7 +93,7 @@ public class SHJson
     private JsonData GetJsonParseToByte(byte[] pByte)
     {
         System.Text.UTF8Encoding pEncoder = new System.Text.UTF8Encoding();
-        return JsonMapper.ToJson(pEncoder.GetString(pByte));
+        return JsonMapper.ToObject(pEncoder.GetString(pByte));
     }
 
     private JsonData GetJsonParseToString(string strBuff)

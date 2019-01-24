@@ -19,27 +19,27 @@ public abstract class SHBaseTable
     public abstract bool IsLoadTable();
 
     // 다양화(로드) : 서버 웹 데이터
-    public virtual WWW LoadWebData(Action<bool> pDone)                              { return null; }
+    public virtual WWW LoadWebData(Action<bool> pDone)         { return null; }
 
     // 다양화(로드) : 코드로 데이터를 생성(Hard한 데이터)
-    public virtual eErrorCode LoadStaticTable()                                     { return eErrorCode.Table_Not_Override; }
+    public virtual eErrorCode LoadStaticTable()                { return eErrorCode.Table_Not_Override; }
 
     // 다양화(로드) : Json파일에서 로드
-    public virtual eErrorCode LoadJsonTable(JsonData pJson, string strTableName)    { return eErrorCode.Table_Not_Override; }
+    public virtual eErrorCode LoadJsonTable(JsonData pJson)    { return eErrorCode.Table_Not_Override; }
 
     // 다양화(로드) : XML파일에서 로드
-    public virtual eErrorCode LoadXMLTable(XmlNode pNode)                           { return eErrorCode.Table_Not_Override; }
+    public virtual eErrorCode LoadXMLTable(XmlNode pNode)      { return eErrorCode.Table_Not_Override; }
 
     // 다양화(로드) : Byte파일에서 로드
-    public virtual eErrorCode LoadBytesTable(byte[] pByte)                          { return eErrorCode.Table_Not_Override; }
+    public virtual eErrorCode LoadBytesTable(byte[] pByte)     { return eErrorCode.Table_Not_Override; }
 
     // 다양화(로드) : 컨테이너를 시리얼 라이즈해서 Byte파일로 내어주는 함수
-    public virtual byte[] GetBytesTable()                                           { return null; }
+    public virtual byte[] GetBytesTable()                      { return null; }
     #endregion
 
     #region Interface Load Functions
     // 인터페이스 : Static 한 데이터 로드
-    public void LoadStatic(Action<eErrorCode> pCallback)
+    public virtual void LoadStatic(Action<eErrorCode> pCallback)
     {
         if (eErrorCode.Table_Not_Override == LoadStaticTable())
         {
@@ -52,9 +52,9 @@ public abstract class SHBaseTable
     }
 
     // 인터페이스 : Json파일 로드
-    public void LoadJson(string strFileName, Action<eErrorCode> pCallback)
+    public virtual void LoadJson(string strFileName, Action<eErrorCode> pCallback)
     {
-        if (eErrorCode.Table_Not_Override == LoadJsonTable(null, null))
+        if (eErrorCode.Table_Not_Override == LoadJsonTable(null))
         {
             pCallback(eErrorCode.Table_Not_Override);
             return;
@@ -70,12 +70,12 @@ public abstract class SHBaseTable
 
             Initialize();
 
-            pCallback(LoadJsonTable(pJson.m_pJsonNode, m_strFileName));
+            pCallback(LoadJsonTable(pJson.m_pJsonNode));
         });
     }
 
     // 인터페이스 : XML파일 로드
-    public void LoadXML(string strFileName, Action<eErrorCode> pCallback) 
+    public virtual void LoadXML(string strFileName, Action<eErrorCode> pCallback) 
     {
         if (eErrorCode.Table_Not_Override == LoadXMLTable(null))
         {
@@ -117,7 +117,7 @@ public abstract class SHBaseTable
     }
     
     // 인터페이스 : Byte파일 로드
-    public void LoadByte(string strFileName, Action<eErrorCode> pCallback)
+    public virtual void LoadByte(string strFileName, Action<eErrorCode> pCallback)
     {
         if (eErrorCode.Table_Not_Override == LoadBytesTable(null))
         {
@@ -142,10 +142,10 @@ public abstract class SHBaseTable
     // 인터페이스 : 테이블 타입
     public eTableType GetTableType()
     {
-        if (eErrorCode.Table_Not_Override != LoadStaticTable())         return eTableType.Static;
-        if (eErrorCode.Table_Not_Override != LoadBytesTable(null))      return eTableType.Byte;
-        if (eErrorCode.Table_Not_Override != LoadXMLTable(null))        return eTableType.XML;
-        if (eErrorCode.Table_Not_Override != LoadJsonTable(null, null)) return eTableType.Json;
+        if (eErrorCode.Table_Not_Override != LoadStaticTable())    return eTableType.Static;
+        if (eErrorCode.Table_Not_Override != LoadBytesTable(null)) return eTableType.Byte;
+        if (eErrorCode.Table_Not_Override != LoadXMLTable(null))   return eTableType.XML;
+        if (eErrorCode.Table_Not_Override != LoadJsonTable(null))  return eTableType.Json;
 
         return eTableType.None;
     }

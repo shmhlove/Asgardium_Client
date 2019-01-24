@@ -35,7 +35,7 @@ public class JsonClientConfig : SHBaseTable
         return (false == string.IsNullOrEmpty(Version));
     }
 
-    public override eErrorCode LoadJsonTable(JsonData pJson, string strFileName)
+    public override eErrorCode LoadJsonTable(JsonData pJson)
     {
         if (null == pJson)
             return eErrorCode.Table_LoadFailed;

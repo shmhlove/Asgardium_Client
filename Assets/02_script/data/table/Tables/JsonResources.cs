@@ -13,7 +13,6 @@ public class SHResourcesInfo
     public string           m_strFileName;         // 확장자가 있는 이름
     public string           m_strExtension;        // 확장자
     public string           m_strSize;             // 파일크기
-    //public string           m_strLastWriteTime;    // 마지막 수정날짜 ( 리스팅 할때마다 변경되어서 그냥 제거시킴 )
     public string           m_strHash;             // 해시
     public string           m_strPath;             // Resources폴더 이하 경로
     public eResourceType    m_eResourceType;       // 리소스 타입
@@ -38,10 +37,26 @@ public class JsonResources : SHBaseTable
         return (0 != m_pData.Count);
     }
 
-    public override eErrorCode LoadJsonTable(JsonData pJson, string strFileName)
+    public override void LoadJson(string strFileName, Action<eErrorCode> pCallback)
+    {
+        var pTextAsset = Resources.Load<TextAsset>(string.Format("Table/Json/{0}", strFileName));
+        if (null == pTextAsset)
+        {
+            pCallback(eErrorCode.Table_Not_ExsitFile);
+        }
+        else
+        {
+            Initialize();
+            pCallback(LoadJsonTable(JsonMapper.ToObject(pTextAsset.text)));
+        }
+    }
+
+    public override eErrorCode LoadJsonTable(JsonData pJson)
     {
         if (null == pJson)
+        {
             return eErrorCode.Table_LoadFailed;
+        }
         
         int iMaxTable = pJson.Count;
         for (int iLoop = 0; iLoop < iMaxTable; ++iLoop)
@@ -52,7 +67,6 @@ public class JsonResources : SHBaseTable
             pData.m_strFileName         = GetStrToJson(pDataNode, "s_FileName");
             pData.m_strExtension        = GetStrToJson(pDataNode, "s_Extension");
             pData.m_strSize             = GetStrToJson(pDataNode, "s_Size");
-            //pData.m_strLastWriteTime    = GetStrToJson(pDataNode, "s_LastWriteTime");
             pData.m_strHash             = GetStrToJson(pDataNode, "s_Hash");
             pData.m_strPath             = GetStrToJson(pDataNode, "s_Path");
             pData.m_eResourceType       = SHUtils.GetResourceTypeByExtension(pData.m_strExtension);
@@ -63,23 +77,12 @@ public class JsonResources : SHBaseTable
         return eErrorCode.Succeed;
     }
     
-    public void LoadImmediately()
-    {
-        var pTextAsset = Resources.Load<TextAsset>(string.Format("Table/Json/{0}", m_strFileName));
-        if (null == pTextAsset)
-        {
-            Debug.LogError("[LSH] Error!! not exist JsonResourcesInfo.json, Please Run > SHTool > Update Resources Info");
-        }
-        else
-        {
-            LoadJsonTable(JsonMapper.ToJson(pTextAsset.text), m_strFileName);
-        }
-    }
-
     public SHResourcesInfo GetResouceInfo(string strName)
     {
         if (false == IsLoadTable())
-            LoadImmediately();
+        {
+            LoadJson(m_strFileName, (errorCode) => { });
+        }
 
         strName = strName.ToLower().Trim();
         if (false == m_pData.ContainsKey(strName))

@@ -15,26 +15,24 @@ public class SHUIManager : SHSingleton<SHUIManager>
         Single.Scene.AddEventForLoadedScene(OnEventLoadedScene);
     }
 
-    public bool AddRoot(Type type, SHUIRoot root)
+    public void AddRoot(Type type, SHUIRoot root)
     {
-        if (dicRoots.ContainsKey(type))
+        if (false == dicRoots.ContainsKey(type))
         {
-            return false;
+            dicRoots.Add(type, root);
         }
-
-        dicRoots.Add(type, root);
-        return true;
+        else
+        {
+            dicRoots[type] = root;
+        }
     }
 
-    public bool RemoveRoot(Type type)
+    public void RemoveRoot(Type type)
     {
         if (dicRoots.ContainsKey(type))
         {
             dicRoots.Remove(type);
-            return true;
         }
-
-        return false;
     }
 
     public void GetRoot<T>(Action<T> pCallback) where T :  SHUIRoot
@@ -42,6 +40,7 @@ public class SHUIManager : SHSingleton<SHUIManager>
         if (dicRoots.ContainsKey(typeof(T)))
         {
             pCallback(dicRoots[typeof(T)] as T);
+            return;
         }
 
         Single.Resources.GetGameObject(typeof(T).ToString(), (pObject) => 

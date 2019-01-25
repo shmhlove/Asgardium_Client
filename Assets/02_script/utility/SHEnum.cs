@@ -83,3 +83,13 @@ public enum eBundlePackType
     All,            // 전체 번들 리패킹
     Update,         // 변경된 리소스가 포함되는 번들만 패킹
 }
+
+public enum eDirection
+{
+    Front,
+    Back,
+    Left,
+    Right,
+    Top,
+    Bottom
+}

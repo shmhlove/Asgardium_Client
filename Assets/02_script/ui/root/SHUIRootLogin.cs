@@ -10,19 +10,23 @@ public class SHUIRootLogin : SHUIRoot
     {
         //SetEnableAllPanels(false);
 
-        var panel = GetPanel<SHUIPanelLogin>();
-        panel.SetActive(true);
-        panel.OnLoginAction = pLoginAction;
-        panel.OnSigninAction = pSigninAction;
-        panel.OnloseAction = pCloseAction;
+        GetPanel<SHUIPanelLogin>("Panel - Login", (pPanel) => 
+        {
+            pPanel.SetActive(true);
+            pPanel.OnLoginAction = pLoginAction;
+            pPanel.OnSigninAction = pSigninAction;
+            pPanel.OnloseAction = pCloseAction;
+        });
     }
 
     public void CloseLoginPanel()
     {
-        var panel = GetPanel<SHUIPanelLogin>();
-        panel.SetActive(false);
-        panel.OnLoginAction = null;
-        panel.OnSigninAction = null;
-        panel.OnloseAction = null;
+        GetPanel<SHUIPanelLogin>("Panel - Login", (pPanel) => 
+        {
+            pPanel.SetActive(false);
+            pPanel.OnLoginAction = null;
+            pPanel.OnSigninAction = null;
+            pPanel.OnloseAction = null;
+        });
     }
 }

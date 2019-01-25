@@ -106,11 +106,7 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
     {
         Single.UI.GetRoot<SHUIRootGlobal>((pUIRoot) => 
         {
-            // if (false == pUIRoot.ShowFade("Panel_FadeIn", pCallback))
-            {
-                if (null != pCallback)
-                    pCallback();
-            }
+            pUIRoot.ShowFade("Panel - FadeIn", pCallback);
         });
     }
     
@@ -118,11 +114,7 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
     {
         Single.UI.GetRoot<SHUIRootGlobal>((pUIRoot) => 
         {
-            //if (false == uiRoot.ShowFade("Panel_FadeOut", pCallback))
-            {
-                if (null != pCallback)
-                    pCallback();
-            }
+            pUIRoot.ShowFade("Panel - FadeOut", pCallback);
         });
     }
 }

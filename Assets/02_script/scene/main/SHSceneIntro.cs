@@ -13,7 +13,7 @@ public class SHSceneIntro : MonoBehaviour
         {
             pUIRoot.Show(() => 
             {
-                Single.Scene.LoadScene(eSceneType.Login, pCallback: (pReply) => 
+                Single.Scene.LoadScene(eSceneType.Login, bIsUseFade: true, pCallback: (pReply) => 
                 {
 
                 });

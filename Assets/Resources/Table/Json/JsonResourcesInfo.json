@@ -1,35 +1,27 @@
 
 [
     {
-        "s_Name" : "UIRoot_Global",
-        "s_FileName" : "UIRoot_Global.prefab",
+        "s_Name" : "SHUIRootGlobal",
+        "s_FileName" : "SHUIRootGlobal.prefab",
         "s_Extension" : ".prefab",
-        "s_Size"      : "26748",
-        "s_Hash"      : "C3F88E6C95138B8EF5D6E88F03DB33C5",
-        "s_Path"      : "Prefab/UI/UIRoot_Global"
+        "s_Size"      : "40296",
+        "s_Hash"      : "81B069ACF7D963F4032B51938763ED4F",
+        "s_Path"      : "Prefab/UI/SHUIRootGlobal"
     },
     {
-        "s_Name" : "Panel_FadeIn",
-        "s_FileName" : "Panel_FadeIn.prefab",
-        "s_Extension" : ".prefab",
-        "s_Size"      : "12992",
-        "s_Hash"      : "FF56F8707992556A573DE8E868B4505B",
-        "s_Path"      : "Prefab/UI/Panel/Panel_FadeIn"
-    },
-    {
-        "s_Name" : "Panel_FadeOut",
-        "s_FileName" : "Panel_FadeOut.prefab",
-        "s_Extension" : ".prefab",
-        "s_Size"      : "12992",
-        "s_Hash"      : "41EF20810D4C2A9C14D01B4ECD85EED5",
-        "s_Path"      : "Prefab/UI/Panel/Panel_FadeOut"
+        "s_Name" : "",
+        "s_FileName" : ".DS_Store",
+        "s_Extension" : ".DS_Store",
+        "s_Size"      : "6148",
+        "s_Hash"      : "4E0C1C7AF309811790EE39CF0B49DF2E",
+        "s_Path"      : "Table/"
     },
     {
         "s_Name" : "JsonClientConfig",
         "s_FileName" : "JsonClientConfig.json",
         "s_Extension" : ".json",
-        "s_Size"      : "464",
-        "s_Hash"      : "DF4F1F0F6F6B6A56C7F831FF0C220BD3",
+        "s_Size"      : "435",
+        "s_Hash"      : "52C3E7EEC4F889916EDCE5D23B208E96",
         "s_Path"      : "Table/Json/JsonClientConfig"
     },
     {
@@ -45,7 +37,7 @@
         "s_FileName" : "JsonResourcesInfo.json",
         "s_Extension" : ".json",
         "s_Size"      : "1684",
-        "s_Hash"      : "E83727008076C349EF2C936B74CF4B8C",
+        "s_Hash"      : "88DDD186E9C7DE908CB51BF355353927",
         "s_Path"      : "Table/Json/JsonResourcesInfo"
     }
 ]

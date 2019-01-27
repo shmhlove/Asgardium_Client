@@ -7,59 +7,52 @@ using System.Collections.Generic;
 
 public class SHUIManager : SHSingleton<SHUIManager>
 {
-    Dictionary<Type, SHUIRoot> dicRoots = new Dictionary<Type, SHUIRoot>();
+    Dictionary<Type, SHUIRoot> m_dicRoots = new Dictionary<Type, SHUIRoot>();
 
     public override void OnInitialize()
     {
         SetDontDestroy();
-        Single.Scene.AddEventForLoadedScene(OnEventLoadedScene);
     }
-
+    
     public void AddRoot(Type type, SHUIRoot root)
     {
-        if (false == dicRoots.ContainsKey(type))
+        if (false == m_dicRoots.ContainsKey(type))
         {
-            dicRoots.Add(type, root);
+            m_dicRoots.Add(type, root);
         }
         else
         {
-            dicRoots[type] = root;
+            m_dicRoots[type] = root;
         }
     }
 
-    public void RemoveRoot(Type type)
+    public void DelRoot(Type type)
     {
-        if (dicRoots.ContainsKey(type))
+        if (true == m_dicRoots.ContainsKey(type))
         {
-            dicRoots.Remove(type);
+            m_dicRoots.Remove(type);
         }
     }
 
     public void GetRoot<T>(Action<T> pCallback) where T :  SHUIRoot
     {
-        if (dicRoots.ContainsKey(typeof(T)))
+        if (m_dicRoots.ContainsKey(typeof(T)))
         {
-            pCallback(dicRoots[typeof(T)] as T);
+            pCallback(m_dicRoots[typeof(T)] as T);
             return;
         }
 
-        Single.Resources.GetGameObject(typeof(T).ToString(), (pObject) => 
+        Single.Resources.GetComponentByObject<T>(typeof(T).ToString(), (pObject) => 
         {
             if (null != pObject)
             {
-                var tObject = pObject as T;
-                AddRoot(typeof(T), tObject);
-                pCallback(tObject);
+                AddRoot(typeof(T), pObject);
+                pCallback(pObject);
             }
             else
             {
                 pCallback(default(T));
             }
         });
-    }
-
-    void OnEventLoadedScene(eSceneType eType)
-    {
-        // 씬이 변경될때 한번 털어줘야한다.
     }
 }

@@ -6,63 +6,68 @@ using System.Collections.Generic;
 
 public class SHUIRoot : MonoBehaviour
 {
-	public List<SHUIPanel> m_listPanels;
-    private Dictionary<string, SHUIPanel> m_dicPanels;
+    [Header("Basic Info")]
+    public List<SHUIPanel> panels;
+
+    [Header("Internal Info")]
+    private Dictionary<Type, SHUIPanel> m_dicPanels;
 
     public virtual void Awake()
     {
         Single.UI.AddRoot(this.GetType(), this);
-
-        m_dicPanels = new Dictionary<string, SHUIPanel>();
-        m_listPanels.ForEach((pPanel) => 
+        
+        m_dicPanels = new Dictionary<Type, SHUIPanel>();
+        panels.ForEach((pPanel) =>
         {
-            m_dicPanels.Add(pPanel.gameObject.name, pPanel);
+            m_dicPanels.Add(pPanel.GetType(), pPanel);
         });
     }
 
-    public void GetPanel(string strName, Action<SHUIPanel> pCallback)
+    public virtual void OnDestroy()
     {
-        GetPanel<SHUIPanel>(strName, pCallback);
+        if (true == SHUIManager.IsExists)
+        {
+            Single.UI.DelRoot(this.GetType());
+        }
     }
 
-    public void GetPanel<T>(string strName, Action<T> pCallback) where T : SHUIPanel
+    public void GetPanel(Action<SHUIPanel> pCallback)
     {
-        if (true == m_dicPanels.ContainsKey(strName))
+        GetPanel<SHUIPanel>(pCallback);
+    }
+
+    public void GetPanel<T>(Action<T> pCallback) where T : SHUIPanel
+    {
+        if (true == m_dicPanels.ContainsKey(typeof(T)))
         {
-            pCallback(m_dicPanels[strName] as T);
+            pCallback(m_dicPanels[typeof(T)] as T);
         }
         else
         {
-            Single.Resources.GetComponentByObject<T>(strName, (pPanel) => 
+            Single.Resources.GetComponentByObject<T>(typeof(T).ToString(), (pPanel) => 
             {
                 if (null == pPanel)
                     pCallback(default(T));
                 else
                 {
-                    AddUIPanel(strName, pPanel);
+                    AddUIPanel(typeof(T), pPanel);
                     pCallback(pPanel);
                 }
             });
         }
     }
-
-    public void SetEnableAllPanels(bool isActive)
+    
+    private void AddUIPanel(Type type, SHUIPanel pPanel)
     {
-        foreach(var kvp in m_dicPanels)
+        if (false == m_dicPanels.ContainsKey(type))
         {
-            kvp.Value.SetActive(isActive);
-        }
-    }
-
-    private void AddUIPanel(string strName, SHUIPanel pPanel)
-    {
-        if (false == m_dicPanels.ContainsKey(strName))
-        {
-            m_dicPanels.Add(strName, pPanel);
+            m_dicPanels.Add(type, pPanel);
         }
         else
         {
-            m_dicPanels[strName] = pPanel;
+            m_dicPanels[type] = pPanel;
         }
+
+        pPanel.transform.SetParent(transform);
     }
 }

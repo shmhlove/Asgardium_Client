@@ -6,27 +6,27 @@ using System.Collections.Generic;
 
 public enum eObjectPoolReturnType
 {
-    None,           // 반환 : 반환안함
-    Disable,        // 반환 : 오브젝트의 Active가 꺼질때 반환
-    ChangeScene,    // 반환 : 씬이 변경될때 반환
+    NoReturn,           // 반환 : 반환안함
+    WhenDisable,        // 반환 : 오브젝트의 Active가 꺼질때 반환
+    WhenChangeScene,    // 반환 : 씬이 변경될때 반환
 }
 
 public enum eObjectPoolDestroyType
 {
-    None,           // 제거 : 제거안함
-    Return,         // 제거 : 풀에 반환될때 제거
-    ChangeScene,    // 제거 : 씬이 변경될때 제거
+    NoDestory,
+    WhenReturn,
+    WhenChangeScene,
 }
 
 public class SHObjectPool
 {
-    public eObjectPoolReturnType  m_eReturnType    = eObjectPoolReturnType.None;
-    public eObjectPoolDestroyType m_eDestroyType   = eObjectPoolDestroyType.None;
-    public GameObject       m_pObject        = null;
+    public eObjectPoolReturnType  m_eReturnType    = eObjectPoolReturnType.NoReturn;
+    public eObjectPoolDestroyType m_eDestroyType   = eObjectPoolDestroyType.NoDestory;
+    public GameObject             m_pObject        = null;
 
-    public Vector3          m_vStartPosition = Vector3.zero;
-    public Quaternion       m_qStartRotate   = Quaternion.identity;
-    public Vector3          m_vStartScale    = Vector3.zero;
+    public Vector3                m_vStartPosition = Vector3.zero;
+    public Quaternion             m_qStartRotate   = Quaternion.identity;
+    public Vector3                m_vStartScale    = Vector3.zero;
 
     public SHObjectPool() { }
     public SHObjectPool(eObjectPoolReturnType eReturnType, eObjectPoolDestroyType eDestoryType, GameObject pObject)
@@ -97,8 +97,8 @@ public class SHObjectPool
 
     public void DestroyObject()
     {
-        m_eReturnType  = eObjectPoolReturnType.None;
-        m_eDestroyType = eObjectPoolDestroyType.None;
+        m_eReturnType  = eObjectPoolReturnType.NoReturn;
+        m_eDestroyType = eObjectPoolDestroyType.NoDestory;
 
         if (null != m_pObject)
         {

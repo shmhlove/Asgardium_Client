@@ -6,18 +6,15 @@ using System.Collections.Generic;
 
 public class SHUIRootIntro : SHUIRoot
 {
-    private Action m_pEventClick;
+    private Action m_pCallback;
 
     public void Show(Action pCallback)
     {
-        m_pEventClick = pCallback;
+        m_pCallback = pCallback;
     }
-    
-    public void OnClickMoveSceneButton()
+
+    public void OnClickButton()
     {
-        if (null == m_pEventClick)
-            return;
-            
-        m_pEventClick();
+        m_pCallback();
     }
 }

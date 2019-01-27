@@ -8,6 +8,11 @@ using LitJson;
 
 public class SHSceneLogin : MonoBehaviour
 {
+    void Awake()
+    {
+        Single.AppInfo.CreateSingleton();
+    }
+
     void Start()
     {
         Single.UI.GetRoot<SHUIRootLogin>((pUIRoot) => 

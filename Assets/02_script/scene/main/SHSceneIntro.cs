@@ -7,6 +7,11 @@ using System.Collections.Generic;
 
 public class SHSceneIntro : MonoBehaviour
 {
+    void Awake()
+    {
+        Single.AppInfo.CreateSingleton();
+    }
+
     void Start()
     {
         Single.UI.GetRoot<SHUIRootIntro>((pUIRoot) => 

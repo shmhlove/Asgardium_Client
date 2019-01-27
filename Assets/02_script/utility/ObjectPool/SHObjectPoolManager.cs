@@ -26,14 +26,15 @@ public class SHObjectPoolManager : SHSingleton<SHObjectPoolManager>
         SetDontDestroy();
 
         ClearAll();
-        Single.Scene.AddEventForLoadedScene(OnEventOfLoadedScene);
+        Single.Scene.AddEventForBeforeLoadScene(OnEventOfLoadedScene);
 
         StartCoroutine(CoroutineCheckAutoRecovery());
     }
-
+    
     public override void OnFinalize()
     {
         StopAllCoroutines();
+        Single.Scene.DelEventForBeforeLoadScene(OnEventOfLoadedScene);
     }
 
     public void Get<T>(string  strName, 
@@ -95,7 +96,7 @@ public class SHObjectPoolManager : SHSingleton<SHObjectPoolManager>
         CheckDictionary(m_dicActives,   strName);
         CheckDictionary(m_dicInactives, strName);
 
-        if (eObjectPoolDestroyType.Return == pObjectInfo.m_eDestroyType)
+        if (eObjectPoolDestroyType.WhenReturn == pObjectInfo.m_eDestroyType)
         {
             SetDestroyObject(strName, pObjectInfo);
         }
@@ -247,13 +248,13 @@ public class SHObjectPoolManager : SHSingleton<SHObjectPoolManager>
         {
             switch (pItem.m_eReturnType)
             {
-                case eObjectPoolReturnType.Disable:
+                case eObjectPoolReturnType.WhenDisable:
                     if (false == pItem.IsActive())
                     {
                         pReturns.Add(pItem);
                     }
                     break;
-                case eObjectPoolReturnType.ChangeScene:
+                case eObjectPoolReturnType.WhenChangeScene:
                     if (true == bIsChangeScene)
                     {
                         pReturns.Add(pItem);
@@ -275,7 +276,7 @@ public class SHObjectPoolManager : SHSingleton<SHObjectPoolManager>
         {
             switch (pItem.m_eDestroyType)
             {
-                case eObjectPoolDestroyType.ChangeScene:
+                case eObjectPoolDestroyType.WhenChangeScene:
                     if (true == bIsChangeScene)
                     {
                         pDestroys.Add(pItem);
@@ -288,7 +289,7 @@ public class SHObjectPoolManager : SHSingleton<SHObjectPoolManager>
         {
             switch (pItem.m_eDestroyType)
             {
-                case eObjectPoolDestroyType.ChangeScene:
+                case eObjectPoolDestroyType.WhenChangeScene:
                     if (true == bIsChangeScene)
                     {
                         pDestroys.Add(pItem);
@@ -307,7 +308,7 @@ public class SHObjectPoolManager : SHSingleton<SHObjectPoolManager>
     {
         if (false == m_dicRoots.ContainsKey(iLayer))
         {
-            var pRoot = SHGameObject.CreateEmptyObject(string.Format("SHObjectPool_{0}", iLayer));
+            var pRoot = new GameObject(string.Format("SHObjectPool_{0}", iLayer));
             pRoot.layer = iLayer;
             DontDestroyOnLoad(pRoot);
             m_dicRoots.Add(iLayer, pRoot.transform);

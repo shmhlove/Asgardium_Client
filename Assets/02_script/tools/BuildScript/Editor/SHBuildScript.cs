@@ -124,8 +124,8 @@ class SHBuildScript
     
     static void PostProcessor(BuildTarget eTarget)
     {
-        SHGameObject.DestoryObject(GameObject.Find("SHSingletons(Destroy)"));
-        SHGameObject.DestoryObject(GameObject.Find("SHSingletons(DontDestroy)"));
+        GameObject.DestroyImmediate(GameObject.Find("SHSingletons(Destroy)"));
+        GameObject.DestroyImmediate(GameObject.Find("SHSingletons(DontDestroy)"));
     }
 
     static void BuildApplication(string[] strScenes, BuildTarget eTarget, BuildOptions eOptions)

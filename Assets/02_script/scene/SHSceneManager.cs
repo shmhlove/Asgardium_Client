@@ -10,8 +10,9 @@ using LitJson;
 
 public class SHSceneManager : SHSingleton<SHSceneManager>
 {
-    private List<Action<eSceneType>> loadSceneEvents = new List<Action<eSceneType>>();
-    
+    private List<Action<eSceneType>> beforeLoadSceneEvents = new List<Action<eSceneType>>();
+    private List<Action<eSceneType>> afterLoadSceneEvents = new List<Action<eSceneType>>();
+
     public override void OnInitialize()
     {
         SetDontDestroy();
@@ -34,14 +35,15 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
         {
             Single.Coroutine.CachingWait(()=> 
             {
-                LoadProcess(SceneManager.LoadSceneAsync(eType.ToString(), eMode), (pAsyncOperation) =>
+                SendEventToBeforeLoad(eType);
+                Single.Coroutine.Async(SceneManager.LoadSceneAsync(eType.ToString(), eMode), (pAsync) => 
                 {
                     if (true == bIsUseFade)
-                        PlayFadeOut(() => pCallback(new SHReply(JsonMapper.ToObject("{}"))));
+                        PlayFadeOut(() => pCallback(new SHReply()));
                     else
-                        pCallback(new SHReply(JsonMapper.ToObject("{}")));
+                        pCallback(new SHReply());
 
-                    SendLoadEvent(eType);
+                    SendEventToAfterLoad(eType);
                 });
             });
         };
@@ -60,23 +62,48 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
         SceneManager.UnloadSceneAsync(eType.ToString());
     }
     
-    public void AddEventForLoadedScene(Action<eSceneType> callback)
+    public void AddEventForBeforeLoadScene(Action<eSceneType> callback)
     {
         if (null == callback)
             return;
 
-        if (true == loadSceneEvents.Contains(callback))
+        if (true == beforeLoadSceneEvents.Contains(callback))
             return;
 
-        loadSceneEvents.Add(callback);
+        beforeLoadSceneEvents.Add(callback);
     }
 
-    public void DelEventForLoadedScene(Action<eSceneType> callback)
+    public void DelEventForBeforeLoadScene(Action<eSceneType> callback)
     {
-        if (false == loadSceneEvents.Contains(callback))
+        if (null == callback)
             return;
 
-        loadSceneEvents.Remove(callback);
+        if (false == beforeLoadSceneEvents.Contains(callback))
+            return;
+
+        beforeLoadSceneEvents.Remove(callback);
+    }
+
+    public void AddEventForAfterLoadScene(Action<eSceneType> callback)
+    {
+        if (null == callback)
+            return;
+
+        if (true == afterLoadSceneEvents.Contains(callback))
+            return;
+
+        afterLoadSceneEvents.Add(callback);
+    }
+
+    public void DelEventForAfterLoadScene(Action<eSceneType> callback)
+    {
+        if (null == callback)
+            return;
+
+        if (false == afterLoadSceneEvents.Contains(callback))
+            return;
+
+        afterLoadSceneEvents.Remove(callback);
     }
 
     public bool IsLoadedScene(eSceneType eType)
@@ -89,14 +116,17 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
         return SHUtils.GetSceneTypeByString(SceneManager.GetActiveScene().name);
     }
     
-    private void LoadProcess(AsyncOperation pAsyncInfo, Action<AsyncOperation> pDone)
+    private void SendEventToBeforeLoad(eSceneType eLoadScene)
     {
-        Single.Coroutine.Async(pAsyncInfo, () => pDone(pAsyncInfo));
+        foreach (var callback in beforeLoadSceneEvents)
+        {
+            callback(eLoadScene);
+        }
     }
-    
-    private void SendLoadEvent(eSceneType eLoadScene)
+
+    private void SendEventToAfterLoad(eSceneType eLoadScene)
     {
-        foreach (var callback in loadSceneEvents)
+        foreach (var callback in afterLoadSceneEvents)
         {
             callback(eLoadScene);
         }
@@ -106,7 +136,7 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
     {
         Single.UI.GetRoot<SHUIRootGlobal>((pUIRoot) => 
         {
-            pUIRoot.ShowFade("Panel - FadeIn", pCallback);
+            pUIRoot.ShowFadePanel(pCallback);
         });
     }
     
@@ -114,7 +144,7 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
     {
         Single.UI.GetRoot<SHUIRootGlobal>((pUIRoot) => 
         {
-            pUIRoot.ShowFade("Panel - FadeOut", pCallback);
+            pUIRoot.CloseFadePanel(pCallback);
         });
     }
 }

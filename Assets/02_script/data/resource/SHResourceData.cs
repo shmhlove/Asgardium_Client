@@ -38,8 +38,9 @@ public partial class SHResourceData : SHBaseData
         });
     }
     
-    public override IEnumerator Load(SHLoadData pInfo, Action<string, SHLoadStartInfo> pStart, 
-                                                       Action<string, SHLoadEndInfo> pDone)
+    public override IEnumerator Load(SHLoadData pInfo, 
+                                     Action<string, SHLoadStartInfo> pStart, 
+                                     Action<string, SHLoadEndInfo> pDone)
     {
         pStart(pInfo.m_strName, new SHLoadStartInfo());
 
@@ -58,7 +59,7 @@ public partial class SHResourceData : SHBaseData
                 pDone(pInfo.m_strName, new SHLoadEndInfo(eErrorCode.Resources_NotExsitInTable));
                 return;
             }
-            
+
             LoadAsync<UObject>(pResourceInfo, (pObject) => 
             {
                 if (null == pObject)
@@ -86,25 +87,24 @@ public partial class SHResourceData : SHBaseData
         }
         
         strFileName = Path.GetFileNameWithoutExtension(strFileName);
-        if (false == m_dicResources.ContainsKey(strFileName.ToLower()))
-        {
-            Single.Table.GetTable<JsonResources>((pTable) => 
-            {
-                var pInfo = pTable.GetResouceInfo(strFileName);
-                if (null == pInfo)
-                {
-                    Debug.Log(string.Format("[LSH] 리소스 테이블에 {0}가 없습니다.(파일이 없거나 리소스 리스팅이 안되었음)", strFileName));
-                    pCallback(null);
-                    return;
-                }
-
-                LoadAsync<T>(pInfo, pCallback);
-            });
-        }
-        else
+        if (true == m_dicResources.ContainsKey(strFileName.ToLower()))
         {
             pCallback(m_dicResources[strFileName.ToLower()] as T);
+            return;
         }
+
+        Single.Table.GetTable<JsonResources>((pTable) =>
+        {
+            var pInfo = pTable.GetResouceInfo(strFileName);
+            if (null == pInfo)
+            {
+                Debug.Log(string.Format("[LSH] 리소스 테이블에 {0}가 없습니다.(파일이 없거나 리소스 리스팅이 안되었음)", strFileName));
+                pCallback(null);
+                return;
+            }
+
+            LoadAsync<T>(pInfo, pCallback);
+        });
     }
     
     public void GetGameObject(string strName, Action<GameObject> pCallback)
@@ -178,7 +178,7 @@ public partial class SHResourceData : SHBaseData
                 pCallback(pObject.GetComponent<T>());
         });
     }
-    
+
     public T Instantiate<T>(T pPrefab) where T : UObject
     {
         if (null == pPrefab)
@@ -187,17 +187,13 @@ public partial class SHResourceData : SHBaseData
             return default(T);
         }
 
-#if UNITY_EDITOR
         DateTime pStartTime = DateTime.Now;
-#endif
-
-        T pGameObject    = UObject.Instantiate<T>(pPrefab);
-        var strName      = pGameObject.name;
+        
+        T pGameObject = UObject.Instantiate<T>(pPrefab);
+        var strName = pGameObject.name;
         pGameObject.name = strName.Substring(0, strName.IndexOf("(Clone)"));
         
-#if UNITY_EDITOR
         Single.AppInfo.SetLoadResource(string.Format("Instantiate : {0}({1}sec)", pPrefab.name, SHUtils.GetElapsedSecond(pStartTime)));
-#endif
 
         return pGameObject;
     }
@@ -219,54 +215,58 @@ public partial class SHResourceData : SHBaseData
     }
     
     // 유틸 : 어싱크로 리소스 로드하기
-    IEnumerator LoadAsync<T>(SHResourcesInfo pTable, Action<T> pCallback) where T : UnityEngine.Object
+    void LoadAsync<T>(SHResourcesInfo pTable, Action<T> pCallback) where T : UnityEngine.Object
     {
         if (null == pTable)
         {
             pCallback(null);
-            yield break;
+            return;
         }
 
         if (true == m_dicResources.ContainsKey(pTable.m_strName.ToLower()))
         {
             pCallback(m_dicResources[pTable.m_strName.ToLower()] as T);
-            yield break;
+            return;
         }
-        
-#if UNITY_EDITOR
-        DateTime pStartTime = DateTime.Now;
-#endif
 
-        UObject pObject = null;
+        Action<T> pLoadedAction = (pObject) =>
+        {
+            if (null == pObject)
+            {
+                Debug.LogError(string.Format("[LSH] {0}을 로드하지 못했습니다!!\n리소스 테이블에는 목록이 있으나 실제 파일은 없을 수도 있습니다.", pTable.m_strPath));
+            }
+            else
+            {
+                m_dicResources.Add(pTable.m_strName.ToLower(), pObject);
+            }
+
+            pCallback(pObject);
+        };
+
+        DateTime pStartTime = DateTime.Now;
+
         //var pBundleData = Single.AssetBundle.GetBundleData(Single.Table.GetBundleInfoToResourceName(pTable.m_strName));
         //if (null != pBundleData)
         //{
-        //    var pRequest = pBundleData.m_pBundle.LoadAssetAsync<T>(pTable.m_strName);
-        //    yield return pRequest;
-
-        //    pObject = pRequest.asset;
+        //    Single.Coroutine.Async(pBundleData.m_pBundle.LoadAssetAsync<T>(pTable.m_strName), (pRequest) =>
+        //    {
+        //        pLoadedAction((pRequest as ResourceRequest).asset);
+        //    });
         //}
         //else
         {
-            var pRequest = Resources.LoadAsync<T>(pTable.m_strPath);
-            yield return pRequest;
+            Single.Coroutine.Async(Resources.LoadAsync<T>(pTable.m_strPath), (pRequest) =>
+            {
+                var pAsset = (pRequest as ResourceRequest).asset;
+                if (null != pAsset)
+                {
+                    Single.AppInfo.SetLoadResource(string.Format("Load : {0}({1}sec)",
+                        pTable.m_strName, ((DateTime.Now - pStartTime).TotalMilliseconds / 1000.0f)));
+                }
 
-            pObject = pRequest.asset;
+                pLoadedAction(pAsset as T);
+            });
         }
-        
-        if (null == pObject)
-        {
-            Debug.LogError(string.Format("[LSH] {0}을 로드하지 못했습니다!!\n리소스 테이블에는 목록이 있으나 실제 파일은 없을 수도 있습니다.", pTable.m_strPath));
-            pCallback(null);
-            yield break;
-        }
-        
-#if UNITY_EDITOR
-        Single.AppInfo.SetLoadResource(string.Format("Load : {0}({1}sec)", pTable.m_strName, ((DateTime.Now - pStartTime).TotalMilliseconds / 1000.0f)));
-#endif
-        
-        m_dicResources.Add(pTable.m_strName.ToLower(), pObject);
-        pCallback(pObject as T);
     }
 
     // 유틸 : 싱크로 리소스 로드하기
@@ -278,9 +278,7 @@ public partial class SHResourceData : SHBaseData
         if (true == m_dicResources.ContainsKey(pTable.m_strName.ToLower()))
             return m_dicResources[pTable.m_strName.ToLower()] as T;
         
-#if UNITY_EDITOR
         DateTime pStartTime = DateTime.Now;
-#endif
 
         T pObject       = null;
         //var pBundleData = Single.AssetBundle.GetBundleData(Single.Table.GetBundleInfoToResourceName(pTable.m_strName));
@@ -295,9 +293,7 @@ public partial class SHResourceData : SHBaseData
             return null;
         }
 
-#if UNITY_EDITOR
         Single.AppInfo.SetLoadResource(string.Format("Load : {0}({1}sec)", pTable.m_strName, ((DateTime.Now - pStartTime).TotalMilliseconds / 1000.0f)));
-#endif
 
         if (true == m_dicResources.ContainsKey(pTable.m_strName.ToLower()))
             m_dicResources[pTable.m_strName.ToLower()] = pObject;

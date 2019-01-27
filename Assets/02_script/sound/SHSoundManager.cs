@@ -128,7 +128,7 @@ public class SHSoundManager : SHSingleton<SHSoundManager>
         m_dicBGMChannel.Clear();
         SHUtils.ForToEnum<eSoundBGMChannel>((eBGMChannel) =>
         {
-            var pObject = SHGameObject.CreateEmptyObject(eBGMChannel.ToString());
+            var pObject = new GameObject(eBGMChannel.ToString());
             pObject.transform.SetParent(transform);
             m_dicBGMChannel.Add(eBGMChannel, SHGameObject.GetComponent<AudioSource>(pObject));
         });
@@ -140,7 +140,7 @@ public class SHSoundManager : SHSingleton<SHSoundManager>
         m_dicEffectChannel.Clear();
         SHUtils.ForToEnum<eSoundEffectChannel>((eEffectChannel) =>
         {
-            var pObject = SHGameObject.CreateEmptyObject(eEffectChannel.ToString());
+            var pObject = new GameObject(eEffectChannel.ToString());
             pObject.transform.SetParent(transform);
             m_dicEffectChannel.Add(eEffectChannel, SHGameObject.GetComponent<AudioSource>(pObject));
         });

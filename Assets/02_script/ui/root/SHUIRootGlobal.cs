@@ -6,11 +6,26 @@ using System.Collections.Generic;
 
 public class SHUIRootGlobal : SHUIRoot
 {
-    public void ShowFade(string strPanelName, Action callback)
+    public override void Awake()
     {
-        GetPanel<SHUIPanelFade>(strPanelName, (pPanel) => 
+        base.Awake();
+        DontDestroyOnLoad(this);
+    }
+
+    public void ShowFadePanel(Action pCallback = null)
+    {
+        GetPanel<SHUIPanelFade>((pPanel) => 
         {
-            pPanel.Show();
+            pPanel.Show(pCallback);
+        });
+    }
+
+    public void CloseFadePanel(Action pCallback = null)
+    {
+        GetPanel<SHUIPanelFade>((pPanel) =>
+        {
+            pPanel.SetActive(true);
+            pPanel.Close(pCallback);
         });
     }
 }

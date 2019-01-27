@@ -39,10 +39,6 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
         PrintDeviceInfo();
     }
     
-    void OnApplicationQuit()
-    {
-    }
-    
     void OnApplicationPause(bool bIsPause)
     {
     }
@@ -255,6 +251,9 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
     // 디버그 : 실시간 로드 리소스 리스트
     public void SetLoadResource(string strInfo)
     {
+#if !UNITY_EDITOR
+        return;
+#endif
         if (false == m_pDicResourceLoadInfo.ContainsKey(Single.Scene.GetActiveScene()))
             m_pDicResourceLoadInfo.Add(Single.Scene.GetActiveScene(), new List<string>());
 
@@ -315,5 +314,5 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
 
         UnityEngine.Debug.Log(strBuff);
     }
-    #endregion
+#endregion
 }

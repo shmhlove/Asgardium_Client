@@ -9,7 +9,12 @@ using LitJson;
 
 public class SHSceneTest : MonoBehaviour
 {
-	void Start ()
+    void Awake()
+    {
+        Single.AppInfo.CreateSingleton();
+    }
+
+    void Start ()
     {
         Single.Network.GET(SHAPIs.SH_API_TEST, null, (reply) =>
         {

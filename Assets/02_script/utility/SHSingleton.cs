@@ -64,8 +64,10 @@ public abstract class SHSingleton<T> : MonoBehaviour where T : SHSingleton<T>
         {
             if (null == m_pInstance)
             {
-                if (null == (m_pInstance = SHGameObject.FindObjectOfType<T>()))
-                    Initialize(SHGameObject.CreateEmptyObject(typeof(T).ToString()).AddComponent<T>());
+                if (null == (m_pInstance = GameObject.FindObjectOfType<T>()))
+                {
+                    Initialize(new GameObject(typeof(T).ToString()).AddComponent<T>());
+                }
             }
 
             return m_pInstance;
@@ -85,7 +87,7 @@ public abstract class SHSingleton<T> : MonoBehaviour where T : SHSingleton<T>
         T pDuplication = SHGameObject.GetDuplication(pInstance);
         if (null != pDuplication)
         {
-            SHGameObject.DestoryObject(pInstance.gameObject);
+            UnityEngine.Object.DestroyImmediate(pInstance.gameObject);
             m_pInstance = pDuplication;
             return;
         }
@@ -94,12 +96,12 @@ public abstract class SHSingleton<T> : MonoBehaviour where T : SHSingleton<T>
         m_pInstance.SetParent("SHSingletons(Destroy)");
         m_pInstance.OnInitialize();
     }
-
+    
     public void CreateSingleton() { }
 
     public void DoDestroy()
     {
-        SHGameObject.DestoryObject(gameObject);
+        UnityEngine.Object.DestroyImmediate(gameObject);
     }
 
     // 인터페이스 : 씬이 제거되어도 싱글턴을 제거하지 않습니다.
@@ -107,12 +109,7 @@ public abstract class SHSingleton<T> : MonoBehaviour where T : SHSingleton<T>
     {
         if (null == m_pInstance)
             return;
-
-#if UNITY_EDITOR
-        if (false == Application.isPlaying)
-            return;
-#endif
-
+        
         DontDestroyOnLoad(m_pInstance.SetParent("SHSingletons(DontDestroy)"));
     }
 

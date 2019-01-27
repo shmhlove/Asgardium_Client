@@ -5,39 +5,31 @@
         "s_FileName" : "SHUIRootGlobal.prefab",
         "s_Extension" : ".prefab",
         "s_Size"      : "40296",
-        "s_Hash"      : "81B069ACF7D963F4032B51938763ED4F",
+        "s_Hash"      : "3917AF85DD66C33B25CE231C35F869D6",
         "s_Path"      : "Prefab/UI/SHUIRootGlobal"
-    },
-    {
-        "s_Name" : "",
-        "s_FileName" : ".DS_Store",
-        "s_Extension" : ".DS_Store",
-        "s_Size"      : "6148",
-        "s_Hash"      : "4E0C1C7AF309811790EE39CF0B49DF2E",
-        "s_Path"      : "Table/"
     },
     {
         "s_Name" : "JsonClientConfig",
         "s_FileName" : "JsonClientConfig.json",
         "s_Extension" : ".json",
-        "s_Size"      : "435",
-        "s_Hash"      : "52C3E7EEC4F889916EDCE5D23B208E96",
+        "s_Size"      : "454",
+        "s_Hash"      : "CCA83DFC873E52E63B8B1F76F6372F76",
         "s_Path"      : "Table/Json/JsonClientConfig"
     },
     {
         "s_Name" : "JsonPreLoadResources",
         "s_FileName" : "JsonPreLoadResources.json",
         "s_Extension" : ".json",
-        "s_Size"      : "64",
-        "s_Hash"      : "C0A8FFE820748BB0C8DD1027B3FD362C",
+        "s_Size"      : "77",
+        "s_Hash"      : "23B8E9643DF982F35B80C9682DFA7F51",
         "s_Path"      : "Table/Json/JsonPreLoadResources"
     },
     {
         "s_Name" : "JsonResourcesInfo",
         "s_FileName" : "JsonResourcesInfo.json",
         "s_Extension" : ".json",
-        "s_Size"      : "1684",
-        "s_Hash"      : "88DDD186E9C7DE908CB51BF355353927",
+        "s_Size"      : "1137",
+        "s_Hash"      : "2B8D5BFD61DBAE3C4236DB4E6E6012CE",
         "s_Path"      : "Table/Json/JsonResourcesInfo"
     }
 ]

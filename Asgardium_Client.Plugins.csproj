@@ -70,14 +70,14 @@
     <Reference Include="UnityEngine.VR">
       <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityVR/RuntimeEditor/UnityEngine.VR.dll</HintPath>
     </Reference>
-    <Reference Include="LitJson">
-      <HintPath>Assets/Plugins/LitJson/LitJson.dll</HintPath>
+    <Reference Include="Excel">
+      <HintPath>Assets/Plugins/Excel.dll</HintPath>
     </Reference>
     <Reference Include="System.Data">
       <HintPath>Assets/Plugins/System.Data.dll</HintPath>
     </Reference>
-    <Reference Include="Excel">
-      <HintPath>Assets/Plugins/Excel.dll</HintPath>
+    <Reference Include="LitJson">
+      <HintPath>Assets/Plugins/LitJson/LitJson.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor">
       <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
@@ -425,8 +425,6 @@
     <Compile Include="Assets\Plugins\socket.io\websocket-sharp\WebSocketState.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\02_script\tools\RenderTexture\SampleResources\20060.atlas.txt" />
-    <None Include="Assets\02_script\tools\RenderTexture\SampleResources\20060.json.txt" />
     <None Include="Assets\LunarConsole\readme.txt" />
     <None Include="Assets\NGUI\Examples\Atlases\Fantasy\Fantasy Font - Normal.txt" />
     <None Include="Assets\NGUI\Examples\Atlases\Refractive\Refractive Font - Header.txt" />

@@ -8,6 +8,6 @@ public class SHUIPanelDebug : SHUIPanel
 {
     public void OnClickConsoleButton()
     {
-		  LunarConsolePlugin.LunarConsole.Show();
+        LunarConsolePlugin.LunarConsole.Show();
     }
 }

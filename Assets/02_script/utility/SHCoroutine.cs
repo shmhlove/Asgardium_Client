@@ -9,10 +9,16 @@ public class SHCoroutine : SHSingleton<SHCoroutine>
     public override void OnInitialize()
     {
         SetDontDestroy();
-        Single.Scene.AddEventForLoadedScene(OnEventLoadedScene);
+        Single.Scene.AddEventForBeforeLoadScene(OnEventOfLoadedScene);
     }
 
-    public void OnEventLoadedScene(eSceneType eType)
+    public override void OnFinalize()
+    {
+        StopAllCoroutines();
+        Single.Scene.DelEventForBeforeLoadScene(OnEventOfLoadedScene);
+    }
+
+    public void OnEventOfLoadedScene(eSceneType eType)
     {
         StopAllCoroutines();
     }
@@ -145,23 +151,20 @@ public class SHCoroutine : SHSingleton<SHCoroutine>
 
     //yield return new AsyncOperation : 비동기 작업이 끝날 때 까지 대기 (씬로딩)
     //-----------------------------------------------
-    public AsyncOperation Async(AsyncOperation pAsync, Action pAction)
+    public AsyncOperation Async(AsyncOperation pAsync, Action<AsyncOperation> pAction)
     {
         if (null == pAction)
         {
-            pAction = () => {};
+            pAction = (p) => {};
         }
 
         StartCoroutine(InvokeToAsync(pAsync, pAction));
         return pAsync;
     }
-    private IEnumerator InvokeToAsync(AsyncOperation pAsync, Action pAction)
+    private IEnumerator InvokeToAsync(AsyncOperation pAsync, Action<AsyncOperation> pAction)
     {
-        while((null != pAsync) && (false == pAsync.isDone))
-        {
-            yield return null;
-        }
+        yield return pAsync;
 
-        pAction.Invoke();
+        pAction.Invoke(pAsync);
     }
 }

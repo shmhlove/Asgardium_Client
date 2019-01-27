@@ -10,7 +10,7 @@ public class SHUIRootLogin : SHUIRoot
     {
         //SetEnableAllPanels(false);
 
-        GetPanel<SHUIPanelLogin>("Panel - Login", (pPanel) => 
+        GetPanel<SHUIPanelLogin>((pPanel) => 
         {
             pPanel.SetActive(true);
             pPanel.OnLoginAction = pLoginAction;
@@ -21,7 +21,7 @@ public class SHUIRootLogin : SHUIRoot
 
     public void CloseLoginPanel()
     {
-        GetPanel<SHUIPanelLogin>("Panel - Login", (pPanel) => 
+        GetPanel<SHUIPanelLogin>((pPanel) => 
         {
             pPanel.SetActive(false);
             pPanel.OnLoginAction = null;

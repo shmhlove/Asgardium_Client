@@ -16,6 +16,13 @@ public class SHReply
     public JsonData data;
     public SHError error;
 
+    public SHReply()
+    {
+        this.isSucceed = true;
+        this.data = null;
+        this.error = null;
+    }
+
     public SHReply(JsonData data)
     {
         this.isSucceed = true;

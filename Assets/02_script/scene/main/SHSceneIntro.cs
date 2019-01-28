@@ -14,7 +14,7 @@ public class SHSceneIntro : MonoBehaviour
 
     void Start()
     {
-        Single.UI.GetRoot<SHUIRootIntro>((pUIRoot) => 
+        Single.UI.GetRoot<SHUIRootIntro>(SHUIConstant.ROOT_INTRO, (pUIRoot) => 
         {
             pUIRoot.Show(() => 
             {

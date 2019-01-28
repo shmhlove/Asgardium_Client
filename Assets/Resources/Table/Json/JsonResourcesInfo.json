@@ -1,12 +1,12 @@
 
 [
     {
-        "s_Name" : "SHUIRootGlobal",
-        "s_FileName" : "SHUIRootGlobal.prefab",
+        "s_Name" : "UI Root - Global",
+        "s_FileName" : "UI Root - Global.prefab",
         "s_Extension" : ".prefab",
-        "s_Size"      : "40296",
-        "s_Hash"      : "3917AF85DD66C33B25CE231C35F869D6",
-        "s_Path"      : "Prefab/UI/SHUIRootGlobal"
+        "s_Size"      : "38764",
+        "s_Hash"      : "60E7347B61CB3A0287E71122B5C34B93",
+        "s_Path"      : "Prefab/UI/UI Root - Global"
     },
     {
         "s_Name" : "JsonClientConfig",
@@ -28,8 +28,8 @@
         "s_Name" : "JsonResourcesInfo",
         "s_FileName" : "JsonResourcesInfo.json",
         "s_Extension" : ".json",
-        "s_Size"      : "1137",
-        "s_Hash"      : "2B8D5BFD61DBAE3C4236DB4E6E6012CE",
+        "s_Size"      : "1131",
+        "s_Hash"      : "2211D8B2CB48EDBFC978BED86F1F662B",
         "s_Path"      : "Table/Json/JsonResourcesInfo"
     }
 ]

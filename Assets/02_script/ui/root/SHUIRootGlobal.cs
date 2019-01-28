@@ -14,7 +14,7 @@ public class SHUIRootGlobal : SHUIRoot
 
     public void ShowFadePanel(Action pCallback = null)
     {
-        GetPanel<SHUIPanelFade>((pPanel) => 
+        GetPanel<SHUIPanelFade>(SHUIConstant.PANEL_FADE, (pPanel) => 
         {
             pPanel.Show(pCallback);
         });
@@ -22,7 +22,7 @@ public class SHUIRootGlobal : SHUIRoot
 
     public void CloseFadePanel(Action pCallback = null)
     {
-        GetPanel<SHUIPanelFade>((pPanel) =>
+        GetPanel<SHUIPanelFade>(SHUIConstant.PANEL_FADE, (pPanel) =>
         {
             pPanel.SetActive(true);
             pPanel.Close(pCallback);

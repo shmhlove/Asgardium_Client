@@ -7,46 +7,46 @@ using System.Collections.Generic;
 
 public class SHUIManager : SHSingleton<SHUIManager>
 {
-    Dictionary<Type, SHUIRoot> m_dicRoots = new Dictionary<Type, SHUIRoot>();
+    Dictionary<string, SHUIRoot> m_dicRoots = new Dictionary<string, SHUIRoot>();
 
     public override void OnInitialize()
     {
         SetDontDestroy();
     }
     
-    public void AddRoot(Type type, SHUIRoot root)
+    public void AddRoot(string strName, SHUIRoot root)
     {
-        if (false == m_dicRoots.ContainsKey(type))
+        if (false == m_dicRoots.ContainsKey(strName))
         {
-            m_dicRoots.Add(type, root);
+            m_dicRoots.Add(strName, root);
         }
         else
         {
-            m_dicRoots[type] = root;
+            m_dicRoots[strName] = root;
         }
     }
 
-    public void DelRoot(Type type)
+    public void DelRoot(string strName)
     {
-        if (true == m_dicRoots.ContainsKey(type))
+        if (true == m_dicRoots.ContainsKey(strName))
         {
-            m_dicRoots.Remove(type);
+            m_dicRoots.Remove(strName);
         }
     }
 
-    public void GetRoot<T>(Action<T> pCallback) where T :  SHUIRoot
+    public void GetRoot<T>(string strName, Action<T> pCallback) where T :  SHUIRoot
     {
-        if (m_dicRoots.ContainsKey(typeof(T)))
+        if (m_dicRoots.ContainsKey(strName))
         {
-            pCallback(m_dicRoots[typeof(T)] as T);
+            pCallback(m_dicRoots[strName] as T);
             return;
         }
 
-        Single.Resources.GetComponentByObject<T>(typeof(T).ToString(), (pObject) => 
+        Single.Resources.GetComponentByObject<T>(strName, (pObject) => 
         {
             if (null != pObject)
             {
-                AddRoot(typeof(T), pObject);
+                AddRoot(strName, pObject);
                 pCallback(pObject);
             }
             else

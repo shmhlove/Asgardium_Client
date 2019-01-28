@@ -10,16 +10,16 @@ public class SHUIRoot : MonoBehaviour
     public List<SHUIPanel> panels;
 
     [Header("Internal Info")]
-    private Dictionary<Type, SHUIPanel> m_dicPanels;
+    private Dictionary<string, SHUIPanel> m_dicPanels;
 
     public virtual void Awake()
     {
-        Single.UI.AddRoot(this.GetType(), this);
+        Single.UI.AddRoot(gameObject.name, this);
         
-        m_dicPanels = new Dictionary<Type, SHUIPanel>();
+        m_dicPanels = new Dictionary<string, SHUIPanel>();
         panels.ForEach((pPanel) =>
         {
-            m_dicPanels.Add(pPanel.GetType(), pPanel);
+            m_dicPanels.Add(pPanel.gameObject.name, pPanel);
         });
     }
 
@@ -27,20 +27,20 @@ public class SHUIRoot : MonoBehaviour
     {
         if (true == SHUIManager.IsExists)
         {
-            Single.UI.DelRoot(this.GetType());
+            Single.UI.DelRoot(gameObject.name);
         }
     }
 
-    public void GetPanel(Action<SHUIPanel> pCallback)
+    public void GetPanel(string strName, Action<SHUIPanel> pCallback)
     {
-        GetPanel<SHUIPanel>(pCallback);
+        GetPanel<SHUIPanel>(strName, pCallback);
     }
 
-    public void GetPanel<T>(Action<T> pCallback) where T : SHUIPanel
+    public void GetPanel<T>(string strName, Action<T> pCallback) where T : SHUIPanel
     {
-        if (true == m_dicPanels.ContainsKey(typeof(T)))
+        if (true == m_dicPanels.ContainsKey(strName))
         {
-            pCallback(m_dicPanels[typeof(T)] as T);
+            pCallback(m_dicPanels[strName] as T);
         }
         else
         {
@@ -50,22 +50,22 @@ public class SHUIRoot : MonoBehaviour
                     pCallback(default(T));
                 else
                 {
-                    AddUIPanel(typeof(T), pPanel);
+                    AddUIPanel(strName, pPanel);
                     pCallback(pPanel);
                 }
             });
         }
     }
     
-    private void AddUIPanel(Type type, SHUIPanel pPanel)
+    private void AddUIPanel(string strName, SHUIPanel pPanel)
     {
-        if (false == m_dicPanels.ContainsKey(type))
+        if (false == m_dicPanels.ContainsKey(strName))
         {
-            m_dicPanels.Add(type, pPanel);
+            m_dicPanels.Add(strName, pPanel);
         }
         else
         {
-            m_dicPanels[type] = pPanel;
+            m_dicPanels[strName] = pPanel;
         }
 
         pPanel.transform.SetParent(transform);

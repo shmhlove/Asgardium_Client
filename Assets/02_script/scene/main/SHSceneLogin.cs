@@ -15,7 +15,7 @@ public class SHSceneLogin : MonoBehaviour
 
     void Start()
     {
-        Single.UI.GetRoot<SHUIRootLogin>((pUIRoot) => 
+        Single.UI.GetRoot<SHUIRootLogin>(SHUIConstant.ROOT_LOGIN, (pUIRoot) => 
         {
             pUIRoot.ShowLoginPanel(
                 (strId, strPass) => 

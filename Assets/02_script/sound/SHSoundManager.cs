@@ -158,6 +158,7 @@ public class SHSoundManager : SHSingleton<SHSoundManager>
             yield return null;
         }
     }
+
     private IEnumerator CoroutineVolumeDown(AudioSource pAudio, Action pEndCallback)
     {
         if (null == pAudio)

@@ -12,4 +12,5 @@ public static class SHUIConstant
 
     public static string PANEL_FADE = "Panel - Fade";
     public static string PANEL_LOGIN = "Panel - Login";
+    public static string PANEL_SIGNUP = "Panel - Signup";
 }

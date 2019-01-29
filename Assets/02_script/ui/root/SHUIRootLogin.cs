@@ -6,16 +6,11 @@ using System.Collections.Generic;
 
 public class SHUIRootLogin : SHUIRoot
 {
-    public void ShowLoginPanel(Action<string, string> pLoginAction, Action<string, string> pSigninAction, Action pCloseAction)
+    public void ShowLoginPanel(Action<string, string> pLoginCallback, Action pSignupCallback)
     {
-        //SetEnableAllPanels(false);
-
         GetPanel<SHUIPanelLogin>(SHUIConstant.PANEL_LOGIN, (pPanel) => 
         {
-            pPanel.SetActive(true);
-            pPanel.OnLoginAction = pLoginAction;
-            pPanel.OnSigninAction = pSigninAction;
-            pPanel.OnloseAction = pCloseAction;
+            pPanel.Show(pLoginCallback, pSignupCallback);
         });
     }
 
@@ -23,10 +18,23 @@ public class SHUIRootLogin : SHUIRoot
     {
         GetPanel<SHUIPanelLogin>(SHUIConstant.PANEL_LOGIN, (pPanel) => 
         {
-            pPanel.SetActive(false);
-            pPanel.OnLoginAction = null;
-            pPanel.OnSigninAction = null;
-            pPanel.OnloseAction = null;
+            pPanel.Close();
+        });
+    }
+
+    public void ShowSignupPanel(Action<string, string> pRegistCallback, Action pGobackCallback)
+    {
+        GetPanel<SHUIPanelSignup>(SHUIConstant.PANEL_SIGNUP, (pPanel) => 
+        {
+            pPanel.Show(pRegistCallback, pGobackCallback);
+        });
+    }
+
+    public void CloseSignupPanel()
+    {
+        GetPanel<SHUIPanelSignup>(SHUIConstant.PANEL_SIGNUP, (pPanel) => 
+        {
+            pPanel.Close();
         });
     }
 }

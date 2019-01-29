@@ -6,34 +6,39 @@ using System.Collections.Generic;
 
 public class SHUIPanelLogin : SHUIPanel 
 {
+    [Header("User Information")]
     public UIInput inputId;
     public UIInput inputPass;
     
-    public Action<string, string> OnLoginAction;
-    public Action<string, string> OnSigninAction;
-    public Action OnloseAction;
+    private Action<string, string> m_pEventLogin;
+    private Action m_pEventSignup;
+
+    public override void OnBeforeShow(params object[] pArgs)
+    {
+        if ((null == pArgs) || (2 > pArgs.Length))
+            return;
+        
+        m_pEventLogin  = ((Action<string, string>)pArgs[0]);
+        m_pEventSignup = ((Action)pArgs[1]);
+    }
 
 	public void OnClickLoginButton()
 	{
-        if (null != OnLoginAction)
+        if (null == m_pEventLogin)
         {
-            OnLoginAction(inputId.value, inputPass.value);
+            return;
         }
+
+        m_pEventLogin(inputId.value, inputPass.value);
 	}
     
     public void OnClickSigninButton()
 	{
-        if (null != OnSigninAction)
+        if (null == m_pEventSignup)
         {
-            OnSigninAction(inputId.value, inputPass.value);
+            return;
         }
-	}
 
-    public void OnClickCloseButton()
-    {
-        if (null != OnloseAction)
-        {
-            OnloseAction();
-        }
-    }
+        m_pEventSignup();
+	}
 }

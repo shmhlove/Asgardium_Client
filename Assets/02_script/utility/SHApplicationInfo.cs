@@ -235,7 +235,7 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
             pStyle.fontSize = GetRatioW(20);
 
             // Left Bottom
-            GUI.Box(new Rect(5, (Screen.height - GetRatioH(35)), GetRatioW(350), GetRatioH(30)),
+            GUI.Box(new Rect(5, (Screen.height - GetRatioH(35)), GetRatioW(250), GetRatioH(30)),
                 string.Format("{0} : {1} Scene", GetRuntimePlatform(), Single.Scene.GetActiveScene()), pStyle);
             
             // Center Bottom
@@ -243,7 +243,7 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
                 string.Format("v{0}", pTable.Version), pStyle);
 
             // Right Bottom
-            GUI.Box(new Rect(Screen.width - GetRatioW(355), (Screen.height - GetRatioH(35)), GetRatioW(350), GetRatioH(30)),
+            GUI.Box(new Rect(Screen.width - GetRatioW(255), (Screen.height - GetRatioH(35)), GetRatioW(250), GetRatioH(30)),
                 string.Format("ServiceMode : {0}", pTable.ServiceMode), pStyle);
         });
     }

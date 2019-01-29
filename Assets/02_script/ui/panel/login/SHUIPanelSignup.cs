@@ -8,9 +8,10 @@ public class SHUIPanelSignup : SHUIPanel
 {
     [Header("User Information")]
     public UIInput inputId;
+    public UIInput inputName;
     public UIInput inputPass;
 
-    private Action<string, string> m_pEventRegistration;
+    private Action<string, string, string> m_pEventRegistration;
     private Action m_pEventGoBackLogin;
 
     public override void OnBeforeShow(params object[] pArgs)
@@ -18,7 +19,7 @@ public class SHUIPanelSignup : SHUIPanel
         if ((null == pArgs) || (2 > pArgs.Length))
             return;
         
-        m_pEventRegistration  = ((Action<string, string>)pArgs[0]);
+        m_pEventRegistration  = ((Action<string, string, string>)pArgs[0]);
         m_pEventGoBackLogin = ((Action)pArgs[1]);
     }
 
@@ -29,7 +30,7 @@ public class SHUIPanelSignup : SHUIPanel
             return;
         }
 
-        m_pEventRegistration(inputId.value, inputPass.value);
+        m_pEventRegistration(inputId.value, inputName.value, inputPass.value);
 	}
 
 	public void OnClickGoBackLoginButton()

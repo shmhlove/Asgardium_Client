@@ -77,7 +77,7 @@ public class SHSceneLogin : MonoBehaviour
         ShowSignupPanel();
     }
 
-    private void OnClickRegistrationUser(string strEmail, string strPassword)
+    private void OnClickRegistrationUser(string strEmail, string strName, string strPassword)
     {
 
     }

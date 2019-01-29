@@ -22,7 +22,7 @@ public class SHUIRootLogin : SHUIRoot
         });
     }
 
-    public void ShowSignupPanel(Action<string, string> pRegistCallback, Action pGobackCallback)
+    public void ShowSignupPanel(Action<string, string, string> pRegistCallback, Action pGobackCallback)
     {
         GetPanel<SHUIPanelSignup>(SHUIConstant.PANEL_SIGNUP, (pPanel) => 
         {

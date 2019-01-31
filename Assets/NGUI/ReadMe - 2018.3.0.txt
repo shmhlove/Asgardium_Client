@@ -1,9 +1,8 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
- Copyright © 2011-2016 Tasharen Entertainment
-            Version 3.11.4
-    http://www.tasharen.com/?page_id=197
-            support@tasharen.com
+ Copyright © 2011-2019 Tasharen Entertainment
+            Version 2018.3.0
+       https://discord.gg/tasharen/
 ----------------------------------------------
 
 Thank you for buying NGUI!
@@ -18,9 +17,10 @@ If you've obtained NGUI via some other means then note that your license is effe
 as Tasharen cannot provide support for pirated and/or potentially modified software.
 
 Documentation can be found here: http://www.tasharen.com/forum/index.php?topic=6754.0
+Support is provided here: https://discord.gg/tasharen
 
-If you have any questions, suggestions, comments or feature requests, please
-drop by the NGUI forum, found here: http://www.tasharen.com/forum/index.php?board=1.0
+If you have any questions, please first search the forum: http://www.tasharen.com/forum/index.php?board=1.0
+If you don't find an answer, simply ask in the #ngui-support channel in Discord: https://discord.gg/tasharen
 
 --------------------
  How To Update NGUI
@@ -35,7 +35,7 @@ If you have a Standard License:
 3. Import NGUI from the updated Unity Package.
 
 ---------------------------------------
- Support, documentation, and tutorials
+ Documentation, and tutorials
 ---------------------------------------
 
 All can be found here: http://www.tasharen.com/forum/index.php?topic=6754.0
@@ -54,6 +54,32 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+2018.3.0
+- NEW: As the name suggests, support for Unity 2018.3 and its new prefab workflow. Still supports previous versions, including Unity 5.6.
+- NEW: NGUI's atlases and fonts are now saved as ScriptableObjects instead of prefabs. To upgrade, select any old prefab-based atlas or font, and the Upgrade button will show up. BACK UP FIRST just in case! After the new asset gets created, the old atlas or font will be changed to Reference type, pointing to it. You can use the new asset directly, of course -- and if you are Unity savvy enough, you can swap their GUIDs from the meta files, effectively removing the need for the reference asset altogether.
+- NEW: Added a new widget type: Sprite Collection. It can be used to efficiently add thousands of sprites without the overhead of creating game objects. This is meant to be used from code by programmers, but can speed up the creation and modification of sprites by several orders of magnitude. In Sightseer it allowed the world map creation to go from 3348 ms down to 22 ms, for example.
+- NEW: Added UITweener.Finish() to immediately finish the tween, skipping to the end.
+- FIX: Some fixes for key binding text form serialization.
+
+3.12.1
+- NEW: Added an option to UIDragDropItem to make it work not just with press-and-hold but also with click-move-click dragging actions.
+- Improved the UIKeyBinding a bit (to string and from string conversion to be exact).
+
+3.12.0
+- NEW: Popup list can now accept delegates when setting up the items programmatically (ideally anonymous delegates).
+- NEW: Added Localization.Format overloads for 3 parameters and less to avoid GC allocations.
+- NEW: Added UIWidget.SetColorNoAlpha helper function.
+- NEW: color.LinearToGammaSpace() helper extension to match color.GammaToLinear().
+- NEW: Added a fast path for updating a widget's collider if the collider is already known, and forced it to be used when the widget gets enabled.
+- NEW: Added the "No Outline" option to the symbol coloring style. The symbol won't have an outline even if the text does.
+- FIX: Fixed an issue with the font's actual printed size not being printed correctly in inspector in some situations.
+- FIX: Random minor fixes from the support forum.
+- FIX: Missing localization entry warnings will now only be shown once per keyword.
+- FIX: UICamera will no longer keep assigning UICamera.hoveredObject repeatedly while mouse events are enabled. It will now only be assigned if the hovered object changes, or the mouse moves.
+- FIX: Fixed some issues with NGUIText.InsertHyperlink/ReplaceLink.
+- Merged pull request #26 by Nicki Hansen.
+- Checked against Unity 4.7, 5.6, and 2018.1b2.
 
 3.11.4
 - FIX: Assortment of various minor fixes for issues reported on the forums.

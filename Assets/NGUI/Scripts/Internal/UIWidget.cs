@@ -1,6 +1,6 @@
 //-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2017 Tasharen Entertainment Inc
+// Copyright © 2011-2019 Tasharen Entertainment Inc
 //-------------------------------------------------
 
 using UnityEngine;
@@ -11,10 +11,10 @@ using System.Collections.Generic;
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/UI/NGUI Widget")]
+[AddComponentMenu("NGUI/UI/Invisible Widget")]
 public class UIWidget : UIRect
 {
-	public enum Pivot
+	[DoNotObfuscateNGUI] public enum Pivot
 	{
 		TopLeft,
 		Top,
@@ -100,7 +100,7 @@ public class UIWidget : UIRect
 
 	public bool hideIfOffScreen = false;
 
-	public enum AspectRatioSource
+	[DoNotObfuscateNGUI] public enum AspectRatioSource
 	{
 		Free,
 		BasedOnWidth,
@@ -307,6 +307,21 @@ public class UIWidget : UIRect
 	}
 
 	/// <summary>
+	/// Change the color without affecting the alpha.
+	/// </summary>
+
+	public void SetColorNoAlpha (Color c)
+	{
+		if (mColor.r != c.r || mColor.g != c.g || mColor.b != c.b)
+		{
+			mColor.r = c.r;
+			mColor.g = c.g;
+			mColor.b = c.b;
+			Invalidate(false);
+		}
+	}
+
+	/// <summary>
 	/// Widget's alpha -- a convenience method.
 	/// </summary>
 
@@ -420,7 +435,7 @@ public class UIWidget : UIRect
 			{
 				if (panel != null) panel.RemoveWidget(this);
 				mDepth = value;
-				
+
 				if (panel != null)
 				{
 					panel.AddWidget(this);
@@ -543,12 +558,11 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-			Vector2 offset = pivotOffset;
-
-			float x0 = -offset.x * mWidth;
-			float y0 = -offset.y * mHeight;
-			float x1 = x0 + mWidth;
-			float y1 = y0 + mHeight;
+			var offset = pivotOffset;
+			var x0 = -offset.x * mWidth;
+			var y0 = -offset.y * mHeight;
+			var x1 = x0 + mWidth;
+			var y1 = y0 + mHeight;
 
 			return new Vector4(
 				mDrawRegion.x == 0f ? x0 : Mathf.Lerp(x0, x1, mDrawRegion.x),
@@ -804,7 +818,12 @@ public class UIWidget : UIRect
 	/// Adjust the widget's collider size to match the widget's dimensions.
 	/// </summary>
 
-	public void ResizeCollider () { if (NGUITools.GetActive(this)) NGUITools.UpdateWidgetCollider(gameObject); }
+	public void ResizeCollider ()
+	{
+		var bc = GetComponent<BoxCollider>();
+		if (bc != null) NGUITools.UpdateWidgetCollider(this, bc);
+		else NGUITools.UpdateWidgetCollider(this, GetComponent<BoxCollider2D>());
+	}
 
 	/// <summary>
 	/// Static widget comparison function used for depth sorting.
@@ -1460,6 +1479,7 @@ public class UIWidget : UIRect
 						mLocalToPanel = panel.worldToLocal * cachedTransform.localToWorldMatrix;
 						mMatrixFrame = frame;
 					}
+
 					geometry.ApplyTransform(mLocalToPanel, panel.generateNormals);
 					mMoved = false;
 					mChanged = false;

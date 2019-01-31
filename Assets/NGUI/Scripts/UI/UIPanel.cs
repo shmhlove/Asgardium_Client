@@ -1,6 +1,6 @@
 //-------------------------------------------------
-//            NGUI: Next-Gen UI kit
-// Copyright © 2011-2017 Tasharen Entertainment Inc
+//			  NGUI: Next-Gen UI kit
+// Copyright © 2011-2019 Tasharen Entertainment Inc
 //-------------------------------------------------
 
 using UnityEngine;
@@ -11,7 +11,7 @@ using System.Collections.Generic;
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/UI/NGUI Panel")]
+[AddComponentMenu("NGUI/UI/Panel")]
 public class UIPanel : UIRect
 {
 	/// <summary>
@@ -20,7 +20,7 @@ public class UIPanel : UIRect
 
 	static public List<UIPanel> list = new List<UIPanel>();
 
-	public enum RenderQueue
+	[DoNotObfuscateNGUI] public enum RenderQueue
 	{
 		Automatic,
 		StartAt,
@@ -44,7 +44,7 @@ public class UIPanel : UIRect
 	/// <summary>
 	/// Whether normals and tangents will be generated for all meshes.
 	/// </summary>
-	
+
 	public bool generateNormals = false;
 
 	/// <summary>
@@ -600,7 +600,16 @@ public class UIPanel : UIRect
 			{
 				return new Vector4(mClipRange.x + mClipOffset.x, mClipRange.y + mClipOffset.y, size.x, size.y);
 			}
-			return new Vector4(0f, 0f, size.x, size.y);
+			else
+			{
+				var v = new Vector4(0f, 0f, size.x, size.y);
+				var offset = anchorCamera.WorldToScreenPoint(cachedTransform.position);
+				offset.x -= size.x * 0.5f;
+				offset.y -= size.y * 0.5f;
+				v.x -= offset.x;
+				v.y -= offset.y;
+				return v;
+			}
 		}
 	}
 
@@ -688,9 +697,9 @@ public class UIPanel : UIRect
 
 				//if (anchorOffset && (mCam == null || mCam.transform.parent != cachedTransform))
 				//{
-				//    Vector3 off = cachedTransform.position;
-				//    for (int i = 0; i < 4; ++i)
-				//        corners[i] += off;
+				//	  Vector3 off = cachedTransform.position;
+				//	  for (int i = 0; i < 4; ++i)
+				//		  corners[i] += off;
 				//}
 				return corners;
 			}
@@ -1058,8 +1067,8 @@ public class UIPanel : UIRect
 				// Note that when enabling this, the 'if (rigidbody == null)' statement above should be adjusted as well.
 				//else
 				//{
-				//    Rigidbody2D rb = gameObject.AddComponent<Rigidbody2D>();
-				//    rb.isKinematic = true;
+				//	  Rigidbody2D rb = gameObject.AddComponent<Rigidbody2D>();
+				//	  rb.isKinematic = true;
 				//}
 			}
 		}
@@ -1083,13 +1092,13 @@ public class UIPanel : UIRect
 			UIDrawCall dc = drawCalls[i];
 			if (dc != null) UIDrawCall.Destroy(dc);
 		}
-		
+
 		drawCalls.Clear();
 		list.Remove(this);
 
 		mAlphaFrameID = -1;
 		mMatrixFrame = -1;
-		
+
 		if (list.Count == 0)
 		{
 			UIDrawCall.ReleaseAll();
@@ -1324,11 +1333,13 @@ public class UIPanel : UIRect
 		}
 		else
 		{
+			var needsCulling = (mCam == null || mCam.useOcclusionCulling);
+
 			for (int i = 0; i < drawCalls.Count; )
 			{
 				UIDrawCall dc = drawCalls[i];
 
-				if (dc.isDirty && !FillDrawCall(dc))
+				if (dc.isDirty && !FillDrawCall(dc, needsCulling))
 				{
 					UIDrawCall.Destroy(dc);
 					drawCalls.RemoveAt(i);
@@ -1377,6 +1388,7 @@ public class UIPanel : UIRect
 		Shader sdr = null;
 		UIDrawCall dc = null;
 		int count = 0;
+		var needsCulling = (mCam == null || mCam.useOcclusionCulling);
 
 		if (mSortWidgets) SortWidgets();
 
@@ -1387,7 +1399,7 @@ public class UIPanel : UIRect
 			if (w.isVisible && w.hasVertices)
 			{
 				Material mt = w.material;
-				
+
 				if (onCreateMaterial != null) mt = onCreateMaterial(w, mt);
 
 				Texture tx = w.mainTexture;
@@ -1398,7 +1410,7 @@ public class UIPanel : UIRect
 					if (dc != null && dc.verts.Count != 0)
 					{
 						drawCalls.Add(dc);
-						dc.UpdateGeometry(count);
+						dc.UpdateGeometry(count, needsCulling);
 						dc.onRender = mOnRender;
 						mOnRender = null;
 						count = 0;
@@ -1414,11 +1426,28 @@ public class UIPanel : UIRect
 				{
 					if (dc == null)
 					{
-						dc = UIDrawCall.Create(this, mat, tex, sdr);
-						dc.depthStart = w.depth;
-						dc.depthEnd = dc.depthStart;
-						dc.panel = this;
-						dc.onCreateDrawCall = onCreateDrawCall;
+						bool safeToDraw = true;
+#if UNITY_EDITOR && UNITY_2018_3_OR_NEWER
+						if (!Application.isPlaying)
+						{
+							var prefabStage = UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
+
+							if (prefabStage != null)
+							{
+								var prefabStageHandle = prefabStage.stageHandle;
+								var currentStageHandle = UnityEditor.SceneManagement.StageUtility.GetStageHandle(gameObject);
+								if (currentStageHandle != prefabStageHandle) safeToDraw = false;
+							}
+						}
+#endif
+						if (safeToDraw)
+						{
+							dc = UIDrawCall.Create(this, mat, tex, sdr);
+							dc.depthStart = w.depth;
+							dc.depthEnd = dc.depthStart;
+							dc.panel = this;
+							dc.onCreateDrawCall = onCreateDrawCall;
+						}
 					}
 					else
 					{
@@ -1429,14 +1458,18 @@ public class UIPanel : UIRect
 
 					w.drawCall = dc;
 
-					++count;
-					if (generateNormals) w.WriteToBuffers(dc.verts, dc.uvs, dc.cols, dc.norms, dc.tans, generateUV2 ? dc.uv2 : null);
-					else w.WriteToBuffers(dc.verts, dc.uvs, dc.cols, null, null, generateUV2 ? dc.uv2 : null);
-
-					if (w.mOnRender != null)
+					// Important to check this since it can very well be null due to earlier safeToDraw condition
+					if (dc != null)
 					{
-						if (mOnRender == null) mOnRender = w.mOnRender;
-						else mOnRender += w.mOnRender;
+						++count;
+						if (generateNormals) w.WriteToBuffers (dc.verts, dc.uvs, dc.cols, dc.norms, dc.tans, generateUV2 ? dc.uv2 : null);
+						else w.WriteToBuffers (dc.verts, dc.uvs, dc.cols, null, null, generateUV2 ? dc.uv2 : null);
+
+						if (w.mOnRender != null)
+						{
+							if (mOnRender == null) mOnRender = w.mOnRender;
+							else mOnRender += w.mOnRender;
+						}
 					}
 				}
 			}
@@ -1446,7 +1479,7 @@ public class UIPanel : UIRect
 		if (dc != null && dc.verts.Count != 0)
 		{
 			drawCalls.Add(dc);
-			dc.UpdateGeometry(count);
+			dc.UpdateGeometry(count, needsCulling);
 			dc.onRender = mOnRender;
 			mOnRender = null;
 		}
@@ -1459,6 +1492,16 @@ public class UIPanel : UIRect
 	/// </summary>
 
 	public bool FillDrawCall (UIDrawCall dc)
+	{
+		var needsCulling = (mCam == null || mCam.useOcclusionCulling);
+		return FillDrawCall(dc, needsCulling);
+	}
+
+	/// <summary>
+	/// Fill the geometry for the specified draw call.
+	/// </summary>
+
+	public bool FillDrawCall (UIDrawCall dc, bool needsCulling)
 	{
 		if (dc != null)
 		{
@@ -1483,7 +1526,7 @@ public class UIPanel : UIRect
 					if (w.isVisible && w.hasVertices)
 					{
 						++count;
-						
+
 						if (generateNormals) w.WriteToBuffers(dc.verts, dc.uvs, dc.cols, dc.norms, dc.tans, generateUV2 ? dc.uv2 : null);
 						else w.WriteToBuffers(dc.verts, dc.uvs, dc.cols, null, null, generateUV2 ? dc.uv2 : null);
 
@@ -1500,7 +1543,7 @@ public class UIPanel : UIRect
 
 			if (dc.verts.Count != 0)
 			{
-				dc.UpdateGeometry(count);
+				dc.UpdateGeometry(count, needsCulling);
 				dc.onRender = mOnRender;
 				mOnRender = null;
 				return true;
@@ -1622,7 +1665,7 @@ public class UIPanel : UIRect
 		{
 			for (int i = 0; i < UIScrollView.list.size; ++i)
 			{
-				UIScrollView sv = UIScrollView.list[i];
+				UIScrollView sv = UIScrollView.list.buffer[i];
 				if (sv.panel == this && sv.isDragging) forceVisible = true;
 			}
 		}
@@ -1684,7 +1727,7 @@ public class UIPanel : UIRect
 					bool vis = forceVisible || (w.CalculateCumulativeAlpha(frame) > 0.001f);
 					w.UpdateVisibility(vis, forceVisible || alwaysOnScreen || ((clipped || w.hideIfOffScreen) ? IsVisible(w) : true));
 				}
-				
+
 				// Update the widget's geometry if necessary
 				if (w.UpdateGeometry(frame))
 				{
@@ -1930,7 +1973,7 @@ public class UIPanel : UIRect
 	{
 		if (mClipping != UIDrawCall.Clipping.None)
 			return new Vector2(mClipRange.z, mClipRange.w);
-		
+
 		Vector2 size = NGUITools.screenSize;
 		//UIRoot rt = root;
 		//if (rt != null) size *= rt.pixelSizeAdjustment;
@@ -1946,6 +1989,11 @@ public class UIPanel : UIRect
 	{
 		if (anchorCamera == null) return;
 
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
+		if (!mCam.isOrthoGraphic) return;
+#else
+		if (!mCam.orthographic) return;
+#endif
 		bool clip = (mClipping != UIDrawCall.Clipping.None);
 		Transform t = clip ? transform : mCam.transform;
 
@@ -1962,11 +2010,7 @@ public class UIPanel : UIRect
 
 		Gizmos.matrix = t.localToWorldMatrix;
 
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-		if (isUsingThisPanel && !clip && mCam.isOrthoGraphic)
-#else
-		if (isUsingThisPanel && !clip && mCam.orthographic)
-#endif
+		if (isUsingThisPanel && !clip)
 		{
 			UIRoot rt = root;
 
@@ -1992,18 +2036,16 @@ public class UIPanel : UIRect
 				Gizmos.DrawWireCube(szPos, szSize);
 			}
 		}
+
 		Gizmos.color = (isUsingThisPanel && !detailedClipped) ? new Color(1f, 0f, 0.5f) : new Color(0.5f, 0f, 0.5f);
 		Gizmos.DrawWireCube(pos, size);
 
-		if (detailedView)
+		if (detailedView && detailedClipped)
 		{
-			if (detailedClipped)
-			{
-				Gizmos.color = new Color(1f, 0f, 0.5f);
-				size.x -= mClipSoftness.x * 2f;
-				size.y -= mClipSoftness.y * 2f;
-				Gizmos.DrawWireCube(pos, size);
-			}
+			Gizmos.color = new Color(1f, 0f, 0.5f);
+			size.x -= mClipSoftness.x * 2f;
+			size.y -= mClipSoftness.y * 2f;
+			Gizmos.DrawWireCube(pos, size);
 		}
 	}
 #endif // UNITY_EDITOR

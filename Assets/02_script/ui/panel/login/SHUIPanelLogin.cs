@@ -7,11 +7,11 @@ using System.Collections.Generic;
 public class SHUIPanelLogin : SHUIPanel 
 {
     [Header("User Information")]
-    public UIInput inputId;
+    public UIInput inputEmail;
     public UIInput inputPass;
     
     private Action<string, string> m_pEventLogin;
-    private Action m_pEventSignup;
+    private Action<string, string> m_pEventSignup;
 
     public override void OnBeforeShow(params object[] pArgs)
     {
@@ -19,7 +19,14 @@ public class SHUIPanelLogin : SHUIPanel
             return;
         
         m_pEventLogin  = ((Action<string, string>)pArgs[0]);
-        m_pEventSignup = ((Action)pArgs[1]);
+        m_pEventSignup = ((Action<string, string>)pArgs[1]);
+
+        if (3 <= pArgs.Length)
+        {
+            inputEmail.value = (string)pArgs[2];
+        }
+
+        inputPass.value = "";
     }
 
 	public void OnClickLoginButton()
@@ -29,7 +36,7 @@ public class SHUIPanelLogin : SHUIPanel
             return;
         }
 
-        m_pEventLogin(inputId.value, inputPass.value);
+        m_pEventLogin(inputEmail.value, inputPass.value);
 	}
     
     public void OnClickSigninButton()
@@ -39,6 +46,6 @@ public class SHUIPanelLogin : SHUIPanel
             return;
         }
 
-        m_pEventSignup();
+        m_pEventSignup(inputEmail.value, inputPass.value);
 	}
 }

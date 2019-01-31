@@ -103,9 +103,24 @@ public class SHReply
             Debug.LogFormat("[RESPONSE Error] : {0} {1}\n{2}",
                 request.method,
                 request.url,
-                this.error.toString());
+                this.error.ToString());
         }
         
         request.Dispose();
+    }
+
+    public override string ToString()
+    {
+        if (null != data)
+        {
+            return data.ToJson();
+        }
+
+        if (null != error)
+        {
+            return error.ToString();
+        }
+
+        return string.Empty;
     }
 }

@@ -18,37 +18,7 @@ public class SHSceneTest : MonoBehaviour
     {
         Single.Network.GET(SHAPIs.SH_API_TEST, null, (reply) =>
         {
-            if (reply.isSucceed)
-            {
-            }
-            else
-            {
-            }
-        });
-
-        JsonData json = new JsonData();
-        json["name"] = "unity test";
-        json["pass"] = "1234";
-        Single.Network.POST(SHAPIs.SH_API_LOGIN, json, (reply) =>
-        {
-            if (reply.isSucceed)
-            {
-            }
-            else
-            {
-            }
-        });
-
-        json["name"] = "unity test";
-        json["pass"] = "1234";
-        Single.Network.POST(SHAPIs.SH_API_SIGNUP, json, (reply) => 
-        {
-            if (reply.isSucceed)
-            {
-            }
-            else
-            {
-            }
+            Single.UI.GetGlobalRoot().ShowAlert(reply.ToString());
         });
     }
 }

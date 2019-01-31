@@ -44,6 +44,7 @@ public static partial class SHUtils
         {
             case "intro":         return eSceneType.Intro;
             case "login":         return eSceneType.Login;
+            case "lobby":         return eSceneType.Lobby;
         }                        
         return eSceneType.None;
     }

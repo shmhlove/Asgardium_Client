@@ -12,48 +12,48 @@ class SHBuildScript
 
     #region Android Build
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    [MenuItem("SHTools/CI/Android All Build For Korea")]
-    static void KOR_AndroidBuild()
+    [MenuItem("SHTools/CI/App Build For Android")]
+    static void KOR_AndroidAppBuild()
     { 
-        AppBuild(eNationType.Korea, BuildTarget.Android, eServiceMode.QA, BuildOptions.None);
-        AssetBundlesPacking(BuildTarget.Android, eBundlePackType.All);
+        AppBuild(eNationType.Korea, BuildTarget.Android, eServiceMode.Dev, BuildOptions.Development);
+        //AppBuild(eNationType.Korea, BuildTarget.Android, eServiceMode.Live, BuildOptions.None);
     }
 
-    [MenuItem("SHTools/CI/Android AppBuild For Korea")]
-	static void KOR_AndroidAppBuild()
-    { AppBuild(eNationType.Korea, BuildTarget.Android, eServiceMode.QA, BuildOptions.None);   }
-    
-    [MenuItem("SHTools/CI/Android AssetBundles Packing")]
-	static void KOR_AndroidAssetBundlesPacking()
-    { AssetBundlesPacking(BuildTarget.Android, eBundlePackType.All);  }
+    // [MenuItem("SHTools/CI/AssetBundles Packing For Android")]
+	// static void KOR_AndroidAssetBundlesPacking()
+    // {
+    //     AssetBundlesPacking(BuildTarget.Android, eBundlePackType.All);
+    // }
 
-    [MenuItem("SHTools/CI/Android AssetBundles Upload")]
-    static void KOR_AndroidAssetBundlesUpload()
-    { UploadAssetBundles(BuildTarget.Android); }
+    // [MenuItem("SHTools/CI/AssetBundles Upload For Android")]
+    // static void KOR_AndroidAssetBundlesUpload()
+    // {
+    //     UploadAssetBundles(BuildTarget.Android);
+    // }
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     #endregion
 
 
     #region iOS Build
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    [MenuItem("SHTools/CI/iOS All Build For Korea")]
-    static void KOR_iOSBuild()
+    [MenuItem("SHTools/CI/App Build For iOS")]
+    static void KOR_iOSAppBuild()
     { 
-        AppBuild(eNationType.Korea, BuildTarget.iOS, eServiceMode.QA, BuildOptions.AcceptExternalModificationsToPlayer);
-        AssetBundlesPacking(BuildTarget.iOS, eBundlePackType.All);
+        AppBuild(eNationType.Korea, BuildTarget.iOS, eServiceMode.Dev, BuildOptions.Development);
+        //AppBuild(eNationType.Korea, BuildTarget.iOS, eServiceMode.Live, BuildOptions.None);
     }
 
-    [MenuItem("SHTools/CI/iOS AppBuild For Korea")]
-	static void KOR_iOSAppBuild()
-    { AppBuild(eNationType.Korea, BuildTarget.iOS, eServiceMode.QA, BuildOptions.AcceptExternalModificationsToPlayer);   }
-    
-    [MenuItem("SHTools/CI/iOS AssetBundles Packing")]
-	static void KOR_iOSAssetBundlesPacking()
-    { AssetBundlesPacking(BuildTarget.iOS, eBundlePackType.All);  }
+    // [MenuItem("SHTools/CI/AssetBundles Packing For iOS")]
+	// static void KOR_iOSAssetBundlesPacking()
+    // {
+    //     AssetBundlesPacking(BuildTarget.iOS, eBundlePackType.All);
+    // }
 
-    [MenuItem("SHTools/CI/iOS AssetBundles Upload")]
-    static void KOR_iOSAssetBundlesUpload()
-    { UploadAssetBundles(BuildTarget.iOS); }
+    // [MenuItem("SHTools/CI/AssetBundles Upload For iOS")]
+    // static void KOR_iOSAssetBundlesUpload()
+    // {
+    //     UploadAssetBundles(BuildTarget.iOS);
+    // }
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     #endregion
     
@@ -67,7 +67,6 @@ class SHBuildScript
     static void AssetBundlesPacking(BuildTarget eTarget, eBundlePackType ePackType)
     {
         PackingAssetBundles(eTarget, ePackType);
-        //UploadAssetBundles(eTarget);
         PostProcessor(eTarget);
     }
     
@@ -78,10 +77,10 @@ class SHBuildScript
             switch (eTarget)
             {
                 case BuildTarget.Android:
-                    PlayerSettings.Android.keystoreName = string.Format("{0}/{1}", SHPath.GetRoot(), pConfigFile.AOS_KeyStoreName);
-                    PlayerSettings.Android.keystorePass = pConfigFile.AOS_KeyStorePass;
-                    PlayerSettings.Android.keyaliasName = pConfigFile.AOS_KeyAliasName;
-                    PlayerSettings.Android.keyaliasPass = pConfigFile.AOS_KeyAliasPass;
+                    PlayerSettings.Android.keystoreName = string.Format("{0}/GoogleKeyStore/asgardium.keystore", SHPath.GetRoot());
+                    PlayerSettings.Android.keystorePass = "lee35235";
+                    PlayerSettings.Android.keyaliasName = "asgardium";
+                    PlayerSettings.Android.keyaliasPass = "lee35235";
                     EditorUserBuildSettings.androidBuildSubtarget = MobileTextureSubtarget.ETC;
                     break;
                 case BuildTarget.iOS:
@@ -91,35 +90,6 @@ class SHBuildScript
 
             PlayerSettings.bundleVersion = pConfigFile.Version;
         });
-    }
-
-    static void UploadAssetBundles(BuildTarget eTarget)
-    {
-        // var strExportPath = string.Format("{0}/{1}/{2}", SHPath.GetBuild(), SHHard.GetPlatformStringByEnum(eTarget), "AssetBundle");
-        // var strUploadRoot = string.Format("{0}/{1}", SHHard.GetPlatformStringByEnum(eTarget), "AssetBundle");
-        // var pFileList = SHUtils.Search(strExportPath, (FileInfo pFile) =>
-        // {
-        //     var strUploadPath = string.Format("{0}/{1}", 
-        //         strUploadRoot, pFile.FullName.Substring(pFile.FullName.IndexOf("AssetBundle") + "AssetBundle".Length + 1)).Replace("\\", "/");
-            
-        //     Single.Firebase.Storage.Upload(pFile.FullName.Replace("\\", "/"), strUploadPath, (pReply) => 
-        //     {
-        //         if (pReply.IsSucceed)
-        //         {
-        //             Debug.LogFormat("SUCCEED!! UploadPath : {0}", strUploadPath);
-        //         }
-        //         else
-        //         {
-        //             Debug.LogFormat("FAILED!! UploadPath : {0}", strUploadPath);
-        //         }
-        //     });
-        // });
-        
-        // Single.Firebase.Storage.Upload(pFileList, strUploadRoot, (pReply) => 
-        // {
-        //     PostProcessor(eTarget);
-        //     EditorApplication.Exit(0);
-        // });
     }
     
     static void PostProcessor(BuildTarget eTarget)
@@ -159,6 +129,35 @@ class SHBuildScript
         Debug.LogFormat("** [SHBuilder] AssetBundles Packing End({0}) -> {1}", eTarget, DateTime.Now.ToString("yyyy-MM-dd [ HH:mm:ss ]"));
     }
     
+    static void UploadAssetBundles(BuildTarget eTarget)
+    {
+        // var strExportPath = string.Format("{0}/{1}/{2}", SHPath.GetBuild(), SHHard.GetPlatformStringByEnum(eTarget), "AssetBundle");
+        // var strUploadRoot = string.Format("{0}/{1}", SHHard.GetPlatformStringByEnum(eTarget), "AssetBundle");
+        // var pFileList = SHUtils.Search(strExportPath, (FileInfo pFile) =>
+        // {
+        //     var strUploadPath = string.Format("{0}/{1}", 
+        //         strUploadRoot, pFile.FullName.Substring(pFile.FullName.IndexOf("AssetBundle") + "AssetBundle".Length + 1)).Replace("\\", "/");
+            
+        //     Single.Firebase.Storage.Upload(pFile.FullName.Replace("\\", "/"), strUploadPath, (pReply) => 
+        //     {
+        //         if (pReply.IsSucceed)
+        //         {
+        //             Debug.LogFormat("SUCCEED!! UploadPath : {0}", strUploadPath);
+        //         }
+        //         else
+        //         {
+        //             Debug.LogFormat("FAILED!! UploadPath : {0}", strUploadPath);
+        //         }
+        //     });
+        // });
+        
+        // Single.Firebase.Storage.Upload(pFileList, strUploadRoot, (pReply) => 
+        // {
+        //     PostProcessor(eTarget);
+        //     EditorApplication.Exit(0);
+        // });
+    }
+
     static string GetBuildName(BuildTarget eTarget, string strAppName)
     {
         if (BuildTarget.Android == eTarget)

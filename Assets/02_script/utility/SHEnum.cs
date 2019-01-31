@@ -8,13 +8,14 @@ public enum eErrorCode
     // network error (Sync Server)
     Net_Common_HTTP = 1000,
     Net_Common_InvalidParam = 1001,
-    Net_Common_DatabaseFind = 1002,
+    Net_Common_NotFoundCollection = 1002,
     Net_Common_DatabaseWrite = 1003,
     Net_Common_InvalidResponseData = 1004,
     Net_Common_JsonParse = 1005,
 
-    Net_Auth_UserFind = 2001,
+    Net_Auth_NotFoundUser = 2001,
     Net_Auth_AlreadySignupUser = 2002,
+    Net_Auth_InvalidPassword = 2003,
 
     // data error
     Data_NotImplementation = 1000001,
@@ -35,6 +36,7 @@ public enum eSceneType
     None,
     Intro,
     Login,
+    Lobby,
 }
 
 public enum eNationType

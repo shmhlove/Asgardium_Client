@@ -237,7 +237,14 @@ public partial class SHResourceData : SHBaseData
             }
             else
             {
-                m_dicResources.Add(pTable.m_strName.ToLower(), pObject);
+                if (false == m_dicResources.ContainsKey(pTable.m_strName.ToLower()))
+                {
+                    m_dicResources.Add(pTable.m_strName.ToLower(), pObject);
+                }
+                else
+                {
+                    m_dicResources[pTable.m_strName.ToLower()] = pObject;
+                }
             }
 
             pCallback(pObject);

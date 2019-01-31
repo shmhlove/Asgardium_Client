@@ -34,11 +34,24 @@ public class SHUIManager : SHSingleton<SHUIManager>
         }
     }
 
-    public void GetRoot<T>(string strName, Action<T> pCallback) where T :  SHUIRoot
+    public T GetRoot<T>(string strName) where T :  SHUIRoot
     {
         if (m_dicRoots.ContainsKey(strName))
         {
-            pCallback(m_dicRoots[strName] as T);
+            return m_dicRoots[strName] as T;
+        }
+        else
+        {
+            return default(T);
+        }
+    }
+
+    public void GetRoot<T>(string strName, Action<T> pCallback) where T :  SHUIRoot
+    {
+        var pUIRoot = GetRoot<T>(strName);
+        if (null != pUIRoot)
+        {
+            pCallback(pUIRoot);
             return;
         }
 
@@ -54,5 +67,10 @@ public class SHUIManager : SHSingleton<SHUIManager>
                 pCallback(default(T));
             }
         });
+    }
+
+    public SHUIRootGlobal GetGlobalRoot()
+    {
+        return GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
     }
 }

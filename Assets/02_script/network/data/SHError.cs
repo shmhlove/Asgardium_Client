@@ -8,22 +8,22 @@ using LitJson;
 
 public class SHError
 {
-    public eErrorCode errorCode;
+    public eErrorCode code;
     public string message;
     public JsonData extras;
 
     public SHError(eErrorCode errorCode, string message, JsonData extras = null)
     {
-        this.errorCode = errorCode;
+        this.code = errorCode;
         this.message = message;
         this.extras = extras;
     }
 
-    public string toString()
+    public override string ToString()
     {
         if (null != extras)
-            return string.Format("(ErrorCode : {0}) {1}, {2}", errorCode, message, extras.ToJson());
+            return string.Format("({0}) {1}, {2}", (int)code, message, extras.ToJson());
         else
-            return string.Format("(ErrorCode : {0}) {1}", errorCode, message);
+            return string.Format("{1} ({0})", (int)code, message);
     }
 }

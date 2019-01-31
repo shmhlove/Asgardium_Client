@@ -5,9 +5,9 @@
         "ServiceMode": "Dev",
         "Version": "1.0.1",
 		
-		"AOS_KeyStoreName": "GoogleKeyStore/kingsadventure.keystore",
+		"AOS_KeyStoreName": "GoogleKeyStore/asgardium.keystore",
 		"AOS_KeyStorePass": "lee35235",
-		"AOS_KeyAliasName": "kingsadventure",
+		"AOS_KeyAliasName": "asgardium",
 		"AOS_KeyAliasPass": "lee35235",
 		
 		"IOS_TeamID": "T8263VR796",

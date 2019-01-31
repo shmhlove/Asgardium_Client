@@ -6,12 +6,24 @@ using UnityEditor;
 using System;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 
 public static partial class SHUtils
 {
+    public static bool IsValidEmail(string strEmail)
+    {
+        if (true == string.IsNullOrEmpty(strEmail))
+        {
+            return false;
+        }
+
+        string strPattern = "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}\\@[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}(\\.[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25})+";
+        return Regex.IsMatch(strEmail, strPattern);
+    }
+
     // Component Missing 체크
     public static void CheckMissingComponent()
     {

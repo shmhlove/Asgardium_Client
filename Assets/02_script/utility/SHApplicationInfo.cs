@@ -130,7 +130,7 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
     void SetOrientation()
     {
         Screen.orientation = ScreenOrientation.AutoRotation;
-        Screen.autorotateToPortrait = true;
+        Screen.autorotateToPortrait = false;
         Screen.autorotateToPortraitUpsideDown = true;
         Screen.autorotateToLandscapeRight = false;
         Screen.autorotateToLandscapeLeft = false;
@@ -254,6 +254,9 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
 #if !UNITY_EDITOR
         return;
 #endif
+        if (false == Application.isPlaying)
+            return;
+            
         if (false == m_pDicResourceLoadInfo.ContainsKey(Single.Scene.GetActiveScene()))
             m_pDicResourceLoadInfo.Add(Single.Scene.GetActiveScene(), new List<string>());
 

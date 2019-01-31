@@ -36,17 +36,17 @@ namespace LunarConsoleEditorInternal
     {
         private static readonly string[] kLegacyAssets =
         {
-            "Assets/Plugins/Android/LunarConsole",
+            // "Assets/Plugins/Android/LunarConsole",
 
-            "Assets/LunarConsole/Editor/Android/AndroidManifest.xml",
-            "Assets/LunarConsole/Editor/Android/libs",
-            "Assets/LunarConsole/Editor/Android/project.properties",
-            "Assets/LunarConsole/Editor/Android/res",
+            // "Assets/LunarConsole/Editor/Android/AndroidManifest.xml",
+            // "Assets/LunarConsole/Editor/Android/libs",
+            // "Assets/LunarConsole/Editor/Android/project.properties",
+            // "Assets/LunarConsole/Editor/Android/res",
 
-            "Assets/Plugins/LunarConsole/Editor/Android/AndroidManifest.xml",
-            "Assets/Plugins/LunarConsole/Editor/Android/libs",
-            "Assets/Plugins/LunarConsole/Editor/Android/project.properties",
-            "Assets/Plugins/LunarConsole/Editor/Android/res",
+            // "Assets/Plugins/LunarConsole/Editor/Android/AndroidManifest.xml",
+            // "Assets/Plugins/LunarConsole/Editor/Android/libs",
+            // "Assets/Plugins/LunarConsole/Editor/Android/project.properties",
+            // "Assets/Plugins/LunarConsole/Editor/Android/res",
         };
 
         static Autorun()

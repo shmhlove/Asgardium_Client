@@ -110,6 +110,9 @@ public abstract class SHSingleton<T> : MonoBehaviour where T : SHSingleton<T>
         if (null == m_pInstance)
             return;
         
+        if (false == Application.isPlaying)
+            return;
+            
         DontDestroyOnLoad(m_pInstance.SetParent("SHSingletons(DontDestroy)"));
     }
 

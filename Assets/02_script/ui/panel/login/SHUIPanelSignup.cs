@@ -7,12 +7,12 @@ using System.Collections.Generic;
 public class SHUIPanelSignup : SHUIPanel 
 {
     [Header("User Information")]
-    public UIInput inputId;
+    public UIInput inputEmail;
     public UIInput inputName;
     public UIInput inputPass;
 
     private Action<string, string, string> m_pEventRegistration;
-    private Action m_pEventGoBackLogin;
+    private Action<string, string, string> m_pEventGoBackLogin;
 
     public override void OnBeforeShow(params object[] pArgs)
     {
@@ -20,7 +20,19 @@ public class SHUIPanelSignup : SHUIPanel
             return;
         
         m_pEventRegistration  = ((Action<string, string, string>)pArgs[0]);
-        m_pEventGoBackLogin = ((Action)pArgs[1]);
+        m_pEventGoBackLogin = ((Action<string, string, string>)pArgs[1]);
+
+        if (3 <= pArgs.Length)
+        {
+            inputEmail.value = (string)pArgs[2];
+        }
+
+        if (4 <= pArgs.Length)
+        {
+            inputName.value = (string)pArgs[3];
+        }
+
+        inputPass.value = "";
     }
 
 	public void OnClickRegistrationButton()
@@ -30,7 +42,7 @@ public class SHUIPanelSignup : SHUIPanel
             return;
         }
 
-        m_pEventRegistration(inputId.value, inputName.value, inputPass.value);
+        m_pEventRegistration(inputEmail.value, inputName.value, inputPass.value);
 	}
 
 	public void OnClickGoBackLoginButton()
@@ -40,6 +52,6 @@ public class SHUIPanelSignup : SHUIPanel
             return;
         }
 
-        m_pEventGoBackLogin();
+        m_pEventGoBackLogin(inputEmail.value, inputName.value, inputPass.value);
 	}
 }

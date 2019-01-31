@@ -28,4 +28,18 @@ public class SHUIRootGlobal : SHUIRoot
             pPanel.Close(pCallback);
         });
     }
+
+    public void ShowAlert(string strMessage, Action pCallback = null)
+    {
+        GetPanel<SHUIPanelAlert>(SHUIConstant.PANEL_ALERT, (pPanel) =>
+        {
+            Action<eAlertButtonAction> pResult = (eAction) =>
+            {
+                pPanel.Close(pCallback);
+            };
+            
+            pPanel.SetActive(true);
+            pPanel.Show("", strMessage, eAlertButtonType.OneButton, pResult);
+        });
+    }
 }

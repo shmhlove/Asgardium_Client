@@ -8,8 +8,6 @@ using LitJson;
 
 public class SHSceneLogin : MonoBehaviour
 {
-    private SHUIRootLogin m_pUIRoot = null;
-
     private void Awake()
     {
         Single.AppInfo.CreateSingleton();
@@ -17,73 +15,77 @@ public class SHSceneLogin : MonoBehaviour
 
     private void Start()
     {
-        SetUIRoot(() => 
-        {
-            ShowLoginPanel();
-        });
+        ShowLoginPanel();
     }
 
-    private void SetUIRoot(Action pCallback)
+    private void ShowLoginPanel(string strEmail = "")
     {
-        Single.UI.GetRoot<SHUIRootLogin>(SHUIConstant.ROOT_LOGIN, (pUIRoot) => 
-        {
-            m_pUIRoot = pUIRoot;
-            pCallback();
-        });
+        var pUIRoot = Single.UI.GetRoot<SHUIRootLogin>(SHUIConstant.ROOT_LOGIN);
+        pUIRoot.CloseSignupPanel();
+        pUIRoot.ShowLoginPanel(OnClickLogin, OnClickSignup, strEmail);
     }
 
-    private void ShowLoginPanel()
+    private void ShowSignupPanel(string strEmail = "", string strName = "")
     {
-        if (null == m_pUIRoot)
-        {
-            Debug.LogError("[LSH] not set ui-root object in LoginScene");
-            return;
-        }
-
-        m_pUIRoot.CloseSignupPanel();
-        m_pUIRoot.ShowLoginPanel(OnClickLogin, OnClickSignup);
-    }
-
-    private void ShowSignupPanel()
-    {
-        if (null == m_pUIRoot)
-        {
-            Debug.LogError("[LSH] not set ui-root object in LoginScene");
-            return;
-        }
-
-        m_pUIRoot.CloseLoginPanel();
-        m_pUIRoot.ShowSignupPanel(OnClickRegistrationUser, OnClickGoBackLogin);
+        var pUIRoot = Single.UI.GetRoot<SHUIRootLogin>(SHUIConstant.ROOT_LOGIN);
+        pUIRoot.CloseLoginPanel();
+        pUIRoot.ShowSignupPanel(OnClickRegistrationUser, OnClickGoBackLogin, strEmail, strName);
     }
 
     private void OnClickLogin(string strEmail, string strPassword)
     {
+        if (false == SHUtils.IsValidEmail(strEmail))
+        {
+            Single.UI.GetGlobalRoot().ShowAlert("올바른 이메일 형식이 아닙니다.");
+            return;
+        }
+
         JsonData json = new JsonData();
-        json["name"] = strEmail;
-        json["pass"] = strPassword;
+        json["email"] = strEmail;
+        json["password"] = strPassword;
         Single.Network.POST(SHAPIs.SH_API_LOGIN, json, (reply) =>
         {
-            if (reply.isSucceed)
+            Single.UI.GetGlobalRoot().ShowAlert(reply.ToString(), () => 
             {
-            }
-            else
-            {
-            }
+                if (reply.isSucceed)
+                {
+                    Single.Scene.LoadScene(eSceneType.Lobby, bIsUseFade:true);
+                }
+            });
         });
     }
 
-    private void OnClickSignup()
+    private void OnClickSignup(string strEmail, string strPassword)
     {
-        ShowSignupPanel();
+        ShowSignupPanel(strEmail);
     }
 
     private void OnClickRegistrationUser(string strEmail, string strName, string strPassword)
     {
+        if (false == SHUtils.IsValidEmail(strEmail))
+        {
+            Single.UI.GetGlobalRoot().ShowAlert("올바른 이메일 형식이 아닙니다.");
+            return;
+        }
 
+        JsonData json = new JsonData();
+        json["email"] = strEmail;
+        json["name"] = strName;
+        json["password"] = strPassword;
+        Single.Network.POST(SHAPIs.SH_API_SIGNUP, json, (reply) =>
+        {
+            Single.UI.GetGlobalRoot().ShowAlert(reply.ToString(), () => 
+            {
+                if (reply.isSucceed)
+                {
+                    ShowLoginPanel(strEmail);
+                }
+            });
+        });
     }
 
-    private void OnClickGoBackLogin()
+    private void OnClickGoBackLogin(string strEmail, string strName, string strPassword)
     {
-        ShowLoginPanel();
+        ShowLoginPanel(strEmail);
     }
 }

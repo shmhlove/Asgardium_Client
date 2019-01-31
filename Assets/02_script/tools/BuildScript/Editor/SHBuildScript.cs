@@ -15,7 +15,7 @@ class SHBuildScript
     [MenuItem("SHTools/CI/App Build For Android")]
     static void KOR_AndroidAppBuild()
     { 
-        AppBuild(eNationType.Korea, BuildTarget.Android, eServiceMode.Dev, BuildOptions.None);
+        AppBuild(eNationType.Korea, BuildTarget.Android, eServiceMode.Dev, BuildOptions.Development);
         //AppBuild(eNationType.Korea, BuildTarget.Android, eServiceMode.Live, BuildOptions.None);
     }
 

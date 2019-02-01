@@ -39,7 +39,6 @@ public class SHReply
 
     public SHReply(UnityWebRequest request)
     {
-        this.isSucceed = !request.isError;
         this.data = null;
         this.error = null;
 

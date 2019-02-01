@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using UnityEditor.Build.Reporting;
 
 using System;
 using System.IO;
@@ -103,15 +104,18 @@ class SHBuildScript
         string strBuildName = GetBuildName(eTarget, Single.AppInfo.GetProductName());
         Debug.LogFormat("** [SHBuilder] Build Start({0}) -> {1}", strBuildName, DateTime.Now.ToString("yyyy-MM-dd [ HH:mm:ss ]"));
         {
-            EditorUserBuildSettings.SwitchActiveBuildTarget(eTarget);
+            if (BuildTarget.Android == eTarget)
+                EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Android, eTarget);
+            else
+                EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.iOS, eTarget);
 
             string strExportPath = string.Format("{0}/{1}/{2}", SHPath.GetBuild(), SHUtils.GetPlatformStringByEnum(eTarget), strBuildName);
             SHUtils.CreateDirectory(strExportPath);
 
-			string strResult = BuildPipeline.BuildPlayer(strScenes, strExportPath, eTarget, eOptions);
-            if (0 < strResult.Length)
+			BuildReport pReport = BuildPipeline.BuildPlayer(strScenes, strExportPath, eTarget, eOptions);
+            if (BuildResult.Failed == pReport.summary.result)
             {
-                throw new Exception("[SHBuilder] BuildPlayer failure: " + strResult);
+                throw new Exception("[SHBuilder] BuildPlayer failure: BuildPipeline.BuildPlayer");
             }
         }
         Debug.LogFormat("** [SHBuilder] Build End({0}) -> {1}", strBuildName, DateTime.Now.ToString("yyyy-MM-dd [ HH:mm:ss ]"));

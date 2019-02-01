@@ -1,6 +1,6 @@
 //-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2017 Tasharen Entertainment Inc
+// Copyright © 2011-2019 Tasharen Entertainment Inc
 //-------------------------------------------------
 
 using UnityEngine;
@@ -16,14 +16,14 @@ public class UIGrid : UIWidgetContainer
 {
 	public delegate void OnReposition ();
 
-	public enum Arrangement
+	[DoNotObfuscateNGUI] public enum Arrangement
 	{
 		Horizontal,
 		Vertical,
 		CellSnap,
 	}
 
-	public enum Sorting
+	[DoNotObfuscateNGUI] public enum Sorting
 	{
 		None,
 		Alphabetic,
@@ -125,8 +125,11 @@ public class UIGrid : UIWidgetContainer
 		for (int i = 0; i < myTrans.childCount; ++i)
 		{
 			Transform t = myTrans.GetChild(i);
+
 			if (!hideInactive || (t && t.gameObject.activeSelf))
-				list.Add(t);
+			{
+				if (!UIDragDropItem.IsDragged(t.gameObject)) list.Add(t);
+			}
 		}
 
 		// Sort the list using the desired sorting logic
@@ -356,7 +359,7 @@ public class UIGrid : UIWidgetContainer
 		int y = 0;
 		int maxX = 0;
 		int maxY = 0;
-		Transform myTrans = transform;
+		//Transform myTrans = transform;
 
 		// Re-add the children in the same order we have them in and position them accordingly
 		for (int i = 0, imax = list.Count; i < imax; ++i)
@@ -379,7 +382,7 @@ public class UIGrid : UIWidgetContainer
 
 			if (animateSmoothly && Application.isPlaying && (pivot != UIWidget.Pivot.TopLeft || Vector3.SqrMagnitude(t.localPosition - pos) >= 0.0001f))
 			{
-				SpringPosition sp = SpringPosition.Begin(t.gameObject, pos, 15f);
+				var sp = SpringPosition.Begin(t.gameObject, pos, 15f);
 				sp.updateScrollView = true;
 				sp.ignoreTimeScale = true;
 			}
@@ -398,7 +401,7 @@ public class UIGrid : UIWidgetContainer
 		// Apply the origin offset
 		if (pivot != UIWidget.Pivot.TopLeft)
 		{
-			Vector2 po = NGUIMath.GetPivotOffset(pivot);
+			var po = NGUIMath.GetPivotOffset(pivot);
 
 			float fx, fy;
 
@@ -413,10 +416,9 @@ public class UIGrid : UIWidgetContainer
 				fy = Mathf.Lerp(-maxX * cellHeight, 0f, po.y);
 			}
 
-			for (int i = 0; i < myTrans.childCount; ++i)
+			foreach (var t in list)
 			{
-				Transform t = myTrans.GetChild(i);
-				SpringPosition sp = t.GetComponent<SpringPosition>();
+				var sp = t.GetComponent<SpringPosition>();
 
 				if (sp != null)
 				{

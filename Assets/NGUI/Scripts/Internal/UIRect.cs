@@ -1,6 +1,6 @@
 //-------------------------------------------------
-//            NGUI: Next-Gen UI kit
-// Copyright © 2011-2017 Tasharen Entertainment Inc
+//			  NGUI: Next-Gen UI kit
+// Copyright © 2011-2019 Tasharen Entertainment Inc
 //-------------------------------------------------
 
 using UnityEngine;
@@ -154,7 +154,7 @@ public abstract class UIRect : MonoBehaviour
 
 	public AnchorPoint topAnchor = new AnchorPoint(1f);
 
-	public enum AnchorUpdate
+	[DoNotObfuscateNGUI] public enum AnchorUpdate
 	{
 		OnEnable,
 		OnUpdate,
@@ -205,7 +205,7 @@ public abstract class UIRect : MonoBehaviour
 	/// Camera used by anchors.
 	/// </summary>
 
-	public Camera anchorCamera { get { if (!mAnchorsCached) ResetAnchors(); return mCam; } }
+	public Camera anchorCamera { get { if (!mCam || !mAnchorsCached) ResetAnchors(); return mCam; } }
 
 	/// <summary>
 	/// Whether the rectangle is currently anchored fully on all sides.
@@ -445,6 +445,10 @@ public abstract class UIRect : MonoBehaviour
 
 	protected virtual void Awake ()
 	{
+#if UNITY_2018_3_OR_NEWER
+		NGUITools.CheckForPrefabStage (gameObject); 
+#endif
+
 		mStarted = false;
 		mGo = gameObject;
 		mTrans = transform;
@@ -468,7 +472,12 @@ public abstract class UIRect : MonoBehaviour
 
 	public void Update ()
 	{
-		if (!mAnchorsCached) ResetAnchors();
+		if (!mCam)
+		{
+			ResetAndUpdateAnchors();
+			mUpdateFrame = -1;
+		}
+		else if (!mAnchorsCached) ResetAnchors();
 
 		int frame = Time.frameCount;
 
@@ -483,7 +492,7 @@ public abstract class UIRect : MonoBehaviour
 #else
 			if (updateAnchors == AnchorUpdate.OnUpdate || mUpdateAnchors)
 #endif
-				UpdateAnchorsInternal(frame);
+			UpdateAnchorsInternal(frame);
 
 			// Continue with the update
 			OnUpdate();

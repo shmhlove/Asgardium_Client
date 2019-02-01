@@ -1,19 +1,26 @@
 fileFormatVersion: 2
-guid: 78deff67828c35e45a24a0646fec6ad6
+guid: be4cb9dbebdb3f74987ea21dd71c64df
 PluginImporter:
-  serializedVersion: 1
+  externalObjects: {}
+  serializedVersion: 2
   iconMap: {}
   executionOrder: {}
+  defineConstraints: []
   isPreloaded: 0
   isOverridable: 0
+  isExplicitlyReferenced: 0
   platformData:
-    Editor:
-      enabled: 1
-      settings:
-        DefaultValueInitialized: true
-    first:
+  - first:
+      Any: 
+    second:
       enabled: 0
       settings: {}
+  - first:
+      Editor: Editor
+    second:
+      enabled: 0
+      settings:
+        DefaultValueInitialized: true
   userData: 
   assetBundleName: 
   assetBundleVariant: 

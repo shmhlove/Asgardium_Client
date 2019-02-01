@@ -4,7 +4,7 @@
 //  Lunar Unity Mobile Console
 //  https://github.com/SpaceMadness/lunar-unity-console
 //
-//  Copyright 2018 Alex Lementuev, SpaceMadness.
+//  Copyright 2019 Alex Lementuev, SpaceMadness.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -245,7 +245,8 @@ namespace LunarConsolePluginInternal
 
         public static List<Type> FindAttributeTypes(Assembly assembly, Type attributeType)
         {
-            return FindTypes(assembly, delegate(Type type) {
+            return FindTypes(assembly, delegate(Type type)
+            {
                 var attributes = type.GetCustomAttributes(attributeType, false);
                 return attributes != null && attributes.Length > 0;
             });
@@ -268,7 +269,7 @@ namespace LunarConsolePluginInternal
             }
             catch (Exception e)
             {
-                Log.e(e, "Unable to list types");
+                Log.e(e, "Unable to list types for assembly: {0}", assembly);
             }
 
             return list;

@@ -23,6 +23,7 @@ public class SHUIPanelAlert : SHUIPanel
     [Header("Message")]
     public UILabel m_pLabelTitle;
     public UILabel m_pLabelBody;
+    public UITextList m_pTextListBody;
 
     [Header("Buttons")]
     public GameObject m_pOneButton;
@@ -34,7 +35,11 @@ public class SHUIPanelAlert : SHUIPanel
     public override void OnBeforeShow(params object[] pArgs)
     {
         m_pLabelTitle.text = (string)pArgs[0];
-        m_pLabelBody.text = (string)pArgs[1];
+        //m_pLabelBody.text = (string)pArgs[1];
+
+        m_pTextListBody.Clear();
+        m_pTextListBody.Add((string)pArgs[1]);
+
         switch((eAlertButtonType)pArgs[2])
         {
             case eAlertButtonType.NoButton:

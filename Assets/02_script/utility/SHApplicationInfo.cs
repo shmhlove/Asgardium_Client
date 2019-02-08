@@ -129,11 +129,11 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
     
     void SetOrientation()
     {
-        Screen.orientation = ScreenOrientation.AutoRotation;
-        Screen.autorotateToPortrait = false;
-        Screen.autorotateToPortraitUpsideDown = true;
-        Screen.autorotateToLandscapeRight = false;
-        Screen.autorotateToLandscapeLeft = false;
+        //Screen.orientation = ScreenOrientation.AutoRotation;
+        //Screen.autorotateToPortrait = false;
+        //Screen.autorotateToPortraitUpsideDown = true;
+        //Screen.autorotateToLandscapeRight = false;
+        //Screen.autorotateToLandscapeLeft = false;
     }
     
     void SetCacheInfo(long lSizeMB, int iExpirationMonth)

@@ -96,21 +96,22 @@ public class UITextList : MonoBehaviour
 
 	public int paragraphCount { get { return paragraphs.size; } }
 
-	/// <summary>
-	/// Whether the text list is usable.
-	/// </summary>
+    /// <summary>
+    /// Whether the text list is usable.
+    /// </summary>
 
-#if DYNAMIC_FONT
-	public bool isValid { get { return textLabel != null && textLabel.ambigiousFont != null; } }
-#else
-	public bool isValid { get { return textLabel != null && textLabel.bitmapFont != null; } }
-#endif
+    //#if DYNAMIC_FONT
+    //	public bool isValid { get { return textLabel != null && textLabel.ambigiousFont != null; } }
+    //#else
+    //	public bool isValid { get { return textLabel != null && textLabel.bitmapFont != null; } }
+    //#endif
+    public bool isValid { get { return textLabel != null; } }
 
-	/// <summary>
-	/// Relative (0-1 range) scroll value, with 0 being the oldest entry and 1 being the newest entry.
-	/// </summary>
+    /// <summary>
+    /// Relative (0-1 range) scroll value, with 0 being the oldest entry and 1 being the newest entry.
+    /// </summary>
 
-	public float scrollValue
+    public float scrollValue
 	{
 		get
 		{

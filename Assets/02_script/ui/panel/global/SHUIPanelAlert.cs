@@ -34,28 +34,33 @@ public class SHUIPanelAlert : SHUIPanel
 
     public override void OnBeforeShow(params object[] pArgs)
     {
-        m_pLabelTitle.text = (string)pArgs[0];
-        //m_pLabelBody.text = (string)pArgs[1];
-
-        m_pTextListBody.Clear();
-        m_pTextListBody.Add((string)pArgs[1]);
-
-        switch((eAlertButtonType)pArgs[2])
+        Single.Coroutine.NextUpdate(() =>
         {
-            case eAlertButtonType.NoButton:
-                m_pOneButton.SetActive(false);
-                m_pTwoButton.SetActive(false);
-                break;
-            case eAlertButtonType.OneButton:
-                m_pOneButton.SetActive(true);
-                m_pTwoButton.SetActive(false);
-                break;
-            case eAlertButtonType.TwoButton:
-                m_pOneButton.SetActive(false);
-                m_pTwoButton.SetActive(true);
-                break;
-        }
-        m_pCallback = (Action<eAlertButtonAction>)pArgs[3];
+            m_pLabelTitle.text = (string)pArgs[0];
+            //m_pLabelBody.text = (string)pArgs[1];
+
+            m_pTextListBody.Clear();
+            m_pTextListBody.textLabel.pivot = UIWidget.Pivot.Center;
+            m_pTextListBody.Add((string)pArgs[1]);
+
+            switch ((eAlertButtonType)pArgs[2])
+            {
+                case eAlertButtonType.NoButton:
+                    m_pOneButton.SetActive(false);
+                    m_pTwoButton.SetActive(false);
+                    break;
+                case eAlertButtonType.OneButton:
+                    m_pOneButton.SetActive(true);
+                    m_pTwoButton.SetActive(false);
+                    break;
+                case eAlertButtonType.TwoButton:
+                    m_pOneButton.SetActive(false);
+                    m_pTwoButton.SetActive(true);
+                    break;
+            }
+
+            m_pCallback = (Action<eAlertButtonAction>)pArgs[3];
+        });
     }
 
     public override void OnAfterClose(params object[] pArgs)

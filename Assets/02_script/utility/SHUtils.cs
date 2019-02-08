@@ -58,11 +58,14 @@ public static partial class SHUtils
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else
-        var pThreads = Process.GetCurrentProcess().Threads;
-        foreach(ProcessThread pThread in pThreads)
-        {
-            pThread.Dispose();
-        }
+        // var pThreads = Process.GetCurrentProcess().Threads;
+        // foreach(ProcessThread pThread in pThreads)
+        // {
+        //     if (pThread)
+        //     {
+        //         pThread.Dispose();
+        //     }
+        // }
 
         Process.GetCurrentProcess().Kill();
 #endif

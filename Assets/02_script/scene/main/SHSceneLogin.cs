@@ -11,7 +11,6 @@ public class SHSceneLogin : MonoBehaviour
     private void Awake()
     {
         Single.AppInfo.CreateSingleton();
-        Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL, (pUIRoot) => {});
     }
 
     private void Start()
@@ -19,34 +18,36 @@ public class SHSceneLogin : MonoBehaviour
         ShowLoginPanel();
     }
 
-    private void ShowLoginPanel(string strEmail = "")
+    private async void ShowLoginPanel(string strEmail = "")
     {
-        var pUIRoot = Single.UI.GetRoot<SHUIRootLogin>(SHUIConstant.ROOT_LOGIN);
+        var pUIRoot = await Single.UI.GetRoot<SHUIRootLogin>(SHUIConstant.ROOT_LOGIN);
         pUIRoot.CloseSignupPanel();
         pUIRoot.ShowLoginPanel(OnClickLogin, OnClickSignup, strEmail);
     }
 
-    private void ShowSignupPanel(string strEmail = "", string strName = "")
+    private async void ShowSignupPanel(string strEmail = "", string strName = "")
     {
-        var pUIRoot = Single.UI.GetRoot<SHUIRootLogin>(SHUIConstant.ROOT_LOGIN);
+        var pUIRoot = await Single.UI.GetRoot<SHUIRootLogin>(SHUIConstant.ROOT_LOGIN);
         pUIRoot.CloseLoginPanel();
         pUIRoot.ShowSignupPanel(OnClickRegistrationUser, OnClickGoBackLogin, strEmail, strName);
     }
 
-    private void OnClickLogin(string strEmail, string strPassword)
+    private async void OnClickLogin(string strEmail, string strPassword)
     {
         if (false == SHUtils.IsValidEmail(strEmail))
         {
-            Single.UI.GetGlobalRoot().ShowAlert("올바른 이메일 형식이 아닙니다.");
+            var pUIRoot = await Single.UI.GetGlobalRoot();
+            pUIRoot.ShowAlert("올바른 이메일 형식이 아닙니다.");
             return;
         }
 
         JsonData json = new JsonData();
         json["email"] = strEmail;
         json["password"] = strPassword;
-        Single.Network.POST(SHAPIs.SH_API_LOGIN, json, (reply) =>
+        Single.Network.POST(SHAPIs.SH_API_LOGIN, json, async (reply) =>
         {
-            Single.UI.GetGlobalRoot().ShowAlert(reply.ToString(), () => 
+            var pUIRoot = await Single.UI.GetGlobalRoot();
+            pUIRoot.ShowAlert(reply.ToString(), () => 
             {
                 if (reply.isSucceed)
                 {
@@ -61,11 +62,12 @@ public class SHSceneLogin : MonoBehaviour
         ShowSignupPanel(strEmail);
     }
 
-    private void OnClickRegistrationUser(string strEmail, string strName, string strPassword)
+    private async void OnClickRegistrationUser(string strEmail, string strName, string strPassword)
     {
         if (false == SHUtils.IsValidEmail(strEmail))
         {
-            Single.UI.GetGlobalRoot().ShowAlert("올바른 이메일 형식이 아닙니다.");
+            var pUIRoot = await Single.UI.GetGlobalRoot();
+            pUIRoot.ShowAlert("올바른 이메일 형식이 아닙니다.");
             return;
         }
 
@@ -73,9 +75,10 @@ public class SHSceneLogin : MonoBehaviour
         json["email"] = strEmail;
         json["name"] = strName;
         json["password"] = strPassword;
-        Single.Network.POST(SHAPIs.SH_API_SIGNUP, json, (reply) =>
+        Single.Network.POST(SHAPIs.SH_API_SIGNUP, json, async (reply) =>
         {
-            Single.UI.GetGlobalRoot().ShowAlert(reply.ToString(), () => 
+            var pUIRoot = await Single.UI.GetGlobalRoot();
+            pUIRoot.ShowAlert(reply.ToString(), () => 
             {
                 if (reply.isSucceed)
                 {

@@ -12,14 +12,14 @@ public class SHSceneTest : MonoBehaviour
     void Awake()
     {
         Single.AppInfo.CreateSingleton();
-        Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL, (pUIRoot) => {});
     }
 
     void Start ()
     {
-        Single.Network.GET(SHAPIs.SH_API_TEST, null, (reply) =>
+        Single.Network.GET(SHAPIs.SH_API_TEST, null, async (reply) =>
         {
-            Single.UI.GetGlobalRoot().ShowAlert(reply.ToString());
+            var pUIRoot = await Single.UI.GetGlobalRoot();
+            pUIRoot.ShowAlert(reply.ToString());
         });
     }
 }

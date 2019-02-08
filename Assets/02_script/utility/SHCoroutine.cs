@@ -163,7 +163,10 @@ public class SHCoroutine : SHSingleton<SHCoroutine>
     }
     private IEnumerator InvokeToAsync(AsyncOperation pAsync, Action<AsyncOperation> pAction)
     {
-        yield return pAsync;
+        while (!pAsync.isDone)
+        {
+            yield return null;
+        }
 
         pAction.Invoke(pAsync);
     }

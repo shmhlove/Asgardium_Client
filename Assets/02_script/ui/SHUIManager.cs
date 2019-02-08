@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 using System;
+using System.Threading.Tasks;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
@@ -34,24 +35,24 @@ public class SHUIManager : SHSingleton<SHUIManager>
         }
     }
 
-    public T GetRoot<T>(string strName) where T :  SHUIRoot
+    public async Task<T> GetRoot<T>(string strName) where T : SHUIRoot
     {
-        if (m_dicRoots.ContainsKey(strName))
+        var promise = new TaskCompletionSource<T>();
+
+        GetRoot<T>(strName, (pUIRoot) =>
         {
-            return m_dicRoots[strName] as T;
-        }
-        else
-        {
-            return default(T);
-        }
+            promise.TrySetResult(pUIRoot);
+        });
+
+        await promise.Task;
+        return promise.Task.Result;
     }
 
     public void GetRoot<T>(string strName, Action<T> pCallback) where T :  SHUIRoot
     {
-        var pUIRoot = GetRoot<T>(strName);
-        if (null != pUIRoot)
+        if (m_dicRoots.ContainsKey(strName))
         {
-            pCallback(pUIRoot);
+            pCallback(m_dicRoots[strName] as T);
             return;
         }
 
@@ -69,8 +70,8 @@ public class SHUIManager : SHSingleton<SHUIManager>
         });
     }
 
-    public SHUIRootGlobal GetGlobalRoot()
+    public async Task<SHUIRootGlobal> GetGlobalRoot()
     {
-        return GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
+        return await GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
     }
 }

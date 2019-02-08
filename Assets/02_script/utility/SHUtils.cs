@@ -20,8 +20,12 @@ public static partial class SHUtils
             return false;
         }
 
-        string strPattern = "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}\\@[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}(\\.[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25})+";
-        return Regex.IsMatch(strEmail, strPattern);
+        // string strPattern = @"[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}\\@[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}(\\.[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25})+";
+        // return Regex.IsMatch(strEmail, strPattern);
+        
+        Regex regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
+        Match match = regex.Match(strEmail);
+        return match.Success;
     }
 
     // Component Missing 체크

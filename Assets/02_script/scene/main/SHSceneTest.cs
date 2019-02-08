@@ -12,6 +12,7 @@ public class SHSceneTest : MonoBehaviour
     void Awake()
     {
         Single.AppInfo.CreateSingleton();
+        Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL, (pUIRoot) => {});
     }
 
     void Start ()

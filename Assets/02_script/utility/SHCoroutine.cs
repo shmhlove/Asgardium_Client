@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 
 using System;
 using System.Collections;
@@ -104,7 +105,7 @@ public class SHCoroutine : SHSingleton<SHCoroutine>
 
     //yield return new WWW(string) : 웹 통신 작업이 끝날 때까지 대기
     //-----------------------------------------------
-    public WWW WWW(WWW pWWW, Action<WWW> pAction)
+    public UnityWebRequest WWW(UnityWebRequest pWWW, Action<UnityWebRequest> pAction)
     {
         if (null == pAction)
         {
@@ -114,15 +115,9 @@ public class SHCoroutine : SHSingleton<SHCoroutine>
         StartCoroutine(InvokeToWWW(pWWW, pAction));
         return pWWW;
     }
-    public WWW WWWOfSync(WWW pWWW)
+    private IEnumerator InvokeToWWW(UnityWebRequest pWWW, Action<UnityWebRequest> pAction)
     {
-        pWWW = WWW(pWWW, null);
-        while (false == pWWW.isDone);
-        return pWWW;
-    }
-    private IEnumerator InvokeToWWW(WWW pWWW, Action<WWW> pAction)
-    {
-        yield return pWWW;
+        yield return pWWW.SendWebRequest();
 
         pAction.Invoke(pWWW);
     }

@@ -3,6 +3,7 @@ using UnityEngine.EventSystems;
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,9 +16,6 @@ using DicResourceLoadInfo = System.Collections.Generic.Dictionary<eSceneType, Sy
 public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
 {
     [Header("Debug")]
-    // 컴포넌트(디버그) : 디버그용 정보출력 
-    [SerializeField] private GUIText            m_pDebugText        = null;
-
     // 기타(디버그) : FPS 출력용 델타타임
     [ReadOnlyField]
     [SerializeField] private float              m_fDeltaTime        = 0.0f;
@@ -31,9 +29,6 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
 
         // 어플리케이션 정보설정
         SetApplicationInfo();
-
-        // 스크린 로그 초기화
-        ScreenLog(string.Empty);
 
         // 디바이스 정보 로그
         PrintDeviceInfo();
@@ -62,19 +57,17 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
         DrawAppInformation();
     }
     
-    void SetApplicationInfo()
+    async void SetApplicationInfo()
     {
-        Single.Table.GetTable<JsonClientConfig>((pTable) => 
-        {
-            SetFrameRate(pTable.FrameRate);
-            SetCacheInfo(pTable.CacheSize, 30);
-            SetSleepMode();
-            SetOrientation();
-            SetCrittercism();
-
-            UnityEngine.Debug.LogFormat("[LSH] ProcessID : {0}", GetProcessID());
-            UnityEngine.Debug.LogFormat("[LSH] DebugPort : {0}", GetDebugPort());
-        });
+        var pTable = await Single.Table.GetTable<JsonClientConfig>();
+        
+        SetFrameRate(pTable.FrameRate);
+        SetSleepMode();
+        SetOrientation();
+        SetCrittercism();
+        
+        UnityEngine.Debug.LogFormat("[LSH] ProcessID : {0}", GetProcessID());
+        UnityEngine.Debug.LogFormat("[LSH] DebugPort : {0}", GetDebugPort());
     }
     
     public bool IsEditorMode()
@@ -109,14 +102,6 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
         return 56000 + (GetProcessID() % 1000);
     }
     
-    public void ScreenLog(string strLog)
-    {
-        if (null == m_pDebugText)
-            return;
-
-        m_pDebugText.text = strLog;
-    }
-    
     void SetFrameRate(int iFrame)
     {
         Application.targetFrameRate = iFrame;
@@ -134,12 +119,6 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
         //Screen.autorotateToPortraitUpsideDown = true;
         //Screen.autorotateToLandscapeRight = false;
         //Screen.autorotateToLandscapeLeft = false;
-    }
-    
-    void SetCacheInfo(long lSizeMB, int iExpirationMonth)
-    {
-        Caching.maximumAvailableDiskSpace   = lSizeMB * 1024 * 1024;
-        Caching.expirationDelay             = 60 * 60 * 24 * iExpirationMonth;
     }
     
     void SetCrittercism()
@@ -227,25 +206,26 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
     }
     
     // 디버그 : 앱 정보 출력
-    void DrawAppInformation()
+    async void DrawAppInformation()
     {
-        Single.Table.GetTable<JsonClientConfig>((pTable) => 
+        var pTable = await Single.Table.GetTable<JsonClientConfig>();
+
+        GUIStyle pStyle = new GUIStyle(GUI.skin.box)
         {
-            GUIStyle pStyle = new GUIStyle(GUI.skin.box);
-            pStyle.fontSize = GetRatioW(20);
+            fontSize = GetRatioW(20)
+        };
 
-            // Left Bottom
-            GUI.Box(new Rect(5, (Screen.height - GetRatioH(35)), GetRatioW(250), GetRatioH(30)),
-                string.Format("{0} : {1} Scene", GetRuntimePlatform(), Single.Scene.GetActiveScene()), pStyle);
-            
-            // Center Bottom
-            GUI.Box(new Rect((Screen.width * 0.5f) - (GetRatioW(120) * 0.5f), (Screen.height - GetRatioH(35)), GetRatioW(120), GetRatioH(30)),
-                string.Format("v{0}", pTable.Version), pStyle);
-
-            // Right Bottom
-            GUI.Box(new Rect(Screen.width - GetRatioW(255), (Screen.height - GetRatioH(35)), GetRatioW(250), GetRatioH(30)),
-                string.Format("ServiceMode : {0}", pTable.ServiceMode), pStyle);
-        });
+        // Left Bottom
+        GUI.Box(new Rect(5, (Screen.height - GetRatioH(35)), GetRatioW(250), GetRatioH(30)),
+            string.Format("{0} : {1} Scene", GetRuntimePlatform(), Single.Scene.GetActiveScene()), pStyle);
+        
+        // Center Bottom
+        GUI.Box(new Rect((Screen.width * 0.5f) - (GetRatioW(120) * 0.5f), (Screen.height - GetRatioH(35)), GetRatioW(120), GetRatioH(30)),
+            string.Format("v{0}", pTable.Version), pStyle);
+        
+        // Right Bottom
+        GUI.Box(new Rect(Screen.width - GetRatioW(255), (Screen.height - GetRatioH(35)), GetRatioW(250), GetRatioH(30)),
+            string.Format("ServiceMode : {0}", pTable.ServiceMode), pStyle);
     }
     
     // 디버그 : 실시간 로드 리소스 리스트

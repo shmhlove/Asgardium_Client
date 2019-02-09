@@ -2,6 +2,7 @@
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -39,32 +40,31 @@ public partial class SHTableData : SHBaseData
         pCallback(dicLoadList);
     }
 
-    public override IEnumerator Load(SHLoadData pInfo, 
-                                     Action<string, SHLoadStartInfo> pStart,
-                                     Action<string, SHLoadEndInfo> pDone)
+    public async override void Load
+    (
+        SHLoadData pInfo, 
+        Action<string, SHLoadStartInfo> pStart,
+        Action<string, SHLoadEndInfo> pDone
+    )
     {
         pStart(pInfo.m_strName, new SHLoadStartInfo());
 
-        GetTable(pInfo.m_strName, (pTable) => 
+        var pTable = await GetTable(pInfo.m_strName);
+        if (null == pTable)
         {
-            if (null == pTable)
-            {
-                Debug.LogErrorFormat("[LSH] 등록된 테이블이 아닙니다.!!({0})", pInfo.m_strName);
-                pDone(pInfo.m_strName, new SHLoadEndInfo(eErrorCode.Table_Not_AddClass));
-                return;
-            }
-
-            if (true == pTable.IsLoadTable())
-            {
-                pDone(pInfo.m_strName, new SHLoadEndInfo(eErrorCode.Succeed));
-            }
-            else
-            {
-                pDone(pInfo.m_strName, new SHLoadEndInfo(eErrorCode.Table_LoadFailed));
-            }
-        });
-
-        yield return null;
+            Debug.LogErrorFormat("[LSH] 등록된 테이블이 아닙니다.!!({0})", pInfo.m_strName);
+            pDone(pInfo.m_strName, new SHLoadEndInfo(eErrorCode.Table_Not_AddClass));
+            return;
+        }
+        
+        if (true == pTable.IsLoadTable())
+        {
+            pDone(pInfo.m_strName, new SHLoadEndInfo(eErrorCode.Succeed));
+        }
+        else
+        {
+            pDone(pInfo.m_strName, new SHLoadEndInfo(eErrorCode.Table_LoadFailed));
+        }
     }
     
     public SHLoadData CreateLoadInfo(string strName)
@@ -76,42 +76,29 @@ public partial class SHTableData : SHBaseData
             m_pLoadFunc = Load
         };
     }
-
-    public void GetTable(string strFileName, Action<SHBaseTable> pCallback)
-    {
-        if (true == string.IsNullOrEmpty(strFileName))
-        {
-            pCallback(null);
-        }
-
-        GetTable(GetTypeByFileName(strFileName), pCallback);
-    }
     
-    public void GetTable<T>(Action<T> pCallback) where T : SHBaseTable
+    public async Task<T> GetTable<T>() where T : SHBaseTable
     {
-        GetTable(typeof(T), (pTable) => 
-        {
-            if (null == pTable)
-            {
-                pCallback(default(T));
-            }
-            else
-            {
-                pCallback(pTable as T);
-            }
-        });
+        return await GetTable(typeof(T)) as T;
     }
 
-    public void GetTable(Type pType, Action<SHBaseTable> pCallback)
+    public async Task<SHBaseTable> GetTable(string strFileName)
+    {
+        return await GetTable(GetTypeByFileName(strFileName));
+    }
+
+    public async Task<SHBaseTable> GetTable(Type pType)
     {
         if (0 == m_dicTables.Count)
         {
             OnInitialize();
         }
 
+        var pPromise = new TaskCompletionSource<SHBaseTable>();
+
         if (false == m_dicTables.ContainsKey(pType))
         {
-            pCallback(null);
+            pPromise.TrySetResult(null);
         }
         else
         {
@@ -119,12 +106,12 @@ public partial class SHTableData : SHBaseData
 
             if (true == pTable.IsLoadTable())
             {
-                pCallback(pTable);
+                pPromise.TrySetResult(pTable);
             }
             else
             {
-                Action<eErrorCode> pAction = (errorCode) => { pCallback(pTable); };
-                switch(pTable.GetTableType())
+                void pAction(eErrorCode errorCode) { pPromise.TrySetResult(pTable); }
+                switch (pTable.GetTableType())
                 {
                     case eTableType.Static: pTable.LoadStatic(pAction);                         break;
                     case eTableType.Byte:   pTable.LoadByte(pTable.m_strByteFileName, pAction); break;
@@ -133,6 +120,8 @@ public partial class SHTableData : SHBaseData
                 }
             }            
         }
+
+        return await pPromise.Task;
     }
     
     public Type GetTypeByFileName(string strFileName)

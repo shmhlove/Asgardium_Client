@@ -99,7 +99,7 @@ public class SHNetworkManager : SHSingleton<SHNetworkManager>
 
     private IEnumerator CoroutineSendRequest(UnityWebRequest www, Action<SHReply> callback)
     {
-        yield return www.Send();
+        yield return www.SendWebRequest();
         
         callback(new SHReply(www));
     }
@@ -117,7 +117,7 @@ public class SHNetworkManager : SHSingleton<SHNetworkManager>
                 foreach (var key in body.Keys)
                 {
                     // EscapeURL : URL에 사용하는 문자열로 인코딩 : 특수문자에 대해 16진수코드값으로 변환,,
-                    keyValueParamList.Add(key + "=" + WWW.EscapeURL(body[key].ToJson()));
+                    keyValueParamList.Add(key + "=" + UnityWebRequest.EscapeURL(body[key].ToJson()));
                 }
             }
             
@@ -126,17 +126,16 @@ public class SHNetworkManager : SHSingleton<SHNetworkManager>
         }
         
         string bodyString = GetBodyMessage((HTTPMethodType.GET == methodType) ? null : body);
-
-        UnityWebRequest request = new UnityWebRequest(uri.AbsoluteUri);
-        request.method = methodType.ToString();
-        request.downloadHandler = new DownloadHandlerBuffer();
-        request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(bodyString));
-        request.timeout = 3;
         
-        Debug.LogFormat("[REQUEST] : {0} {1}\nbody = {2}",
-         methodType,
-         uri.OriginalString,
-         bodyString);
+        UnityWebRequest request = new UnityWebRequest(uri.AbsoluteUri)
+        {
+            method = methodType.ToString(),
+            downloadHandler = new DownloadHandlerBuffer(),
+            uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(bodyString)),
+            timeout = 3,
+        };
+        
+        Debug.LogFormat("[REQUEST] : {0} {1}\nbody = {2}", methodType, uri.OriginalString, bodyString);
 
         request.SetRequestHeader("Content-Type", "application/json; charset=utf-8");
         request.SetRequestHeader("Accept", "application/json");

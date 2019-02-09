@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 
 using System;
-using System.Threading.Tasks;
 using System.IO;
+using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -15,15 +15,20 @@ public class SHUIManager : SHSingleton<SHUIManager>
         SetDontDestroy();
     }
     
-    public void AddRoot(string strName, SHUIRoot root)
+    public void AddRoot(string strName, SHUIRoot pRoot)
     {
+        if (null == pRoot)
+        {
+            return;
+        }
+
         if (false == m_dicRoots.ContainsKey(strName))
         {
-            m_dicRoots.Add(strName, root);
+            m_dicRoots.Add(strName, pRoot);
         }
         else
         {
-            m_dicRoots[strName] = root;
+            m_dicRoots[strName] = pRoot;
         }
     }
 
@@ -37,37 +42,20 @@ public class SHUIManager : SHSingleton<SHUIManager>
 
     public async Task<T> GetRoot<T>(string strName) where T : SHUIRoot
     {
-        var promise = new TaskCompletionSource<T>();
+        var pPromise = new TaskCompletionSource<T>();
 
-        GetRoot<T>(strName, (pUIRoot) =>
-        {
-            promise.TrySetResult(pUIRoot);
-        });
-
-        await promise.Task;
-        return promise.Task.Result;
-    }
-
-    public void GetRoot<T>(string strName, Action<T> pCallback) where T :  SHUIRoot
-    {
         if (m_dicRoots.ContainsKey(strName))
         {
-            pCallback(m_dicRoots[strName] as T);
-            return;
+            pPromise.TrySetResult(m_dicRoots[strName] as T);
+        }
+        else
+        {
+            var pObject = await Single.Resources.GetComponentByObject<T>(strName);
+            AddRoot(strName, pObject);
+            pPromise.TrySetResult(pObject);
         }
 
-        Single.Resources.GetComponentByObject<T>(strName, (pObject) => 
-        {
-            if (null != pObject)
-            {
-                AddRoot(strName, pObject);
-                pCallback(pObject);
-            }
-            else
-            {
-                pCallback(default(T));
-            }
-        });
+        return await pPromise.Task;
     }
 
     public async Task<SHUIRootGlobal> GetGlobalRoot()

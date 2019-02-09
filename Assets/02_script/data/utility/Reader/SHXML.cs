@@ -77,19 +77,17 @@ public class SHXML
         pCallback(pBuff);
     }
 
-    private void LoadByPackage(string strFileName, Action<string> pCallback)
+    private async void LoadByPackage(string strFileName, Action<string> pCallback)
     {
-        Single.Resources.GetTextAsset(Path.GetFileNameWithoutExtension(strFileName), (pTextAsset) => 
+        var pTextAsset = await Single.Resources.GetTextAsset(Path.GetFileNameWithoutExtension(strFileName));
+        if (null == pTextAsset)
         {
-            if (null == pTextAsset)
-            {
-                pCallback(string.Empty);
-            }
-            else
-            {
-                pCallback(pTextAsset.text);
-            }
-        });
+            pCallback(string.Empty);
+        }
+        else
+        {
+            pCallback(pTextAsset.text);
+        }
     }
 
     private XmlDocument GetDocument()

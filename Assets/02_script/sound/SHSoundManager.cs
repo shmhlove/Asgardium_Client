@@ -39,7 +39,7 @@ public class SHSoundManager : SHSingleton<SHSoundManager>
         StopAllCoroutines();
     }
 
-    public void PlayBGM(string strName)
+    public async void PlayBGM(string strName)
     {
         if (false == m_dicSoundTable.ContainsKey(strName))
         {
@@ -48,16 +48,14 @@ public class SHSoundManager : SHSingleton<SHSoundManager>
         }
         
         var pInfo = m_dicSoundTable[strName];
-        Single.Resources.GetSound(pInfo.m_strFileName, (pObject) => 
-        {
-            m_dicBGMChannel[pInfo.m_eBGMChannel].clip   = pObject;
-            m_dicBGMChannel[pInfo.m_eBGMChannel].loop   = pInfo.m_bIsLoop;
-            m_dicBGMChannel[pInfo.m_eBGMChannel].volume = 0.0f;
-            m_dicBGMChannel[pInfo.m_eBGMChannel].Play();
-            m_dicBGMChannel[pInfo.m_eBGMChannel].Pause();
-            m_dicBGMChannel[pInfo.m_eBGMChannel].Play();
-            StartCoroutine(CoroutineVolumeUP(m_dicBGMChannel[pInfo.m_eBGMChannel]));
-        });
+        var pClip = await Single.Resources.GetSound(pInfo.m_strFileName);
+        m_dicBGMChannel[pInfo.m_eBGMChannel].clip   = pClip;
+        m_dicBGMChannel[pInfo.m_eBGMChannel].loop   = pInfo.m_bIsLoop;
+        m_dicBGMChannel[pInfo.m_eBGMChannel].volume = 0.0f;
+        m_dicBGMChannel[pInfo.m_eBGMChannel].Play();
+        m_dicBGMChannel[pInfo.m_eBGMChannel].Pause();
+        m_dicBGMChannel[pInfo.m_eBGMChannel].Play();
+        StartCoroutine(CoroutineVolumeUP(m_dicBGMChannel[pInfo.m_eBGMChannel]));
     }
 
     public void StopBGM(string strName)
@@ -73,7 +71,7 @@ public class SHSoundManager : SHSingleton<SHSoundManager>
             m_dicBGMChannel[pInfo.m_eBGMChannel], m_dicBGMChannel[pInfo.m_eBGMChannel].Stop));
     }
 
-    public void PlayEffect(string strName)
+    public async void PlayEffect(string strName)
     {
         if (false == m_dicSoundTable.ContainsKey(strName))
         {
@@ -82,15 +80,13 @@ public class SHSoundManager : SHSingleton<SHSoundManager>
         }
         
         var pInfo = m_dicSoundTable[strName];
-        Single.Resources.GetSound(pInfo.m_strFileName, (pObject) => 
-        {
-            m_dicEffectChannel[pInfo.m_eEffectChannel].clip   = pObject;
-            m_dicEffectChannel[pInfo.m_eEffectChannel].loop   = pInfo.m_bIsLoop;
-            m_dicEffectChannel[pInfo.m_eEffectChannel].volume = 1.0f;
-            m_dicEffectChannel[pInfo.m_eEffectChannel].Play();
-            m_dicEffectChannel[pInfo.m_eEffectChannel].Pause();
-            m_dicEffectChannel[pInfo.m_eEffectChannel].Play();
-        });
+        var pObject = await Single.Resources.GetSound(pInfo.m_strFileName);
+        m_dicEffectChannel[pInfo.m_eEffectChannel].clip   = pObject;
+        m_dicEffectChannel[pInfo.m_eEffectChannel].loop   = pInfo.m_bIsLoop;
+        m_dicEffectChannel[pInfo.m_eEffectChannel].volume = 1.0f;
+        m_dicEffectChannel[pInfo.m_eEffectChannel].Play();
+        m_dicEffectChannel[pInfo.m_eEffectChannel].Pause();
+        m_dicEffectChannel[pInfo.m_eEffectChannel].Play();
     }
 
     public void StopEffect(string strName)
@@ -109,7 +105,7 @@ public class SHSoundManager : SHSingleton<SHSoundManager>
     {
         foreach (var kvp in dicChannel)
         {
-            GameObject.DestroyObject(kvp.Value);
+            GameObject.Destroy(kvp.Value);
         }
         dicChannel.Clear();
     }

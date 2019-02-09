@@ -102,7 +102,7 @@ public class SHObjectPool
 
         if (null != m_pObject)
         {
-            GameObject.DestroyObject(m_pObject);
+            GameObject.Destroy(m_pObject);
         }
     }
 }

@@ -36,7 +36,7 @@ public class SHUIRoot : MonoBehaviour
         GetPanel<SHUIPanel>(strName, pCallback);
     }
 
-    public void GetPanel<T>(string strName, Action<T> pCallback) where T : SHUIPanel
+    public async void GetPanel<T>(string strName, Action<T> pCallback) where T : SHUIPanel
     {
         if (true == m_dicPanels.ContainsKey(strName))
         {
@@ -44,21 +44,19 @@ public class SHUIRoot : MonoBehaviour
         }
         else
         {
-            Single.Resources.GetComponentByObject<T>(typeof(T).ToString(), (pPanel) => 
-            {
-                if (null == pPanel)
-                    pCallback(default(T));
-                else
-                {
-                    AddUIPanel(strName, pPanel);
-                    pCallback(pPanel);
-                }
-            });
+            var pPanel = await Single.Resources.GetComponentByObject<T>(typeof(T).ToString());
+            AddUIPanel(strName, pPanel);
+            pCallback(pPanel);
         }
     }
     
     private void AddUIPanel(string strName, SHUIPanel pPanel)
     {
+        if (null == pPanel)
+        {
+            return;
+        }
+
         if (false == m_dicPanels.ContainsKey(strName))
         {
             m_dicPanels.Add(strName, pPanel);

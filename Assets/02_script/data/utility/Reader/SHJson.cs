@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Networking;
 
 using System;
 using System.IO;
@@ -53,14 +54,14 @@ public class SHJson
     private void LoadByWWW(string strFileName, Action<JsonData> pCallback)
     {
         var strFilePath = GetStreamingPath(strFileName);
-        Single.Coroutine.WWW(new WWW(strFilePath), (pWWW) => 
+        Single.Coroutine.WWW(new UnityWebRequest(strFilePath), (pWWW) => 
         {
             if (true != string.IsNullOrEmpty(pWWW.error))
             {
                 Debug.LogWarningFormat("[LSH] Json(*.json)파일을 읽는 중 오류발생!!(Path:{0}, Error:{1})", strFilePath, pWWW.error);
             }
             
-            pCallback(GetJsonParseToString(pWWW.text));
+            pCallback(GetJsonParseToString(pWWW.downloadHandler.text));
         });
     }
 
@@ -75,19 +76,17 @@ public class SHJson
         pCallback(GetJsonParseToString(strBuff));
     }
 
-    private void LoadByPackage(string strFileName, Action<JsonData> pCallback)
+    private async void LoadByPackage(string strFileName, Action<JsonData> pCallback)
     {
-        Single.Resources.GetTextAsset(Path.GetFileNameWithoutExtension(strFileName), (pTextAsset) => 
+        var pTextAsset = await Single.Resources.GetTextAsset(Path.GetFileNameWithoutExtension(strFileName));
+        if (null == pTextAsset)
         {
-            if (null == pTextAsset)
-            {
-                pCallback(null);
-            }
-            else
-            {
-                pCallback(GetJsonParseToByte(pTextAsset.bytes));
-            }
-        });
+            pCallback(null);
+        }
+        else
+        {
+            pCallback(GetJsonParseToByte(pTextAsset.bytes));
+        }
     }
     
     private JsonData GetJsonParseToByte(byte[] pByte)

@@ -4,6 +4,7 @@ using UnityEditor.Build.Reporting;
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -71,26 +72,23 @@ class SHBuildScript
         PostProcessor(eTarget);
     }
     
-    static void PreProcessor(BuildTarget eTarget)
+    static async void PreProcessor(BuildTarget eTarget)
     {
-        Single.Table.GetTable<JsonClientConfig>((pConfigFile) => 
+        var pConfigFile = await Single.Table.GetTable<JsonClientConfig>();
+        switch (eTarget)
         {
-            switch (eTarget)
-            {
-                case BuildTarget.Android:
-                    PlayerSettings.Android.keystoreName = string.Format("{0}/GoogleKeyStore/asgardium.keystore", SHPath.GetRoot());
-                    PlayerSettings.Android.keystorePass = "lee35235";
-                    PlayerSettings.Android.keyaliasName = "asgardium";
-                    PlayerSettings.Android.keyaliasPass = "lee35235";
-                    EditorUserBuildSettings.androidBuildSubtarget = MobileTextureSubtarget.ETC;
-                    break;
-                case BuildTarget.iOS:
-                    EditorUserBuildSettings.androidBuildSubtarget = MobileTextureSubtarget.PVRTC;
-                    break;
-            }
-
-            PlayerSettings.bundleVersion = pConfigFile.Version;
-        });
+            case BuildTarget.Android:
+                PlayerSettings.Android.keystoreName = string.Format("{0}/GoogleKeyStore/asgardium.keystore", SHPath.GetRoot());
+                PlayerSettings.Android.keystorePass = "lee35235";
+                PlayerSettings.Android.keyaliasName = "asgardium";
+                PlayerSettings.Android.keyaliasPass = "lee35235";
+                EditorUserBuildSettings.androidBuildSubtarget = MobileTextureSubtarget.ETC;
+                break;
+            case BuildTarget.iOS:
+                EditorUserBuildSettings.androidBuildSubtarget = MobileTextureSubtarget.PVRTC;
+                break;
+        }
+        PlayerSettings.bundleVersion = pConfigFile.Version;
     }
     
     static void PostProcessor(BuildTarget eTarget)

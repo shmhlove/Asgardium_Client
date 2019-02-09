@@ -129,18 +129,16 @@ public class SHObjectPoolManager : SHSingleton<SHObjectPoolManager>
             return m_dicInactives[strName];
     }
 
-    private void GetInactiveObject(string   strName, 
-                    eObjectPoolReturnType   eReturnType, 
-                    eObjectPoolDestroyType  eDestroyType,
-                    Action<SHObjectPool>    pCallback)
-    {
+    private async void GetInactiveObject(string                  strName, 
+                                         eObjectPoolReturnType   eReturnType, 
+                                         eObjectPoolDestroyType  eDestroyType,
+                                         Action<SHObjectPool>    pCallback)
+    {                                    
         var pObjects = GetInactiveObjects(strName);
         if (0 == pObjects.Count)
         {
-            Single.Resources.GetGameObject(strName, (pObject) => 
-            {
-                pCallback(new SHObjectPool(eReturnType, eDestroyType, pObject));
-            });
+            var pObject = await Single.Resources.GetGameObject(strName);
+            pCallback(new SHObjectPool(eReturnType, eDestroyType, pObject));
         }
         else
         {

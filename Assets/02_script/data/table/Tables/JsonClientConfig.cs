@@ -23,7 +23,6 @@ public class JsonClientConfig : SHBaseTable
     public string FB_StorageBaseURL = string.Empty;
 
     public int    FrameRate        = 60;
-    public int    CacheSize        = 200;
 
     public JsonClientConfig()
     {
@@ -56,7 +55,6 @@ public class JsonClientConfig : SHBaseTable
         FB_StorageBaseURL = GetStrToJson(pDataNode, "FB_StorageBaseURL");
 
         FrameRate = GetIntToJson(pDataNode, "FrameRate");
-        CacheSize = GetIntToJson(pDataNode, "CacheSize");
         
         return eErrorCode.Succeed;
     }
@@ -81,7 +79,6 @@ public class JsonClientConfig : SHBaseTable
     //    pClientConfigJsonData["IOS_TeamID"] = IOS_TeamID;
 
     //    pClientConfigJsonData["FrameRate"] = FrameRate;
-    //    pClientConfigJsonData["CacheSize"] = CacheSize;
     
     //    var pJsonWriter = new JsonWriter();
     //    pJsonWriter.PrettyPrint = true;

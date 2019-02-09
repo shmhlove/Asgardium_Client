@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Networking;
 
 using System;
 using System.IO;
@@ -50,14 +51,14 @@ public class SHBytes
 
     private void LoadByWWW(string strFilePath, Action<byte[]> pCallback)
     {
-        Single.Coroutine.WWW(new WWW(strFilePath), (pWWW) => 
+        Single.Coroutine.WWW(new UnityWebRequest(strFilePath), (pWWW) => 
         {
             if (true != string.IsNullOrEmpty(pWWW.error))
             {
                 Debug.LogWarningFormat("[LSH] Byte(*.bytes)파일을 읽는 중 오류발생!!(Path:{0}, Error:{1})", strFilePath, pWWW.error);
             }
             
-            pCallback(pWWW.bytes); 
+            pCallback(pWWW.downloadHandler.data); 
         });
     }
     
@@ -72,18 +73,16 @@ public class SHBytes
         pCallback(pBuff);
     }
 
-    private void LoadByPackage(string strFileName, Action<byte[]> pCallback)
+    private async void LoadByPackage(string strFileName, Action<byte[]> pCallback)
     {
-        Single.Resources.GetTextAsset(Path.GetFileNameWithoutExtension(strFileName), (pTextAsset) => 
-        {            
-            if (null == pTextAsset)
-            {
-                pCallback(null);
-            }
-            else
-            {
-                pCallback(pTextAsset.bytes);
-            }
-        });
+        var pTextAsset = await Single.Resources.GetTextAsset(Path.GetFileNameWithoutExtension(strFileName));
+        if (null == pTextAsset)
+        {
+            pCallback(null);
+        }
+        else
+        {
+            pCallback(pTextAsset.bytes);
+        }
     }
 }

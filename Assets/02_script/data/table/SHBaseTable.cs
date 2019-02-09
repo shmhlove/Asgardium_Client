@@ -18,9 +18,6 @@ public abstract class SHBaseTable
 
     public abstract bool IsLoadTable();
 
-    // 다양화(로드) : 서버 웹 데이터
-    public virtual WWW LoadWebData(Action<bool> pDone)         { return null; }
-
     // 다양화(로드) : 코드로 데이터를 생성(Hard한 데이터)
     public virtual eErrorCode LoadStaticTable()                { return eErrorCode.Table_Not_Override; }
 

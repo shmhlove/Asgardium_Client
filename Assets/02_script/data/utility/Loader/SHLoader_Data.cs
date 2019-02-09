@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 using System;
+using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -22,11 +23,10 @@ public class SHLoadData
     public eDataType            m_eDataType;          // 로드할 데이터 타입
     public string               m_strName;            // 로드할 데이터 이름
     public Func<bool>           m_pLoadOkayTrigger;   // 트리거 람다 : 로드 타이밍을 데이터 로드부에서 결정할 수 있도록 트리거 람다를 등록할 수 있다.
-    public Func                                       // 로드 콜백 : 로드 타이밍이 왔을때 콜이 될 람다
+    public Action                                     // 로드 콜백 : 로드 타이밍이 왔을때 콜이 될 람다
     <   SHLoadData, 
         Action<string, SHLoadStartInfo>,
-        Action<string, SHLoadEndInfo>,
-        IEnumerator
+        Action<string, SHLoadEndInfo>
     > m_pLoadFunc;
     
     public SHLoadData()
@@ -48,14 +48,9 @@ public class SHLoadData
  */
 public class SHLoadStartInfo
 {
-    public WWW              m_pWWW   = null;
     public AsyncOperation   m_pAsync = null;
 
     public SHLoadStartInfo() { }
-    public SHLoadStartInfo(WWW pWWW)
-    {
-        m_pWWW = pWWW;
-    }
     public SHLoadStartInfo(AsyncOperation pAsync)
     {
         m_pAsync = pAsync;
@@ -63,7 +58,6 @@ public class SHLoadStartInfo
 
     public float GetProgress()
     {
-        if (null != m_pWWW)   return m_pWWW.progress;
         if (null != m_pAsync) return m_pAsync.progress;
 
         return 0.0f;

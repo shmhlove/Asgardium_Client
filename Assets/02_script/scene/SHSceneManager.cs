@@ -132,19 +132,15 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
         }
     }
 
-    private void PlayFadeIn(Action pCallback)
+    private async void PlayFadeIn(Action pCallback)
     {
-        Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL, (pUIRoot) => 
-        {
-            pUIRoot.ShowFadePanel(pCallback);
-        });
+        var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
+        pUIRoot.ShowFadePanel(pCallback);
     }
     
-    private void PlayFadeOut(Action pCallback)
+    private async void PlayFadeOut(Action pCallback)
     {
-        Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL, (pUIRoot) => 
-        {
-            pUIRoot.CloseFadePanel(pCallback);
-        });
+        var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
+        pUIRoot.CloseFadePanel(pCallback);
     }
 }

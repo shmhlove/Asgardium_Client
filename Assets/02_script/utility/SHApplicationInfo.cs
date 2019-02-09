@@ -66,8 +66,8 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
         SetOrientation();
         SetCrittercism();
         
-        UnityEngine.Debug.LogFormat("[LSH] ProcessID : {0}", GetProcessID());
-        UnityEngine.Debug.LogFormat("[LSH] DebugPort : {0}", GetDebugPort());
+        // UnityEngine.Debug.LogFormat("[LSH] ProcessID : {0}", GetProcessID());
+        // UnityEngine.Debug.LogFormat("[LSH] DebugPort : {0}", GetDebugPort());
     }
     
     public bool IsEditorMode()

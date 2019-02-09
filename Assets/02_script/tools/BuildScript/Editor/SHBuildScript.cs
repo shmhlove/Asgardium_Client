@@ -72,9 +72,24 @@ class SHBuildScript
         PostProcessor(eTarget);
     }
     
-    static async void PreProcessor(BuildTarget eTarget)
+    static void PreProcessor(BuildTarget eTarget)
     {
-        var pConfigFile = await Single.Table.GetTable<JsonClientConfig>();
+        // var pConfigFile = await Single.Table.GetTable<JsonClientConfig>();
+        // switch (eTarget)
+        // {
+        //     case BuildTarget.Android:
+        //         PlayerSettings.Android.keystoreName = string.Format("{0}/{1}", SHPath.GetRoot(), pConfigFile.AOS_KeyStoreName);
+        //         PlayerSettings.Android.keystorePass = pConfigFile.AOS_KeyStorePass;
+        //         PlayerSettings.Android.keyaliasName = pConfigFile.AOS_KeyAliasName;
+        //         PlayerSettings.Android.keyaliasPass = pConfigFile.AOS_KeyAliasPass;
+        //         EditorUserBuildSettings.androidBuildSubtarget = MobileTextureSubtarget.ETC;
+        //         break;
+        //     case BuildTarget.iOS:
+        //         EditorUserBuildSettings.androidBuildSubtarget = MobileTextureSubtarget.PVRTC;
+        //         break;
+        // }
+        // PlayerSettings.bundleVersion = pConfigFile.Version;
+
         switch (eTarget)
         {
             case BuildTarget.Android:
@@ -88,7 +103,7 @@ class SHBuildScript
                 EditorUserBuildSettings.androidBuildSubtarget = MobileTextureSubtarget.PVRTC;
                 break;
         }
-        PlayerSettings.bundleVersion = pConfigFile.Version;
+        PlayerSettings.bundleVersion = "1.0.1";
     }
     
     static void PostProcessor(BuildTarget eTarget)

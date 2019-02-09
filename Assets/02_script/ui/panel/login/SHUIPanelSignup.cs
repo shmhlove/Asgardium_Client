@@ -42,7 +42,7 @@ public class SHUIPanelSignup : SHUIPanel
             return;
         }
 
-        m_pEventRegistration(inputEmail.value, inputName.value, inputPass.value);
+        m_pEventRegistration(inputEmail.value.Trim(), inputName.value.Trim(), inputPass.value);
 	}
 
 	public void OnClickGoBackLoginButton()
@@ -52,6 +52,6 @@ public class SHUIPanelSignup : SHUIPanel
             return;
         }
 
-        m_pEventGoBackLogin(inputEmail.value, inputName.value, inputPass.value);
+        m_pEventGoBackLogin(inputEmail.value.Trim(), inputName.value.Trim(), inputPass.value);
 	}
 }

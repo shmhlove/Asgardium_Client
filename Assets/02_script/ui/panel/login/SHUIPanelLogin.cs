@@ -36,7 +36,7 @@ public class SHUIPanelLogin : SHUIPanel
             return;
         }
 
-        m_pEventLogin(inputEmail.value, inputPass.value);
+        m_pEventLogin(inputEmail.value.Trim(), inputPass.value);
 	}
     
     public void OnClickSigninButton()
@@ -46,6 +46,6 @@ public class SHUIPanelLogin : SHUIPanel
             return;
         }
 
-        m_pEventSignup(inputEmail.value, inputPass.value);
+        m_pEventSignup(inputEmail.value.Trim(), inputPass.value);
 	}
 }

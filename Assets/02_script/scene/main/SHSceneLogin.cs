@@ -41,9 +41,11 @@ public class SHSceneLogin : MonoBehaviour
             return;
         }
 
-        JsonData json = new JsonData();
-        json["email"] = strEmail;
-        json["password"] = strPassword;
+        JsonData json = new JsonData
+        {
+            ["email"] = strEmail,
+            ["password"] = strPassword
+        };
         Single.Network.POST(SHAPIs.SH_API_LOGIN, json, async (reply) =>
         {
             var pUIRoot = await Single.UI.GetGlobalRoot();
@@ -71,10 +73,12 @@ public class SHSceneLogin : MonoBehaviour
             return;
         }
 
-        JsonData json = new JsonData();
-        json["email"] = strEmail;
-        json["name"] = strName;
-        json["password"] = strPassword;
+        JsonData json = new JsonData
+        {
+            ["email"] = strEmail,
+            ["name"] = strName,
+            ["password"] = strPassword
+        };
         Single.Network.POST(SHAPIs.SH_API_SIGNUP, json, async (reply) =>
         {
             var pUIRoot = await Single.UI.GetGlobalRoot();

@@ -22,8 +22,8 @@ public class SHError
     public override string ToString()
     {
         if (null != extras)
-            return string.Format("({0}) {1}, {2}", (int)code, message, extras.ToJson());
+            return string.Format("{0} ({1})\n{2}", message, (int)code, extras.ToJson());
         else
-            return string.Format("{1} ({0})", (int)code, message);
+            return string.Format("{0} ({1})", message, (int)code);
     }
 }

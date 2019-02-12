@@ -12,34 +12,29 @@ public class SHUIRootGlobal : SHUIRoot
         DontDestroyOnLoad(this);
     }
 
-    public void ShowFadePanel(Action pCallback = null)
+    public async void ShowFadePanel(Action pCallback = null)
     {
-        GetPanel<SHUIPanelFade>(SHUIConstant.PANEL_FADE, (pPanel) => 
-        {
-            pPanel.Show(pCallback);
-        });
+        var pPanel = await GetPanel<SHUIPanelFade>(SHUIConstant.PANEL_FADE);
+        pPanel.Show(pCallback);
     }
 
-    public void CloseFadePanel(Action pCallback = null)
+    public async void CloseFadePanel(Action pCallback = null)
     {
-        GetPanel<SHUIPanelFade>(SHUIConstant.PANEL_FADE, (pPanel) =>
+        var pPanel = await GetPanel<SHUIPanelFade>(SHUIConstant.PANEL_FADE);
+        pPanel.SetActive(true);
+        pPanel.Close(pCallback);
+    }
+
+    public async void ShowAlert(string strMessage, Action pCallback = null)
+    {
+        var pPanel = await GetPanel<SHUIPanelAlert>(SHUIConstant.PANEL_ALERT);
+
+        Action<eAlertButtonAction> pResult = (eAction) =>
         {
-            pPanel.SetActive(true);
             pPanel.Close(pCallback);
-        });
-    }
-
-    public void ShowAlert(string strMessage, Action pCallback = null)
-    {
-        GetPanel<SHUIPanelAlert>(SHUIConstant.PANEL_ALERT, (pPanel) =>
-        {
-            Action<eAlertButtonAction> pResult = (eAction) =>
-            {
-                pPanel.Close(pCallback);
-            };
-            
-            pPanel.SetActive(true);
-            pPanel.Show("", strMessage, eAlertButtonType.OneButton, pResult);
-        });
+        };
+        
+        pPanel.SetActive(true);
+        pPanel.Show("", strMessage, eAlertButtonType.OneButton, pResult);
     }
 }

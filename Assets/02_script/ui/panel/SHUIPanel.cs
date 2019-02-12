@@ -12,6 +12,11 @@ public class SHUIPanel : SHMonoWrapper
     [SerializeField] private AnimationClip       m_pAnimOfOpen  = null;
     [SerializeField] private AnimationClip       m_pAnimOfClose = null;
 
+    public virtual void OnInitialized()
+    {
+        SetActive(m_bStartEnable);
+    }
+    
     public virtual void OnBeforeShow(params object[] pArgs) { }
     public virtual void OnAfterShow(params object[] pArgs) { }
     public virtual void OnBeforeClose(params object[] pArgs) { }
@@ -35,10 +40,5 @@ public class SHUIPanel : SHMonoWrapper
             OnAfterClose(pArgs);
             SetActive(false);
         });
-    }
-    
-    public virtual void OnClickToClose()
-    {
-        Close();
     }
 }

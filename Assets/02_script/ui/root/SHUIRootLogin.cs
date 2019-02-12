@@ -6,35 +6,27 @@ using System.Collections.Generic;
 
 public class SHUIRootLogin : SHUIRoot
 {
-    public void ShowLoginPanel(params object[] pArgs)
+    public async void ShowLoginPanel(params object[] pArgs)
     {
-        GetPanel<SHUIPanelLogin>(SHUIConstant.PANEL_LOGIN, (pPanel) => 
-        {
-            pPanel.Show(pArgs);
-        });
+        var pPanel = await GetPanel<SHUIPanelLogin>(SHUIConstant.PANEL_LOGIN);
+        pPanel.Show(pArgs);
     }
 
-    public void CloseLoginPanel()
+    public async void CloseLoginPanel()
     {
-        GetPanel<SHUIPanelLogin>(SHUIConstant.PANEL_LOGIN, (pPanel) => 
-        {
-            pPanel.Close();
-        });
+        var pPanel = await GetPanel<SHUIPanelLogin>(SHUIConstant.PANEL_LOGIN);
+        pPanel.Close();
     }
 
-    public void ShowSignupPanel(params object[] pArgs)
+    public async void ShowSignupPanel(params object[] pArgs)
     {
-        GetPanel<SHUIPanelSignup>(SHUIConstant.PANEL_SIGNUP, (pPanel) => 
-        {
-            pPanel.Show(pArgs);
-        });
+        var pPanel = await GetPanel<SHUIPanelSignup>(SHUIConstant.PANEL_SIGNUP);
+        pPanel.Show(pArgs);
     }
 
-    public void CloseSignupPanel()
+    public async void CloseSignupPanel()
     {
-        GetPanel<SHUIPanelSignup>(SHUIConstant.PANEL_SIGNUP, (pPanel) => 
-        {
-            pPanel.Close();
-        });
+        var pPanel = await GetPanel<SHUIPanelSignup>(SHUIConstant.PANEL_SIGNUP);
+        pPanel.Close();
     }
 }

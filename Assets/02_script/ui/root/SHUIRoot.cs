@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 using System;
+using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -19,6 +20,7 @@ public class SHUIRoot : MonoBehaviour
         m_dicPanels = new Dictionary<string, SHUIPanel>();
         panels.ForEach((pPanel) =>
         {
+            pPanel.OnInitialized();
             m_dicPanels.Add(pPanel.gameObject.name, pPanel);
         });
     }
@@ -30,24 +32,23 @@ public class SHUIRoot : MonoBehaviour
             Single.UI.DelRoot(gameObject.name);
         }
     }
-
-    public void GetPanel(string strName, Action<SHUIPanel> pCallback)
+    
+    public async Task<T> GetPanel<T>(string strName) where T : SHUIPanel
     {
-        GetPanel<SHUIPanel>(strName, pCallback);
-    }
+        var pPromise = new TaskCompletionSource<T>();
 
-    public async void GetPanel<T>(string strName, Action<T> pCallback) where T : SHUIPanel
-    {
         if (true == m_dicPanels.ContainsKey(strName))
         {
-            pCallback(m_dicPanels[strName] as T);
+            pPromise.TrySetResult(m_dicPanels[strName] as T);
         }
         else
         {
             var pPanel = await Single.Resources.GetComponentByObject<T>(typeof(T).ToString());
             AddUIPanel(strName, pPanel);
-            pCallback(pPanel);
+            pPromise.TrySetResult(pPanel);
         }
+
+        return await pPromise.Task;
     }
     
     private void AddUIPanel(string strName, SHUIPanel pPanel)

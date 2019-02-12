@@ -21,17 +21,8 @@ public class SHUIPanelSignup : SHUIPanel
         
         m_pEventRegistration  = ((Action<string, string, string>)pArgs[0]);
         m_pEventGoBackLogin = ((Action<string, string, string>)pArgs[1]);
-
-        if (3 <= pArgs.Length)
-        {
-            inputEmail.value = (string)pArgs[2];
-        }
-
-        if (4 <= pArgs.Length)
-        {
-            inputName.value = (string)pArgs[3];
-        }
-
+        inputEmail.value = (string)pArgs[2];
+        inputName.value = "";
         inputPass.value = "";
     }
 

@@ -9,8 +9,9 @@ public class SHUIPanelLogin : SHUIPanel
     [Header("User Information")]
     public UIInput inputEmail;
     public UIInput inputPass;
+    public UIToggle toggleSave;
     
-    private Action<string, string> m_pEventLogin;
+    private Action<string, string, bool> m_pEventLogin;
     private Action<string, string> m_pEventSignup;
 
     public override void OnBeforeShow(params object[] pArgs)
@@ -18,15 +19,15 @@ public class SHUIPanelLogin : SHUIPanel
         if ((null == pArgs) || (2 > pArgs.Length))
             return;
         
-        m_pEventLogin  = ((Action<string, string>)pArgs[0]);
+        m_pEventLogin  = ((Action<string, string, bool>)pArgs[0]);
         m_pEventSignup = ((Action<string, string>)pArgs[1]);
-
-        if (3 <= pArgs.Length)
+        inputEmail.value = (string)pArgs[2];
+        inputPass.value = (string)pArgs[3];
+        
+        if (null != (bool?)pArgs[4])
         {
-            inputEmail.value = (string)pArgs[2];
+            toggleSave.value = ((bool?)pArgs[4]).Value;
         }
-
-        inputPass.value = "";
     }
 
 	public void OnClickLoginButton()
@@ -36,7 +37,7 @@ public class SHUIPanelLogin : SHUIPanel
             return;
         }
 
-        m_pEventLogin(inputEmail.value.Trim(), inputPass.value);
+        m_pEventLogin(inputEmail.value.Trim(), inputPass.value, toggleSave.value);
 	}
     
     public void OnClickSigninButton()

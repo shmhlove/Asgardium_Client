@@ -6,14 +6,11 @@ using System.Collections.Generic;
 
 public class SHUIRootLogin : SHUIRoot
 {
-    public void ShowLoginPanel(
-        Action<string, string> pLoginCallback, 
-        Action<string, string> pSignupCallback,
-        string strEmail)
+    public void ShowLoginPanel(params object[] pArgs)
     {
         GetPanel<SHUIPanelLogin>(SHUIConstant.PANEL_LOGIN, (pPanel) => 
         {
-            pPanel.Show(pLoginCallback, pSignupCallback, strEmail);
+            pPanel.Show(pArgs);
         });
     }
 
@@ -25,15 +22,11 @@ public class SHUIRootLogin : SHUIRoot
         });
     }
 
-    public void ShowSignupPanel(
-        Action<string, string, string> pRegistCallback, 
-        Action<string, string, string> pGobackCallback,
-        string strEmail,
-        string strName)
+    public void ShowSignupPanel(params object[] pArgs)
     {
         GetPanel<SHUIPanelSignup>(SHUIConstant.PANEL_SIGNUP, (pPanel) => 
         {
-            pPanel.Show(pRegistCallback, pGobackCallback, strEmail, strName);
+            pPanel.Show(pArgs);
         });
     }
 

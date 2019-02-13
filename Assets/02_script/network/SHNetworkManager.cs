@@ -21,8 +21,8 @@ public enum HTTPMethodType
 
 public class SHNetworkManager : SHSingleton<SHNetworkManager>
 {
-    //public string WebHost = "http://13.124.43.70:3001";
-    public string WebHost = "http://localhost:3001";
+    public string WebHost = "http://13.124.43.70:3001";
+    //public string WebHost = "http://localhost:3001";
 
     public override void OnInitialize()
     {

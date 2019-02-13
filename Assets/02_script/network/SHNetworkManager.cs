@@ -125,7 +125,7 @@ public class SHNetworkManager : SHSingleton<SHNetworkManager>
                         string.Format("{0}?{1}", path.TrimEnd('/'), string.Join("&", keyValueParamList.ToArray())));
         }
         
-        string bodyString = GetBodyMessage((HTTPMethodType.GET == methodType) ? null : body);
+        string bodyString = GetBodyMessage(body);
         
         UnityWebRequest request = new UnityWebRequest(uri.AbsoluteUri)
         {

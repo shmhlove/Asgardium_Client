@@ -15,12 +15,14 @@ public class SHReply
     public bool isSucceed;
     public JsonData data;
     public SHError error;
+    public JsonData rawResponse;
 
     public SHReply()
     {
         this.isSucceed = true;
         this.data = null;
         this.error = null;
+        this.rawResponse = null;
     }
 
     public SHReply(JsonData data)
@@ -28,6 +30,7 @@ public class SHReply
         this.isSucceed = true;
         this.data = data;
         this.error = null;
+        this.rawResponse = null;
     }
 
     public SHReply(SHError error)
@@ -35,12 +38,14 @@ public class SHReply
         this.isSucceed = false;
         this.data = null;
         this.error = error;
+        this.rawResponse = null;
     }
 
     public SHReply(UnityWebRequest request)
     {
         this.data = null;
         this.error = null;
+        this.rawResponse = null;
 
 #if UNITY_2017_1_OR_NEWER
         if (request.isNetworkError)
@@ -55,30 +60,30 @@ public class SHReply
         {
             try
             {
-                JsonData response = JsonMapper.ToObject(request.downloadHandler.text);
-                if (0 == response.Keys.Count)
+                this.rawResponse = JsonMapper.ToObject(request.downloadHandler.text);
+                if (0 == this.rawResponse.Keys.Count)
                 {
                     this.isSucceed = false;
                     this.error = new SHError(eErrorCode.Net_Common_InvalidResponseData, request.downloadHandler.text);
                 }
                 else
                 {
-                    if (true == response.Keys.Contains("result"))
+                    if (true == this.rawResponse.Keys.Contains("result"))
                     {
-                        this.isSucceed = (bool)response["result"];
+                        this.isSucceed = (bool)this.rawResponse["result"];
                     }
 
-                    if ((true == response.Keys.Contains("data")) && (null != response["data"]))
+                    if ((true == this.rawResponse.Keys.Contains("data")) && (null != this.rawResponse["data"]))
                     {
-                        this.data = response["data"];
+                        this.data = this.rawResponse["data"];
                     }
 
-                    if ((true == response.Keys.Contains("error")) && (null != response["error"]))
+                    if ((true == this.rawResponse.Keys.Contains("error")) && (null != this.rawResponse["error"]))
                     {
-                        if (response["error"].Keys.Contains("extras"))
-                            this.error = new SHError((eErrorCode)(int)response["error"]["code"], (string)response["error"]["message"], response["error"]["extras"]);
+                        if (this.rawResponse["error"].Keys.Contains("extras"))
+                            this.error = new SHError((eErrorCode)(int)this.rawResponse["error"]["code"], (string)this.rawResponse["error"]["message"], this.rawResponse["error"]["extras"]);
                         else
-                            this.error = new SHError((eErrorCode)(int)response["error"]["code"], (string)response["error"]["message"]);
+                            this.error = new SHError((eErrorCode)(int)this.rawResponse["error"]["code"], (string)this.rawResponse["error"]["message"]);
                     }
                 }
             }
@@ -103,6 +108,16 @@ public class SHReply
                 request.method,
                 request.url,
                 this.error.ToString());
+        }
+        
+        if ( (null == this.data)
+          && (null == this.error)
+          && (null != this.rawResponse))
+        {
+            Debug.LogFormat("[RESPONSE rawData] : {0} {1}\n{2}",
+                request.method,
+                request.url,
+                this.rawResponse.ToJson());
         }
         
         request.Dispose();

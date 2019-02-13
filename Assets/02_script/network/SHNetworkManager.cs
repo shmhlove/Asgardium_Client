@@ -6,6 +6,7 @@ using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Security.Cryptography.X509Certificates;
 
 using LitJson;
 using socket.io;
@@ -21,8 +22,8 @@ public enum HTTPMethodType
 
 public class SHNetworkManager : SHSingleton<SHNetworkManager>
 {
-    public string WebHost = "http://13.124.43.70:3001";
-    //public string WebHost = "http://localhost:3001";
+    public string WebHost = "https://13.124.43.70:3002";
+    //public string WebHost = "https://localhost:3002";
 
     public override void OnInitialize()
     {
@@ -138,6 +139,7 @@ public class SHNetworkManager : SHSingleton<SHNetworkManager>
 
         request.method = methodType.ToString();
         request.downloadHandler = new DownloadHandlerBuffer();
+        request.certificateHandler = new SHCustomCertificateHandler();
         request.timeout = 3;
         
         Debug.LogFormat("[REQUEST] : {0} {1}\nbody = {2}", methodType, uri.OriginalString, bodyString);

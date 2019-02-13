@@ -55,6 +55,7 @@ public class SHReply
         {
             this.isSucceed = false;
             this.error = new SHError(eErrorCode.Net_Common_HTTP, request.error);
+            this.rawResponse = new JsonData(request.error);
         }
         else
         {
@@ -119,7 +120,7 @@ public class SHReply
                 request.url,
                 this.rawResponse.ToJson());
         }
-        
+
         request.Dispose();
     }
 

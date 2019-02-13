@@ -127,10 +127,17 @@ public class SHNetworkManager : SHSingleton<SHNetworkManager>
         
         string bodyString = GetBodyMessage(body);
         
-        UnityWebRequest request = new UnityWebRequest(uri.AbsoluteUri);
+        UnityWebRequest request;
+        if (HTTPMethodType.GET == methodType)
+            request = UnityWebRequest.Get(uri.AbsoluteUri);
+        else
+        {
+            request = new UnityWebRequest(uri.AbsoluteUri);
+            request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(bodyString));
+        }
+
         request.method = methodType.ToString();
         request.downloadHandler = new DownloadHandlerBuffer();
-        request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(bodyString));
         request.timeout = 3;
         
         Debug.LogFormat("[REQUEST] : {0} {1}\nbody = {2}", methodType, uri.OriginalString, bodyString);

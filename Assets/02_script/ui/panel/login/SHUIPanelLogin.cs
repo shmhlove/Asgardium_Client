@@ -50,12 +50,19 @@ public class SHUIPanelLogin : SHUIPanel
         m_pEventSignup(inputEmail.value.Trim(), inputPass.value);
 	}
 
-    public void OnClickWebTest()
+    public void OnClickGETWebTest()
     {
-        Single.Network.GET(SHAPIs.SH_API_TEST, null, async (reply) => 
+        Single.Network.GET(SHAPIs.SH_API_TEST, null, (reply) => 
         {
-            var pUIRoot = await Single.UI.GetGlobalRoot();
-            pUIRoot.ShowAlert(reply.rawResponse.ToJson());
+            Debug.LogError(reply.rawResponse.ToJson());
+        });
+    }
+
+    public void OnClickPOSTWebTest()
+    {
+        Single.Network.POST(SHAPIs.SH_API_TEST, null, (reply) => 
+        {
+            Debug.LogError(reply.rawResponse.ToJson());
         });
     }
 }

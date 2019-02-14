@@ -49,20 +49,4 @@ public class SHUIPanelLogin : SHUIPanel
 
         m_pEventSignup(inputEmail.value.Trim(), inputPass.value);
 	}
-
-    public void OnClickGETWebTest()
-    {
-        Single.Network.GET(SHAPIs.SH_API_TEST, null, (reply) => 
-        {
-            Debug.LogError(reply.rawResponse.ToJson());
-        });
-    }
-
-    public void OnClickPOSTWebTest()
-    {
-        Single.Network.POST(SHAPIs.SH_API_TEST, null, (reply) => 
-        {
-            Debug.LogError(reply.rawResponse.ToJson());
-        });
-    }
 }

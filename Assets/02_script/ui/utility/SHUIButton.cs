@@ -5,9 +5,14 @@ using System.Collections.Generic;
 
 public class SHUIButton : UIButton
 {
-	public override void SetState (State state, bool immediate)
+    public override void SetState (State state, bool immediate)
 	{
 		base.SetState(state, immediate);
         isEnabled = (State.Disabled != state);
-	}
+    }
+
+    public void ExecuteClick()
+    {
+        base.OnClick();
+    }
 }

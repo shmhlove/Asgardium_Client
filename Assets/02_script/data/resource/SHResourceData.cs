@@ -222,7 +222,7 @@ public partial class SHResourceData : SHBaseData
         return await pPromise.Task;
     }
 
-    private T Instantiate<T>(T pPrefab) where T : UObject
+    public T Instantiate<T>(T pPrefab) where T : UObject
     {
         if (null == pPrefab)
         {

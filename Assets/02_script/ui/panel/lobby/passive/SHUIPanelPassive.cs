@@ -11,17 +11,16 @@ public class SHUIPanelPassive : SHUIMassiveScrollView
 
         int iCount = 50;
         SetCellCount(iCount);
-        SetScroll(iCount - m_iMaxRow + 1, true);
+        //SetScroll(iCount - m_iMaxRow + 1, true);
+        SetScroll(0, true);
     }
 
     protected override void OnInitialized()
     {
-        Debug.Log("OnInitialized");
     }
 
     protected override void SetSlotData(GameObject go, int index)
-    {
-        
+    {       
     }
 
     protected override void Update()

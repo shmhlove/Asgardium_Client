@@ -3,7 +3,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class SHUIPanelCompany : MonoBehaviour
+public class SHUIPanelStorageCompany : MonoBehaviour
 {
     public CUIListView m_pCUI;
 
@@ -21,6 +21,6 @@ public class SHUIPanelCompany : MonoBehaviour
 
     public int OnGetItemCount()
     {
-        return 100;
+        return 2;
     }
 }

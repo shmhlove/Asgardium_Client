@@ -3,14 +3,13 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class SHUIPanelActive : SHUIMassiveScrollView
+public class SHUIScrollRoot_Active : SHUIMassiveScrollView
 {
     protected override void OnInitialized()
     {
         int iCount = 50;
-        SetCellCount(iCount);
-        //SetScroll(iCount - m_iMaxRow + 1, true);
-        SetScroll(0, true);
+        SetSlotCount(iCount);
+        SetFocus(0, true);
     }
 
     protected override void SetSlotData(GameObject go, int index)

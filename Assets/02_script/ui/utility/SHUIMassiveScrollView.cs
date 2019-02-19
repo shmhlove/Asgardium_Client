@@ -93,7 +93,7 @@ public class SHUIMassiveScrollView : MonoBehaviour
 
         if (0 < m_iReservedCount)
         {
-            SetCellCount(m_iReservedCount);
+            SetSlotCount(m_iReservedCount);
 
             m_iReservedCount = -1;
             bIsNeedToPaint = false;
@@ -101,7 +101,7 @@ public class SHUIMassiveScrollView : MonoBehaviour
 
         if (0 <= m_iReservedIndex)
         {
-            SetScroll(m_iReservedIndex, m_bReservedWithOffset, m_bReservedLastCheck);
+            SetFocus(m_iReservedIndex, m_bReservedWithOffset, m_bReservedLastCheck);
 
             m_iReservedIndex = -1;
             m_bReservedWithOffset = true;
@@ -181,7 +181,7 @@ public class SHUIMassiveScrollView : MonoBehaviour
 
 
     #region Interface Functions
-    public void SetCellCount(int count)
+    public void SetSlotCount(int count)
     {
         if ((null == m_pScrView) || (null == m_pScrView.panel) || (null == m_pGrid))
         {
@@ -230,7 +230,7 @@ public class SHUIMassiveScrollView : MonoBehaviour
         return new List<GameObject>(m_dicSlots.Values);
     }
 
-    public void SetScroll(int index, bool withOffset, bool lastCheck = false)
+    public void SetFocus(int index, bool withOffset, bool lastCheck = false)
     {
         if ((0 > index) || 
             (index >= m_iReservedCount && index >= m_iTotalCount))

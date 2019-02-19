@@ -23,7 +23,6 @@ public class SHUIMassiveScrollView : MonoBehaviour
     [SerializeField]                   private int                  m_iOffsetEnd            = 0;    // 뒷쪽에 배치되는 빈공간(아이템 라인 개수)
     [SerializeField]                   private bool                 m_bEmptyCheckOnEnable   = true; // m_pEmptyView를 위한 Check를 OnEnable 함수에서 하는지에 대한 Flag
     [SerializeField]                   private bool                 m_bAreaSizeLock         = false;// minSize보다 적은 개수의 아이템일 때 센터정렬에 DragScrollView를 막음
-    [SerializeField]                   protected UnityEvent         m_pEventToClickItem     = null;
 
     [Header("Sample Slot")]
     [SerializeField]                   protected GameObject         m_pSample               = null;
@@ -74,6 +73,15 @@ public class SHUIMassiveScrollView : MonoBehaviour
             m_pScrView.onDragFinished   += DragEnd;
             m_pScrView.onMomentumMove   += OnDragging;
             m_pScrView.onStoppedMoving  += DragEnd;
+
+            if (null != m_pScrView.horizontalScrollBar)
+            {
+                EventDelegate.Add(m_pScrView.horizontalScrollBar.onChange, OnScrollBar);
+            }
+            if (null != m_pScrView.verticalScrollBar)
+            {
+                EventDelegate.Add(m_pScrView.verticalScrollBar.onChange, OnScrollBar);
+            }
 
             MakeSpareSlots();
 
@@ -201,11 +209,11 @@ public class SHUIMassiveScrollView : MonoBehaviour
         switch (m_pScrView.movement)
         {
             case UIScrollView.Movement.Horizontal:
-                SetCellCount_Horizontal(count);
+                SetSlotCount_Horizontal(count);
                 break;
 
             case UIScrollView.Movement.Vertical:
-                SetCellCount_Vertical(count);
+                SetSlotCount_Vertical(count);
                 break;
         }
 
@@ -421,7 +429,7 @@ public class SHUIMassiveScrollView : MonoBehaviour
 
     
     #region Utility Functions
-    private void SetCellCount_Horizontal(int count)
+    private void SetSlotCount_Horizontal(int count)
     {
         m_iTotalCount = count;
 
@@ -471,7 +479,7 @@ public class SHUIMassiveScrollView : MonoBehaviour
         Paint();
     }
 
-    private void SetCellCount_Vertical(int count)
+    private void SetSlotCount_Vertical(int count)
     {
         m_iTotalCount = count;
 
@@ -518,21 +526,6 @@ public class SHUIMassiveScrollView : MonoBehaviour
 
         m_pScrView.ResetPosition();
 
-        Paint();
-    }
-
-    private void DragStart()
-    {
-        m_bIsDragging = true;
-    }
-
-    private void DragEnd()
-    {
-        m_bIsDragging = false;
-    }
-
-    private void OnDragging()
-    {
         Paint();
     }
 
@@ -737,14 +730,6 @@ public class SHUIMassiveScrollView : MonoBehaviour
         return pSlot;
     }
 
-    private void OnClickItem()
-    {
-        if (null != m_pEventToClickItem)
-        {
-            m_pEventToClickItem.Invoke();
-        }
-    }
-
     private void PushSlot(GameObject pSlot)
     {
         NGUITools.SetActive(pSlot.gameObject, false);
@@ -755,5 +740,24 @@ public class SHUIMassiveScrollView : MonoBehaviour
 
 
     #region Event Handler
+    private void DragStart()
+    {
+        m_bIsDragging = true;
+    }
+
+    private void DragEnd()
+    {
+        m_bIsDragging = false;
+    }
+
+    private void OnDragging()
+    {
+        Paint();
+    }
+
+    private void OnScrollBar()
+    {
+        Paint();
+    }
     #endregion
 }

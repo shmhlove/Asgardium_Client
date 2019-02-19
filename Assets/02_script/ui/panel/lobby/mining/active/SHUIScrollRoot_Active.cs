@@ -13,7 +13,7 @@ public class SHUIScrollRoot_Active : SHUIMassiveScrollView
     }
 
     protected override void SetSlotData(GameObject go, int index)
-    {       
+    {
     }
 
     protected override void Update()

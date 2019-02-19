@@ -42,7 +42,7 @@ public class SHNetworkManager : SHSingleton<SHNetworkManager>
 
     public void SendRequest(string path, HTTPMethodType methoodType, JsonData body, Action<SHReply> callback)
     {
-        StartCoroutine(CoroutineSendRequest(CreateRequestData(path, methoodType, body), callback));
+        StartCoroutine(CoroutineSendRequest(path, methoodType, body, callback));
     }
 
     public void ConnectWebSocket(Action<SHReply> callback)
@@ -98,10 +98,15 @@ public class SHNetworkManager : SHSingleton<SHNetworkManager>
         });
     }
 
-    private IEnumerator CoroutineSendRequest(UnityWebRequest www, Action<SHReply> callback)
+    private IEnumerator CoroutineSendRequest(string path, HTTPMethodType methodType, JsonData body, Action<SHReply> callback)
     {
+        ShowIndicator();
+
+        UnityWebRequest www = CreateRequestData(path, methodType, body);
         yield return www.SendWebRequest();
-        
+
+        CloseIndicator();
+
         callback(new SHReply(www));
     }
 
@@ -155,5 +160,17 @@ public class SHNetworkManager : SHSingleton<SHNetworkManager>
     private string GetBodyMessage(JsonData body)
     {
         return (null == body) ? "{}" : JsonMapper.ToJson(body);
+    }
+
+    private async void ShowIndicator()
+    {
+        var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
+        pUIRoot.ShowIndicator();
+    }
+
+    private async void CloseIndicator()
+    {
+        var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
+        pUIRoot.CloseIndicator();
     }
 }

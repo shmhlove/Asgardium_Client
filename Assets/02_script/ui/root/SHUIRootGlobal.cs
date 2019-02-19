@@ -34,7 +34,18 @@ public class SHUIRootGlobal : SHUIRoot
             pPanel.Close(pCallback);
         };
         
-        pPanel.SetActive(true);
         pPanel.Show("", strMessage, eAlertButtonType.OneButton, pResult);
+    }
+    
+    public async void ShowIndicator()
+    {
+        var pPanel = await GetPanel<SHUIPanelIndicator>(SHUIConstant.PANEL_INDICATOR);
+        pPanel.Show();
+    }
+
+    public async void CloseIndicator()
+    {
+        var pPanel = await GetPanel<SHUIPanelIndicator>(SHUIConstant.PANEL_INDICATOR);
+        pPanel.Close();
     }
 }

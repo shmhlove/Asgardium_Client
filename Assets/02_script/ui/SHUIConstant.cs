@@ -10,6 +10,7 @@ public static class SHUIConstant
     public static string ROOT_GLOBAL = "UI Root - Global";
     public static string PANEL_FADE = "Panel - Fade";
     public static string PANEL_ALERT = "Panel - Alert";
+    public static string PANEL_INDICATOR = "Panel - Indicator";
 
     // Intro Root
     public static string ROOT_INTRO = "UI Root - Intro";

@@ -3,11 +3,11 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class SHUIPanelPassive : SHUIMassiveScrollView
+public class SHUIPanelActive : SHUIMassiveScrollView
 {
     protected override void OnInitialized()
     {
-        int iCount = 100;
+        int iCount = 50;
         SetCellCount(iCount);
         //SetScroll(iCount - m_iMaxRow + 1, true);
         SetScroll(0, true);

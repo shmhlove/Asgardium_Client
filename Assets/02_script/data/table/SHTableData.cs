@@ -14,10 +14,12 @@ public partial class SHTableData : SHBaseData
     public override void OnInitialize()
     {
         m_dicTables.Clear();
-
+        
         m_dicTables.Add(typeof(JsonClientConfig),     new JsonClientConfig());
         m_dicTables.Add(typeof(JsonPreloadResources), new JsonPreloadResources());
         m_dicTables.Add(typeof(JsonResources),        new JsonResources());
+        
+        m_dicTables.Add(typeof(InstanceUserInfo),     new InstanceUserInfo());
     }
 
     public override void OnFinalize()

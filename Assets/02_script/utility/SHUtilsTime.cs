@@ -26,4 +26,14 @@ public static partial class SHUtils
     {
         return pTime.ToString(strFormat, System.Globalization.CultureInfo.InstalledUICulture);
     }
+
+    public static DateTime GetDateTimeByMillisecond(long milliseconds)
+    {
+        return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(milliseconds).ToLocalTime();
+    }
+
+    public static long GetTotalMillisecondsForUTC()
+    {
+        return (long)DateTime.UtcNow.ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
+    }
 }

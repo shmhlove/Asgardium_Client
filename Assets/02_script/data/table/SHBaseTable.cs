@@ -181,6 +181,23 @@ public abstract class SHBaseTable
         return (int)pNode[strKey];
     }
 
+    // 유틸 : Json에서 long데이터 얻기
+    public long GetLongToJson(JsonData pNode, string strKey)
+    {
+        if (null == pNode)
+            return 0;
+
+        if (false == pNode.Keys.Contains(strKey))
+            return 0;
+
+        if ((JsonType.Int != pNode[strKey].GetJsonType()) &&
+            (JsonType.Long != pNode[strKey].GetJsonType()) &&
+            (JsonType.Double != pNode[strKey].GetJsonType()))
+            return 0;
+
+        return (long)pNode[strKey];
+    }
+
     // 유틸 : Json에서 float데이터 얻기
     public float GetFloatToJson(JsonData pNode, string strKey)
     {

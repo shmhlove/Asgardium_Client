@@ -59,19 +59,26 @@ public class SHSceneLogin : MonoBehaviour
         };
         Single.Network.POST(SHAPIs.SH_API_LOGIN, json, async (reply) =>
         {
-            var pUIRoot = await Single.UI.GetGlobalRoot();
-            pUIRoot.ShowAlert(reply.ToString(), () => 
-            {
+            // var pUIRoot = await Single.UI.GetGlobalRoot();
+            // pUIRoot.ShowAlert(reply.ToString(), async () => 
+            // {
                 if (reply.isSucceed)
                 {
-                    SHPlayerPrefs.SetString("auth_email", bIsSave ? strEmail : string.Empty);
-                    SHPlayerPrefs.SetString("auth_password", bIsSave ? strPassword : string.Empty);
+                    var UserInfo = await Single.Table.GetTable<InstanceUserInfo>();
+                    UserInfo.LoadJsonTable(reply.data);
+
+                    Debug.LogFormat("Created At : {0:yyyy-MM-dd, HH:mm:ss}", SHUtils.GetDateTimeByMillisecond(UserInfo.CreatedAt));
+                    Debug.LogFormat("Updated At : {0:yyyy-MM-dd, HH:mm:ss}", SHUtils.GetDateTimeByMillisecond(UserInfo.UpdatedAt));
+                    Debug.LogFormat("Mining At : {0:yyyy-MM-dd, HH:mm:ss}", SHUtils.GetDateTimeByMillisecond(UserInfo.MiningPowerAt));
+                    
+                    SHPlayerPrefs.SetString("auth_email", bIsSave ? UserInfo.UserEmail : string.Empty);
+                    SHPlayerPrefs.SetString("auth_password", bIsSave ? UserInfo.Password : string.Empty);
                     SHPlayerPrefs.SetInt("auth_is_save", bIsSave ? 1 : 2);
                     SHPlayerPrefs.Save();
 
                     Single.Scene.LoadScene(eSceneType.Lobby, bIsUseFade:true);
                 }
-            });
+            // });
         });
     }
 

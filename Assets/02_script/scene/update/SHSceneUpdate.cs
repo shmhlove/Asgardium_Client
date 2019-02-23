@@ -32,7 +32,7 @@ public class SHSceneUpdate : MonoBehaviour
         {
             // UI 표현 처리
             
-            Debug.LogFormat("Data Load Progress : <color=yellow>{0}%({1}/{2})</color>",
+            Debug.LogFormat("Data Load Progress : <color=red>{0}%({1}/{2})</color>",
                             pProgressInfo.GetPercent(),
                             pProgressInfo.m_iLoadDoneCount,
                             pProgressInfo.m_iTotalDataCount);

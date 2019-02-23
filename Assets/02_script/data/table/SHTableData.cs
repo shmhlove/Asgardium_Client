@@ -15,11 +15,16 @@ public partial class SHTableData : SHBaseData
     {
         m_dicTables.Clear();
         
+        // 클라 테이블
         m_dicTables.Add(typeof(JsonClientConfig),     new JsonClientConfig());
         m_dicTables.Add(typeof(JsonPreloadResources), new JsonPreloadResources());
         m_dicTables.Add(typeof(JsonResources),        new JsonResources());
         
-        m_dicTables.Add(typeof(InstanceUserInfo),     new InstanceUserInfo());
+        // 인스턴스 테이블
+        m_dicTables.Add(typeof(JsonUserInfo),         new JsonUserInfo());
+
+        // 서버 테이블
+        m_dicTables.Add(typeof(JsonServerConfig),     new JsonServerConfig());
     }
 
     public override void OnFinalize()
@@ -73,7 +78,7 @@ public partial class SHTableData : SHBaseData
     {
         return new SHLoadData()
         {
-            m_eDataType = eDataType.LocalTable,
+            m_eDataType = eDataType.Table,
             m_strName   = strName,
             m_pLoadFunc = Load
         };
@@ -115,10 +120,10 @@ public partial class SHTableData : SHBaseData
                 void pAction(eErrorCode errorCode) { pPromise.TrySetResult(pTable); }
                 switch (pTable.GetTableType())
                 {
-                    case eTableType.Static: pTable.LoadStatic(pAction);                         break;
-                    case eTableType.Byte:   pTable.LoadByte(pTable.m_strByteFileName, pAction); break;
-                    case eTableType.XML:    pTable.LoadXML(pTable.m_strFileName, pAction);      break;
-                    case eTableType.Json:   pTable.LoadJson(pTable.m_strFileName, pAction);     break;
+                    case eTableLoadType.Static: pTable.LoadStatic(pAction);                         break;
+                    case eTableLoadType.Byte:   pTable.LoadByte(pTable.m_strByteFileName, pAction); break;
+                    case eTableLoadType.XML:    pTable.LoadXML(pTable.m_strFileName, pAction);      break;
+                    case eTableLoadType.Json:   pTable.LoadJson(pTable.m_strFileName, pAction);     break;
                 }
             }            
         }

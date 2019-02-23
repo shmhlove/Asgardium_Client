@@ -2,13 +2,15 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 
 public class SHUIManager : SHSingleton<SHUIManager>
 {
-    Dictionary<string, SHUIRoot> m_dicRoots = new Dictionary<string, SHUIRoot>();
+    private Dictionary<string, SHUIRoot> m_dicRoots = new Dictionary<string, SHUIRoot>();
+    private SemaphoreSlim m_pSemaphoreSlim = new SemaphoreSlim(1,1);
 
     public override void OnInitialize()
     {
@@ -39,20 +41,30 @@ public class SHUIManager : SHSingleton<SHUIManager>
             m_dicRoots.Remove(strName);
         }
     }
-
+    
     public async Task<T> GetRoot<T>(string strName) where T : SHUIRoot
     {
+        await m_pSemaphoreSlim.WaitAsync();
+        Debug.LogFormat("요청 : {0}", strName);
         var pPromise = new TaskCompletionSource<T>();
-
-        if (m_dicRoots.ContainsKey(strName))
+        try 
         {
-            pPromise.TrySetResult(m_dicRoots[strName] as T);
+            if (m_dicRoots.ContainsKey(strName))
+            {
+                pPromise.TrySetResult(m_dicRoots[strName] as T);
+                Debug.LogFormat("응답(Dictionary) : {0}", strName);
+            }
+            else
+            {
+                var pObject = await Single.Resources.GetComponentByObject<T>(strName);
+                AddRoot(strName, pObject);
+                pPromise.TrySetResult(pObject);
+                Debug.LogFormat("응답(Load) : {0}", strName);
+            }
         }
-        else
+        finally
         {
-            var pObject = await Single.Resources.GetComponentByObject<T>(strName);
-            AddRoot(strName, pObject);
-            pPromise.TrySetResult(pObject);
+            m_pSemaphoreSlim.Release();
         }
 
         return await pPromise.Task;

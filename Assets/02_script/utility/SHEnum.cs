@@ -12,6 +12,8 @@ public enum eErrorCode
     Net_Common_DatabaseWrite = 1003,
     Net_Common_InvalidResponseData = 1004,
     Net_Common_JsonParse = 1005,
+    Net_Common_CollectionRead = 1006,
+    Net_Common_EmptyCollection = 1007,
 
     Net_Auth_NotFoundUser = 2001,
     Net_Auth_AlreadySignupUser = 2002,
@@ -35,6 +37,7 @@ public enum eSceneType
 {
     None,
     Intro,
+    Update,
     Login,
     Lobby,
 }
@@ -47,11 +50,11 @@ public enum eNationType
 public enum eDataType
 {
     None,
-    LocalTable,
+    Table,
     Resources,
 }
 
-public enum eTableType
+public enum eTableLoadType
 {
     None,
     Static,

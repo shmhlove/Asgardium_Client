@@ -10,7 +10,7 @@ public abstract class SHBaseTable
 {
     public string       m_strFileName;
     public string       m_strByteFileName;
-    public eDataType    m_eDataType = eDataType.LocalTable;
+    public eDataType    m_eDataType = eDataType.Table;
 
 
     #region Virtual Functions
@@ -137,14 +137,14 @@ public abstract class SHBaseTable
     }
 
     // 인터페이스 : 테이블 타입
-    public eTableType GetTableType()
+    public eTableLoadType GetTableType()
     {
-        if (eErrorCode.Table_Not_Override != LoadStaticTable())    return eTableType.Static;
-        if (eErrorCode.Table_Not_Override != LoadBytesTable(null)) return eTableType.Byte;
-        if (eErrorCode.Table_Not_Override != LoadXMLTable(null))   return eTableType.XML;
-        if (eErrorCode.Table_Not_Override != LoadJsonTable(null))  return eTableType.Json;
+        if (eErrorCode.Table_Not_Override != LoadStaticTable())    return eTableLoadType.Static;
+        if (eErrorCode.Table_Not_Override != LoadBytesTable(null)) return eTableLoadType.Byte;
+        if (eErrorCode.Table_Not_Override != LoadXMLTable(null))   return eTableLoadType.XML;
+        if (eErrorCode.Table_Not_Override != LoadJsonTable(null))  return eTableLoadType.Json;
 
-        return eTableType.None;
+        return eTableLoadType.None;
     }
     #endregion
 
@@ -173,9 +173,7 @@ public abstract class SHBaseTable
         if (false == pNode.Keys.Contains(strKey))
             return 0;
 
-        if ((JsonType.Int != pNode[strKey].GetJsonType()) &&
-            (JsonType.Long != pNode[strKey].GetJsonType()) &&
-            (JsonType.Double != pNode[strKey].GetJsonType()))
+        if (JsonType.Int != pNode[strKey].GetJsonType())
             return 0;
 
         return (int)pNode[strKey];
@@ -190,9 +188,7 @@ public abstract class SHBaseTable
         if (false == pNode.Keys.Contains(strKey))
             return 0;
 
-        if ((JsonType.Int != pNode[strKey].GetJsonType()) &&
-            (JsonType.Long != pNode[strKey].GetJsonType()) &&
-            (JsonType.Double != pNode[strKey].GetJsonType()))
+        if (JsonType.Long != pNode[strKey].GetJsonType())
             return 0;
 
         return (long)pNode[strKey];
@@ -207,9 +203,7 @@ public abstract class SHBaseTable
         if (false == pNode.Keys.Contains(strKey))
             return 0.0f;
 
-        if ((JsonType.Int != pNode[strKey].GetJsonType()) &&
-            (JsonType.Long != pNode[strKey].GetJsonType()) &&
-            (JsonType.Double != pNode[strKey].GetJsonType()))
+        if (JsonType.Double != pNode[strKey].GetJsonType())
             return 0.0f;
 
         return (float)pNode[strKey];

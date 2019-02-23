@@ -61,15 +61,15 @@ public class SHSceneLogin : MonoBehaviour
         {
             if (reply.isSucceed)
             {
-                var UserInfo = await Single.Table.GetTable<InstanceUserInfo>();
-                UserInfo.LoadJsonTable(reply.data);
-
-                Debug.LogFormat("Created At : {0:yyyy-MM-dd, HH:mm:ss}", SHUtils.GetDateTimeByMillisecond(UserInfo.CreatedAt));
-                Debug.LogFormat("Updated At : {0:yyyy-MM-dd, HH:mm:ss}", SHUtils.GetDateTimeByMillisecond(UserInfo.UpdatedAt));
-                Debug.LogFormat("Mining At : {0:yyyy-MM-dd, HH:mm:ss}", SHUtils.GetDateTimeByMillisecond(UserInfo.MiningPowerAt));
+                var pUserInfo = await Single.Table.GetTable<JsonUserInfo>();
+                pUserInfo.LoadJsonTable(reply.data);
                 
-                SHPlayerPrefs.SetString("auth_email", bIsSave ? UserInfo.UserEmail : string.Empty);
-                SHPlayerPrefs.SetString("auth_password", bIsSave ? UserInfo.Password : string.Empty);
+                Debug.LogFormat("Created At : {0:yyyy-MM-dd, HH:mm:ss}", SHUtils.GetDateTimeByMillisecond(pUserInfo.CreatedAt));
+                Debug.LogFormat("Updated At : {0:yyyy-MM-dd, HH:mm:ss}", SHUtils.GetDateTimeByMillisecond(pUserInfo.UpdatedAt));
+                Debug.LogFormat("Mining At : {0:yyyy-MM-dd, HH:mm:ss}", SHUtils.GetDateTimeByMillisecond(pUserInfo.MiningPowerAt));
+                
+                SHPlayerPrefs.SetString("auth_email", bIsSave ? pUserInfo.UserEmail : string.Empty);
+                SHPlayerPrefs.SetString("auth_password", bIsSave ? pUserInfo.Password : string.Empty);
                 SHPlayerPrefs.SetInt("auth_is_save", bIsSave ? 1 : 2);
                 SHPlayerPrefs.Save();
             }

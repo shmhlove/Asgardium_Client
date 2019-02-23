@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ public class SHUIRoot : MonoBehaviour
 
     [Header("Internal Info")]
     private Dictionary<string, SHUIPanel> m_dicPanels;
+    private SemaphoreSlim m_pSemaphoreSlim = new SemaphoreSlim(1,1);
 
     public virtual void Awake()
     {
@@ -35,17 +37,25 @@ public class SHUIRoot : MonoBehaviour
     
     public async Task<T> GetPanel<T>(string strName) where T : SHUIPanel
     {
-        var pPromise = new TaskCompletionSource<T>();
+        await m_pSemaphoreSlim.WaitAsync();
 
-        if (true == m_dicPanels.ContainsKey(strName))
+        var pPromise = new TaskCompletionSource<T>();
+        try
         {
-            pPromise.TrySetResult(m_dicPanels[strName] as T);
+            if (true == m_dicPanels.ContainsKey(strName))
+            {
+                pPromise.TrySetResult(m_dicPanels[strName] as T);
+            }
+            else
+            {
+                var pPanel = await Single.Resources.GetComponentByObject<T>(typeof(T).ToString());
+                AddUIPanel(strName, pPanel);
+                pPromise.TrySetResult(pPanel);
+            }
         }
-        else
+        finally
         {
-            var pPanel = await Single.Resources.GetComponentByObject<T>(typeof(T).ToString());
-            AddUIPanel(strName, pPanel);
-            pPromise.TrySetResult(pPanel);
+            m_pSemaphoreSlim.Release();
         }
 
         return await pPromise.Task;

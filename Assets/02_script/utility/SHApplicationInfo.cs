@@ -180,23 +180,34 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
     [FuncButton]
     public void SaveLoadResourceList()
     {
-        var pJsonData = new JsonData();
+        // var pJsonData = new JsonData();
         
+        // foreach (var kvp in m_pDicResourceLoadInfo)
+        // {
+        //     foreach (var pValue in kvp.Value)
+        //     {
+        //         pJsonData[string.Format("Scene : {0}", kvp.Key)].Add(pValue);
+        //     }
+        // }
+        
+        // var pJsonWriter = new JsonWriter();
+        // pJsonWriter.PrettyPrint = true;
+        // JsonMapper.ToJson(pJsonData, pJsonWriter);
+
+        // string strSavePath = string.Format("{0}/{1}.json", SHPath.GetAssets(), "RealTimeResourceLoadInfo");
+        // SHUtils.SaveFile(pJsonWriter.ToString(), strSavePath);
+
+        string strBuff = string.Empty;
         foreach (var kvp in m_pDicResourceLoadInfo)
         {
             foreach (var pValue in kvp.Value)
             {
-                pJsonData[string.Format("Scene : {0}", kvp.Key)].Add(pValue);
+                strBuff += string.Format("Scene : {0}\n{1}\n", kvp.Key, pValue);
             }
         }
-        
-        var pJsonWriter = new JsonWriter();
-        pJsonWriter.PrettyPrint = true;
-        JsonMapper.ToJson(pJsonData, pJsonWriter);
 
-        string strSavePath = string.Format("{0}/{1}.json", SHPath.GetAssets(), "RealTimeResourceLoadInfo");
-        SHUtils.SaveFile(pJsonWriter.ToString(), strSavePath);
-
+        string strSavePath = string.Format("{0}/{1}.txt", SHPath.GetRoot(), "RealTimeResourceLoadInfo");
+        SHUtils.SaveFile(strBuff, strSavePath);
         Process.Start(strSavePath);
     }
     [FuncButton]
@@ -240,7 +251,7 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
         if (false == m_pDicResourceLoadInfo.ContainsKey(Single.Scene.GetActiveScene()))
             m_pDicResourceLoadInfo.Add(Single.Scene.GetActiveScene(), new List<string>());
 
-        //// 콜스택 남기기
+        // 콜스택 남기기
         //strInfo += string.Format("\n< CallStack >\n{0}", SHUtils.GetCallStack());
 
         m_pDicResourceLoadInfo[Single.Scene.GetActiveScene()].Add(strInfo);

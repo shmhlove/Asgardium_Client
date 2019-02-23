@@ -14,7 +14,7 @@ public class SHSceneIntro : MonoBehaviour
 
     void Start()
     {
-        Single.Scene.LoadScene(eSceneType.Login, bIsUseFade: true, pCallback: (pReply) => 
+        Single.Scene.LoadScene(eSceneType.Update, bIsUseFade: true, pCallback: (pReply) => 
         {
 
         });

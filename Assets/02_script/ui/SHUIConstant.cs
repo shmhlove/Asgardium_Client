@@ -15,6 +15,9 @@ public static class SHUIConstant
     // Intro Root
     public static string ROOT_INTRO = "UI Root - Intro";
 
+    // Update Root
+    public static string ROOT_UPDATE = "UI Root - Update";
+
     // Login Root
     public static string ROOT_LOGIN = "UI Root - Login";
     public static string PANEL_LOGIN = "Panel - Login";

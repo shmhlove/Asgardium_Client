@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 using LitJson;
 
-public class InstanceUserInfo : SHBaseTable
+public class JsonUserInfo : SHBaseTable
 {
     public string UserId = string.Empty;
     public string UserEmail = string.Empty;
@@ -17,7 +17,7 @@ public class InstanceUserInfo : SHBaseTable
     public long UpdatedAt = 0;
     public long MiningPowerAt = 0;
 	
-    public InstanceUserInfo()
+    public JsonUserInfo()
     {
     }
 

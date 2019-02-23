@@ -37,7 +37,7 @@ public enum eSceneType
 {
     None,
     Intro,
-    Update,
+    Patch,
     Login,
     Lobby,
 }

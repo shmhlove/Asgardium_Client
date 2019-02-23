@@ -43,7 +43,7 @@ public static partial class SHUtils
         switch(strType.ToLower())
         {
             case "intro":         return eSceneType.Intro;
-            case "update":        return eSceneType.Update;
+            case "patch":         return eSceneType.Patch;
             case "login":         return eSceneType.Login;
             case "lobby":         return eSceneType.Lobby;
         }                        

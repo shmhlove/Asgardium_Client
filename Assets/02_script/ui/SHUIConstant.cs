@@ -20,7 +20,7 @@ public static class SHUIConstant
 
     // Login Root
     public static string ROOT_LOGIN = "UI Root - Login";
-    public static string PANEL_LOGIN = "Panel - Login";
+    public static string PANEL_SIGNIN = "Panel - Signin";
     public static string PANEL_SIGNUP = "Panel - Signup";
 
     // Lobby Root

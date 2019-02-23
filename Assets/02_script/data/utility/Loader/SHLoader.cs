@@ -41,8 +41,8 @@ public partial class SHLoader
         }
 
         m_pProgress.LoadStart();
-        
-        CoroutineToLoadProcess();
+
         CoroutineToLoadProgressEvent();
+        CoroutineToLoadProcess();
     }
 }

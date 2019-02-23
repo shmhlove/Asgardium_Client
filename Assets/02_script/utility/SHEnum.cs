@@ -58,9 +58,10 @@ public enum eTableLoadType
 {
     None,
     Static,
+    Server,
+    Byte,
     Json,
     XML,
-    Byte,
 }
 
 public enum eResourceType

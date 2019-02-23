@@ -7,23 +7,18 @@ using System.Collections.Generic;
 
 using LitJson;
 
-public class JsonPreloadResources : SHBaseTable
+public class SHTableClientPreloadResources : SHBaseTable
 {
     Dictionary<eSceneType, List<string>> m_pData = new Dictionary<eSceneType, List<string>>();
     
-    public JsonPreloadResources()
+    public SHTableClientPreloadResources()
     {
-        m_strFileName = "JsonPreloadResources";
+        m_strIdentity = "PreloadResources";
     }
     
     public override void Initialize()
     {
         m_pData.Clear();
-    }
-
-    public override bool IsLoadTable()
-    {
-        return (0 != m_pData.Count);
     }
 
     public override eErrorCode LoadJsonTable(JsonData pJson)
@@ -37,6 +32,9 @@ public class JsonPreloadResources : SHBaseTable
             var pDataNode = pJson[iLoop];
             SHUtils.ForToEnum<eSceneType>((eType) => 
             {
+                if (false == pDataNode.Keys.Contains(eType.ToString()))
+                    return;
+                    
                 for (int iDataIndex = 0; iDataIndex < pDataNode[eType.ToString()].Count; ++iDataIndex)
                 {
                     AddData(eType, (string)pDataNode[eType.ToString()][iDataIndex]);
@@ -50,7 +48,7 @@ public class JsonPreloadResources : SHBaseTable
     public List<string> GetData(eSceneType eType)
     {
         if (false == IsLoadTable())
-            LoadJson(m_strFileName, (errorCode) => {});
+            LoadJson((errorCode) => {});
 
         if (false == m_pData.ContainsKey(eType))
             return new List<string>();

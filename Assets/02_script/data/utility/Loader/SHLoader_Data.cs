@@ -168,7 +168,7 @@ public class SHLoadDataStateInfo
 public class SHLoadingInfo
 {
     // 로드 중인 데이터 정보들
-    public List<SHLoadDataStateInfo> m_pLoadingDatum = new List<SHLoadDataStateInfo>();
+    public List<SHLoadDataStateInfo> m_pLoadingDatas = new List<SHLoadDataStateInfo>();
 
     // 로딩 카운트 정보
     public int   m_iSucceedCount;   // 로드 성공한 데이터 카운트
@@ -177,6 +177,28 @@ public class SHLoadingInfo
     public int   m_iTotalDataCount; // 전체 데이터 카운트
     public float m_fElapsedTime;    // 현재 경과된 시간(초단위)
     public float m_fLoadPercent;    // 로드 진행도(0 ~ 100%)
+
+    public bool IsSucceed()
+    {
+        if (0 == m_iTotalDataCount)
+            return false;
+
+        if (0 == m_iLoadDoneCount)
+            return false;
+
+        return (m_iTotalDataCount == m_iSucceedCount);
+    }
+
+    public double GetPercent()
+    {
+        if (0 == m_iTotalDataCount)
+            return 0;
+
+        if (0 == m_iLoadDoneCount)
+            return 0;
+
+        return Math.Round(((double)m_iLoadDoneCount / (double)m_iTotalDataCount), 2) * 100;
+    }
 }
 
 // public class : 로더

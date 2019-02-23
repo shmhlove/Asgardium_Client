@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 using LitJson;
 
-public class JsonUserInfo : SHBaseTable
+public class SHTableUserInfo : SHBaseTable
 {
     public string UserId = string.Empty;
     public string UserEmail = string.Empty;
@@ -17,8 +17,9 @@ public class JsonUserInfo : SHBaseTable
     public long UpdatedAt = 0;
     public long MiningPowerAt = 0;
 	
-    public JsonUserInfo()
+    public SHTableUserInfo()
     {
+        m_strIdentity = "UserInfo";
     }
 
     public override bool IsLoadTable()

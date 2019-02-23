@@ -45,28 +45,26 @@ public class SHUIManager : SHSingleton<SHUIManager>
     public async Task<T> GetRoot<T>(string strName) where T : SHUIRoot
     {
         await m_pSemaphoreSlim.WaitAsync();
-        Debug.LogFormat("요청 : {0}", strName);
+        
         var pPromise = new TaskCompletionSource<T>();
         try 
         {
             if (m_dicRoots.ContainsKey(strName))
             {
                 pPromise.TrySetResult(m_dicRoots[strName] as T);
-                Debug.LogFormat("응답(Dictionary) : {0}", strName);
             }
             else
             {
                 var pObject = await Single.Resources.GetComponentByObject<T>(strName);
                 AddRoot(strName, pObject);
                 pPromise.TrySetResult(pObject);
-                Debug.LogFormat("응답(Load) : {0}", strName);
             }
         }
         finally
         {
             m_pSemaphoreSlim.Release();
         }
-
+        
         return await pPromise.Task;
     }
 

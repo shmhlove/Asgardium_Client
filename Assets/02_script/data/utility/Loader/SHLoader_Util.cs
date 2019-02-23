@@ -41,11 +41,11 @@ public partial class SHLoader
         pDataInfo.LoadCall(OnEventToLoadStart, OnEventToLoadDone);
     }
 
-    void AddLoadDatum(List<Dictionary<string, SHLoadData>> pLoadDatum)
+    void AddLoadDatas(List<Dictionary<string, SHLoadData>> pLoadData)
     {
-        foreach (var pData in pLoadDatum)
+        foreach (var pData in pLoadData)
         {
-            m_pProgress.AddLoadDatum(pData);
+            m_pProgress.AddLoadDatas(pData);
         }
     }
 

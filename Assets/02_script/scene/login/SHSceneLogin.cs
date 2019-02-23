@@ -61,12 +61,8 @@ public class SHSceneLogin : MonoBehaviour
         {
             if (reply.isSucceed)
             {
-                var pUserInfo = await Single.Table.GetTable<JsonUserInfo>();
+                var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
                 pUserInfo.LoadJsonTable(reply.data);
-                
-                Debug.LogFormat("Created At : {0:yyyy-MM-dd, HH:mm:ss}", SHUtils.GetDateTimeByMillisecond(pUserInfo.CreatedAt));
-                Debug.LogFormat("Updated At : {0:yyyy-MM-dd, HH:mm:ss}", SHUtils.GetDateTimeByMillisecond(pUserInfo.UpdatedAt));
-                Debug.LogFormat("Mining At : {0:yyyy-MM-dd, HH:mm:ss}", SHUtils.GetDateTimeByMillisecond(pUserInfo.MiningPowerAt));
                 
                 SHPlayerPrefs.SetString("auth_email", bIsSave ? pUserInfo.UserEmail : string.Empty);
                 SHPlayerPrefs.SetString("auth_password", bIsSave ? pUserInfo.Password : string.Empty);

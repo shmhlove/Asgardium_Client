@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 using LitJson;
 
-public class JsonClientConfig : SHBaseTable
+public class SHTableClientConfig : SHBaseTable
 {
     public string ServerConfigURL  = string.Empty;
     public string ServiceMode      = string.Empty;
@@ -24,14 +24,9 @@ public class JsonClientConfig : SHBaseTable
 
     public int    FrameRate        = 60;
 
-    public JsonClientConfig()
+    public SHTableClientConfig()
     {
-        m_strFileName = "JsonClientConfig";
-    }
-
-    public override bool IsLoadTable()
-    {
-        return (false == string.IsNullOrEmpty(Version));
+        m_strIdentity = "ClientConfig";
     }
 
     public override eErrorCode LoadJsonTable(JsonData pJson)
@@ -58,32 +53,4 @@ public class JsonClientConfig : SHBaseTable
         
         return eErrorCode.Succeed;
     }
-
-    //public void SaveJsonFile()
-    //{
-    //    SaveJsonFile(SHPath.GetPathToJson());
-    //}
-    //public void SaveJsonFile(string strSavePath)
-    //{
-    //    var pClientConfigJsonData = new JsonData();
-
-    //    pClientConfigJsonData["ServerConfigURL"] = ServerConfigURL;
-    //    pClientConfigJsonData["ServiceMode"] = ServiceMode;
-    //    pClientConfigJsonData["Version"] = Version;
-
-    //    pClientConfigJsonData["AOS_KeyStoreName"] = AOS_KeyStoreName;
-    //    pClientConfigJsonData["AOS_KeyStorePass"] = AOS_KeyStorePass;
-    //    pClientConfigJsonData["AOS_KeyAliasName"] = AOS_KeyAliasName;
-    //    pClientConfigJsonData["AOS_KeyAliasPass"] = AOS_KeyAliasPass;
-
-    //    pClientConfigJsonData["IOS_TeamID"] = IOS_TeamID;
-
-    //    pClientConfigJsonData["FrameRate"] = FrameRate;
-    
-    //    var pJsonWriter = new JsonWriter();
-    //    pJsonWriter.PrettyPrint = true;
-    //    JsonMapper.ToJson(pClientConfigJsonData, pJsonWriter);
-
-    //    SHUtils.SaveFile(pJsonWriter.ToString(), string.Format("{0}/{1}.json", strSavePath, m_strFileName));
-    //}
 }

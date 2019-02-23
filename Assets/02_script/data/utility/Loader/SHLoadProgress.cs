@@ -13,20 +13,19 @@ using System.Collections.Generic;
 public class SHLoadProgress
 {
     // 로드 대기 중인 데이터 정보
-    private Queue<SHLoadDataStateInfo> m_qLoadDatumWaitQueue = new Queue<SHLoadDataStateInfo>();
+    private Queue<SHLoadDataStateInfo> m_qLoadDataWaitQueue = new Queue<SHLoadDataStateInfo>();
 
     // 로드 진행 중인 데이터 정보<파일명, 파일정보>
-    private Dictionary<string, SHLoadDataStateInfo> m_dicLoadingDatum = new Dictionary<string, SHLoadDataStateInfo>();
-    public List<SHLoadDataStateInfo> LoadingDatum { get { return new List<SHLoadDataStateInfo>(m_dicLoadingDatum.Values); } }
+    private Dictionary<string, SHLoadDataStateInfo> m_dicLoadingData = new Dictionary<string, SHLoadDataStateInfo>();
 
     // 로드 성공한 데이터 정보<파일명, 파일정보>
-    private Dictionary<string, SHLoadDataStateInfo> m_dicLoadSucceedDatum = new Dictionary<string, SHLoadDataStateInfo>();
+    private Dictionary<string, SHLoadDataStateInfo> m_dicLoadSucceedData = new Dictionary<string, SHLoadDataStateInfo>();
 
     // 로드 실패한 데이터 정보<파일명, 파일정보>
-    private Dictionary<string, SHLoadDataStateInfo> m_dicLoadFailedDatum = new Dictionary<string, SHLoadDataStateInfo>();
+    private Dictionary<string, SHLoadDataStateInfo> m_dicLoadFailedData = new Dictionary<string, SHLoadDataStateInfo>();
 
     // 전체 데이터 정보 : <데이터 타입, <파일명, 파일정보>>
-    private Dictionary<eDataType, Dictionary<string, SHLoadDataStateInfo>> m_dicAllLoadDatum = new Dictionary<eDataType, Dictionary<string, SHLoadDataStateInfo>>();
+    private Dictionary<eDataType, Dictionary<string, SHLoadDataStateInfo>> m_dicAllLoadData = new Dictionary<eDataType, Dictionary<string, SHLoadDataStateInfo>>();
 
     // 로드 시작 시간
     public DateTime m_pLoadStartTime;
@@ -36,16 +35,16 @@ public class SHLoadProgress
     
     public void Initialize()
     {
-        m_qLoadDatumWaitQueue.Clear();
-        m_dicAllLoadDatum.Clear();
-        m_dicLoadingDatum.Clear();
-        m_dicLoadSucceedDatum.Clear();
-        m_dicLoadFailedDatum.Clear();
+        m_qLoadDataWaitQueue.Clear();
+        m_dicAllLoadData.Clear();
+        m_dicLoadingData.Clear();
+        m_dicLoadSucceedData.Clear();
+        m_dicLoadFailedData.Clear();
     }
 
-    public void AddLoadDatum(Dictionary<string, SHLoadData> dicLoadDatum)
+    public void AddLoadDatas(Dictionary<string, SHLoadData> dicLoadData)
     {
-        foreach (var kvp in dicLoadDatum)
+        foreach (var kvp in dicLoadData)
         {
             if (null == kvp.Value)
                 return;
@@ -55,12 +54,16 @@ public class SHLoadProgress
             {
                 Debug.LogErrorFormat("[LSH] 데이터 로드 중 중복파일 발견!!!(FileName : {0})", kvp.Key);
             }
+            else
+            {
+                AddLoadData(kvp.Value);
+            }
         }
     }
     
     public SHLoadDataStateInfo GetLoadDataInfo(string strName)
     {
-        foreach (var kvp in m_dicAllLoadDatum)
+        foreach (var kvp in m_dicAllLoadData)
         {
             if (true == kvp.Value.ContainsKey(strName.ToLower()))
                 return kvp.Value[strName.ToLower()];
@@ -70,18 +73,18 @@ public class SHLoadProgress
     
     public void EnqueueWaitingDataInfo(SHLoadDataStateInfo pLoadDataInfo)
     {
-        if (true == m_qLoadDatumWaitQueue.Contains(pLoadDataInfo))
+        if (true == m_qLoadDataWaitQueue.Contains(pLoadDataInfo))
             return;
 
-        m_qLoadDatumWaitQueue.Enqueue(pLoadDataInfo);
+        m_qLoadDataWaitQueue.Enqueue(pLoadDataInfo);
     }
 
     public SHLoadDataStateInfo DequeueWaitingDataInfo()
     {
-        if (0 == m_qLoadDatumWaitQueue.Count)
+        if (0 == m_qLoadDataWaitQueue.Count)
             return null;
 
-        var pDataInfo = m_qLoadDatumWaitQueue.Dequeue();
+        var pDataInfo = m_qLoadDataWaitQueue.Dequeue();
         if (null == pDataInfo)
             return null;
 
@@ -93,7 +96,7 @@ public class SHLoadProgress
         var pLoadingInfo = new SHLoadingInfo();
 
         // 로드 중인 데이터 정보들
-        pLoadingInfo.m_pLoadingDatum   = LoadingDatum;
+        pLoadingInfo.m_pLoadingDatas   = new List<SHLoadDataStateInfo>(m_dicLoadingData.Values);
 
         // 로딩 카운트 정보
         pLoadingInfo.m_iSucceedCount   = GetLoadSucceedCount();
@@ -108,23 +111,23 @@ public class SHLoadProgress
 
     public int GetLoadSucceedCount()
     {
-        return m_dicLoadSucceedDatum.Count;
+        return m_dicLoadSucceedData.Count;
     }
 
     public int GetLoadFailedCount()
     {
-        return m_dicLoadFailedDatum.Count;
+        return m_dicLoadFailedData.Count;
     }
     
     public int GetLoadDoneCount()
     {
-        return (m_dicLoadSucceedDatum.Count + m_dicLoadFailedDatum.Count);
+        return (m_dicLoadSucceedData.Count + m_dicLoadFailedData.Count);
     }
 
     public int GetTotalCount()
     {
         int iTotalCount = 0;
-        foreach(var kvp in m_dicAllLoadDatum)
+        foreach(var kvp in m_dicAllLoadData)
         {
             iTotalCount += kvp.Value.Count;
         }
@@ -139,14 +142,20 @@ public class SHLoadProgress
         float fProgress = 0.0f;
 
         // 로드 중인 파일의 진행률 반영
-        foreach (var pData in LoadingDatum)
+        if (0 < m_dicLoadingData.Count)
         {
-            fProgress += pData.GetProgress();
+            foreach (var pData in m_dicLoadingData.Values)
+            {
+                fProgress += pData.GetProgress();
+            }
+            fProgress /= m_dicLoadingData.Count;
         }
-        fProgress /= LoadingDatum.Count;
         
         // 로드 완료된 파일의 진행률 반영
-        fProgress += (GetLoadDoneCount() / GetTotalCount());
+        if (0 < GetTotalCount())
+        {
+            fProgress += (GetLoadDoneCount() / GetTotalCount());
+        }
         
         // 100분률로 변경 후 반환
         return (fProgress * 100.0f);
@@ -164,7 +173,7 @@ public class SHLoadProgress
         if (true == pDataInfo.m_bIsDone)
             return;
 
-        m_dicLoadingDatum[strName] = pDataInfo;
+        m_dicLoadingData[strName] = pDataInfo;
     }
 
     public void SetLoadDoneInfo(string strName, SHLoadEndInfo pLoadEndInfo)
@@ -180,18 +189,18 @@ public class SHLoadProgress
 
         if (false == pLoadEndInfo.m_bIsSuccess)
         {
-            if (false == m_dicLoadFailedDatum.ContainsKey(strName.ToLower()))
-                m_dicLoadFailedDatum.Add(strName.ToLower(), pDataInfo);
+            if (false == m_dicLoadFailedData.ContainsKey(strName.ToLower()))
+                m_dicLoadFailedData.Add(strName.ToLower(), pDataInfo);
         }
         else
         {
-            if (false == m_dicLoadSucceedDatum.ContainsKey(strName.ToLower()))
-                m_dicLoadSucceedDatum.Add(strName.ToLower(), pDataInfo);
+            if (false == m_dicLoadSucceedData.ContainsKey(strName.ToLower()))
+                m_dicLoadSucceedData.Add(strName.ToLower(), pDataInfo);
         }
 
-        if (true == m_dicLoadingDatum.ContainsKey(strName.ToLower()))
+        if (true == m_dicLoadingData.ContainsKey(strName.ToLower()))
         {
-            m_dicLoadingDatum.Remove(strName.ToLower());
+            m_dicLoadingData.Remove(strName.ToLower());
         }
 
         if (true == IsDone())
@@ -220,12 +229,12 @@ public class SHLoadProgress
 
     public bool IsFailed()
     {
-        return (0 != m_dicLoadFailedDatum.Count);
+        return (0 != m_dicLoadFailedData.Count);
     }
 
     public bool IsDone()
     {
-        return ((0 == m_dicLoadingDatum.Count) && (0 == m_qLoadDatumWaitQueue.Count));
+        return ((0 == m_dicLoadingData.Count) && (0 == m_qLoadDataWaitQueue.Count));
     }
 
     public bool IsDone(string strFileName)
@@ -239,10 +248,10 @@ public class SHLoadProgress
 
     public bool IsDone(eDataType eType)
     {
-        if (false == m_dicAllLoadDatum.ContainsKey(eType))
+        if (false == m_dicAllLoadData.ContainsKey(eType))
             return true;
         
-        foreach (var kvp in m_dicAllLoadDatum[eType])
+        foreach (var kvp in m_dicAllLoadData[eType])
         {
             if (false == kvp.Value.IsDone())
                 return false;
@@ -253,7 +262,7 @@ public class SHLoadProgress
 
     public bool IsRemainLoadWaitQueue()
     {
-        return (0 != m_qLoadDatumWaitQueue.Count);
+        return (0 != m_qLoadDataWaitQueue.Count);
     }
     
     private void AddLoadData(SHLoadData pData)
@@ -261,11 +270,11 @@ public class SHLoadProgress
         if (null == pData)
             return;
 
-        if (false == m_dicAllLoadDatum.ContainsKey(pData.m_eDataType))
-            m_dicAllLoadDatum.Add(pData.m_eDataType, new Dictionary<string, SHLoadDataStateInfo>());
+        if (false == m_dicAllLoadData.ContainsKey(pData.m_eDataType))
+            m_dicAllLoadData.Add(pData.m_eDataType, new Dictionary<string, SHLoadDataStateInfo>());
 
         var pDataStateInfo = new SHLoadDataStateInfo(pData);
-        m_qLoadDatumWaitQueue.Enqueue(pDataStateInfo);
-        m_dicAllLoadDatum[pData.m_eDataType][pData.m_strName.ToLower()] = pDataStateInfo;
+        m_qLoadDataWaitQueue.Enqueue(pDataStateInfo);
+        m_dicAllLoadData[pData.m_eDataType][pData.m_strName.ToLower()] = pDataStateInfo;
     }
 }

@@ -15,36 +15,39 @@ public partial class SHTableData : SHBaseData
     {
         m_dicTables.Clear();
         
-        // 클라 테이블
-        m_dicTables.Add(typeof(JsonClientConfig),     new JsonClientConfig());
-        m_dicTables.Add(typeof(JsonPreloadResources), new JsonPreloadResources());
-        m_dicTables.Add(typeof(JsonResources),        new JsonResources());
-        
         // 인스턴스 테이블
-        m_dicTables.Add(typeof(JsonUserInfo),         new JsonUserInfo());
+        m_dicTables.Add(typeof(SHTableUserInfo),               new SHTableUserInfo());
+
+        // 클라 테이블
+        m_dicTables.Add(typeof(SHTableClientConfig),           new SHTableClientConfig());
+        m_dicTables.Add(typeof(SHTableClientPreloadResources), new SHTableClientPreloadResources());
+        m_dicTables.Add(typeof(SHTableClientResources),        new SHTableClientResources());
 
         // 서버 테이블
-        m_dicTables.Add(typeof(JsonServerConfig),     new JsonServerConfig());
+        m_dicTables.Add(typeof(SHTableServerConfig),           new SHTableServerConfig());
     }
-
+    
     public override void OnFinalize()
     {
         m_dicTables.Clear();
     }
     
-    public override void GetLoadList(eSceneType eType, Action<Dictionary<string, SHLoadData>> pCallback)
+    public async override Task<Dictionary<string, SHLoadData>> GetLoadList(eSceneType eType)
     {
-        var dicLoadList = new Dictionary<string, SHLoadData>();
-        
-        foreach (var kvp in m_dicTables)
+        return await Task.Run(() => 
         {
-            if (true == kvp.Value.IsLoadTable())
-                continue;
+            var dicLoadList = new Dictionary<string, SHLoadData>();
+            
+            foreach (var kvp in m_dicTables)
+            {
+                if (true == kvp.Value.IsLoadTable())
+                    continue;
 
-            dicLoadList.Add(kvp.Value.m_strFileName, CreateLoadInfo(kvp.Value.m_strFileName));
-        }
+                dicLoadList.Add(kvp.Value.m_strIdentity, CreateLoadInfo(kvp.Value));
+            }
 
-        pCallback(dicLoadList);
+            return dicLoadList;
+        });
     }
 
     public async override void Load
@@ -55,7 +58,7 @@ public partial class SHTableData : SHBaseData
     )
     {
         pStart(pInfo.m_strName, new SHLoadStartInfo());
-
+        
         var pTable = await GetTable(pInfo.m_strName);
         if (null == pTable)
         {
@@ -74,12 +77,12 @@ public partial class SHTableData : SHBaseData
         }
     }
     
-    public SHLoadData CreateLoadInfo(string strName)
+    public SHLoadData CreateLoadInfo(SHBaseTable pTable)
     {
         return new SHLoadData()
         {
-            m_eDataType = eDataType.Table,
-            m_strName   = strName,
+            m_eDataType = pTable.m_eDataType,
+            m_strName   = pTable.m_strIdentity,
             m_pLoadFunc = Load
         };
     }
@@ -89,9 +92,9 @@ public partial class SHTableData : SHBaseData
         return await GetTable(typeof(T)) as T;
     }
 
-    public async Task<SHBaseTable> GetTable(string strFileName)
+    public async Task<SHBaseTable> GetTable(string strIdentity)
     {
-        return await GetTable(GetTypeByFileName(strFileName));
+        return await GetTable(GetTypeByIdentity(strIdentity));
     }
 
     public async Task<SHBaseTable> GetTable(Type pType)
@@ -120,23 +123,24 @@ public partial class SHTableData : SHBaseData
                 void pAction(eErrorCode errorCode) { pPromise.TrySetResult(pTable); }
                 switch (pTable.GetTableType())
                 {
-                    case eTableLoadType.Static: pTable.LoadStatic(pAction);                         break;
-                    case eTableLoadType.Byte:   pTable.LoadByte(pTable.m_strByteFileName, pAction); break;
-                    case eTableLoadType.XML:    pTable.LoadXML(pTable.m_strFileName, pAction);      break;
-                    case eTableLoadType.Json:   pTable.LoadJson(pTable.m_strFileName, pAction);     break;
+                    case eTableLoadType.Static: pTable.LoadStatic(pAction); break;
+                    case eTableLoadType.Server: pTable.LoadServer(pAction); break;
+                    case eTableLoadType.Byte:   pTable.LoadByte(pAction);   break;
+                    case eTableLoadType.XML:    pTable.LoadXML(pAction);    break;
+                    case eTableLoadType.Json:   pTable.LoadJson(pAction);   break;
                 }
-            }            
+            }
         }
 
         return await pPromise.Task;
     }
     
-    public Type GetTypeByFileName(string strFileName)
+    public Type GetTypeByIdentity(string strIdentity)
     {
-        strFileName = Path.GetFileNameWithoutExtension(strFileName);
+        strIdentity = Path.GetFileNameWithoutExtension(strIdentity);
         foreach (var kvp in m_dicTables)
         {
-            if (true == kvp.Value.m_strFileName.Equals(strFileName))
+            if (true == kvp.Value.m_strIdentity.Equals(strIdentity))
                 return kvp.Key;
         }
 

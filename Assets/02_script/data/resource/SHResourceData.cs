@@ -24,19 +24,23 @@ public partial class SHResourceData : SHBaseData
         m_dicResources.Clear();
     }
     
-    public async override void GetLoadList(eSceneType eType, Action<Dictionary<string, SHLoadData>> pCallback)
+    public async override Task<Dictionary<string, SHLoadData>> GetLoadList(eSceneType eType)
     {
-        var pTable = await Single.Table.GetTable<JsonPreloadResources>();
+        var pTable = await Single.Table.GetTable<SHTableClientPreloadResources>();
+        
+        var pPromise = new TaskCompletionSource<Dictionary<string, SHLoadData>>();
         var dicLoadList  = new Dictionary<string, SHLoadData>();
         foreach (var strValue in pTable.GetData(eType))
         {
             if (true == m_dicResources.ContainsKey(strValue.ToLower()))
                 continue;
             
+            Debug.LogFormat("로드리스트 : {0}", strValue);
             dicLoadList.Add(strValue, CreateLoadInfo(strValue));
         };
-        
-        pCallback(dicLoadList);
+        pPromise.TrySetResult(dicLoadList);
+
+        return await pPromise.Task;
     }
     
     public async override void Load
@@ -54,7 +58,7 @@ public partial class SHResourceData : SHBaseData
             return;
         }
 
-        var pTable = await Single.Table.GetTable<JsonResources>();
+        var pTable = await Single.Table.GetTable<SHTableClientResources>();
         var pResourceInfo = pTable.GetResouceInfo(pInfo.m_strName);
         if (null == pResourceInfo)
         {
@@ -204,7 +208,7 @@ public partial class SHResourceData : SHBaseData
             return await pPromise.Task;
         }
 
-        var pTable = await Single.Table.GetTable<JsonResources>();
+        var pTable = await Single.Table.GetTable<SHTableClientResources>();
         var pInfo = pTable.GetResouceInfo(strFileName);
         if (null == pInfo)
         {

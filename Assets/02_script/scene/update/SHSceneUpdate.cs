@@ -11,21 +11,13 @@ public class SHSceneUpdate : MonoBehaviour
     {
         Single.AppInfo.CreateSingleton();
     }
-
+    
     void Start()
     {
-        UpdateData();
-    }
-
-    void UpdateData()
-    {
-        Single.Network.GET(SHAPIs.SH_API_GET_CONFIG, null, async (reply) => 
+        Single.Data.Load(eSceneType.Update, (pLoadInfo)=>
         {
-            if (reply.isSucceed)
+            if (pLoadInfo.IsSucceed())
             {
-                var pConfig = await Single.Table.GetTable<JsonServerConfig>();
-                pConfig.LoadJsonTable(reply.data);
-
                 Single.Scene.LoadScene(eSceneType.Login, pCallback: (pReply) => 
                 {
 
@@ -33,9 +25,12 @@ public class SHSceneUpdate : MonoBehaviour
             }
             else
             {
-                var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-                pUIRoot.ShowAlert("Config 테이블 다운로드 실패!!");
+                // 재시도 처리
             }
+        }, 
+        (pProgressInfo)=>
+        {
+            // UI 표현 처리
         });
     }
 }

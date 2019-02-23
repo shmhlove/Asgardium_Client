@@ -59,7 +59,7 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
     
     async void SetApplicationInfo()
     {
-        var pTable = await Single.Table.GetTable<JsonClientConfig>();
+        var pTable = await Single.Table.GetTable<SHTableClientConfig>();
         
         SetFrameRate(pTable.FrameRate);
         SetSleepMode();
@@ -219,7 +219,7 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
     // 디버그 : 앱 정보 출력
     async void DrawAppInformation()
     {
-        var pTable = await Single.Table.GetTable<JsonClientConfig>();
+        var pTable = await Single.Table.GetTable<SHTableClientConfig>();
 
         GUIStyle pStyle = new GUIStyle(GUI.skin.box)
         {

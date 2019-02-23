@@ -18,13 +18,13 @@ public class SHResourcesInfo
     public eResourceType    m_eResourceType;       // 리소스 타입
 }
 
-public class JsonResources : SHBaseTable
+public class SHTableClientResources : SHBaseTable
 {
     Dictionary<string, SHResourcesInfo> m_pData = new Dictionary<string, SHResourcesInfo>();
 
-    public JsonResources()
+    public SHTableClientResources()
     {
-        m_strFileName = "JsonResourcesInfo";
+        m_strIdentity = "ResourcesInfo";
     }
     
     public override void Initialize()
@@ -34,12 +34,12 @@ public class JsonResources : SHBaseTable
 
     public override bool IsLoadTable()
     {
-        return (0 != m_pData.Count);
+        return m_bIsLoaded;
     }
 
-    public override void LoadJson(string strFileName, Action<eErrorCode> pCallback)
+    public override void LoadJson(Action<eErrorCode> pCallback)
     {
-        var pTextAsset = Resources.Load<TextAsset>(string.Format("Table/Json/{0}", strFileName));
+        var pTextAsset = Resources.Load<TextAsset>(string.Format("Table/Json/{0}", GetFileName(eTableLoadType.Json)));
         if (null == pTextAsset)
         {
             pCallback(eErrorCode.Table_Not_ExsitFile);
@@ -47,7 +47,9 @@ public class JsonResources : SHBaseTable
         else
         {
             Initialize();
-            pCallback(LoadJsonTable(JsonMapper.ToObject(pTextAsset.text)));
+            var errorCode = LoadJsonTable(JsonMapper.ToObject(pTextAsset.text));
+            m_bIsLoaded = errorCode == eErrorCode.Succeed;
+            pCallback(errorCode);
         }
     }
 
@@ -81,7 +83,7 @@ public class JsonResources : SHBaseTable
     {
         if (false == IsLoadTable())
         {
-            LoadJson(m_strFileName, (errorCode) => { });
+            LoadJson((errorCode) => { });
         }
 
         strName = strName.ToLower().Trim();

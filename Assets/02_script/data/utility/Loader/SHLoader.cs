@@ -31,7 +31,7 @@ public partial class SHLoader
     {
         Initialize();
         
-        AddLoadDatum(pLoadList);
+        AddLoadDatas(pLoadList);
         AddLoadEvent(pDone, pProgress);
         
         if (false == IsRemainLoadFiles())

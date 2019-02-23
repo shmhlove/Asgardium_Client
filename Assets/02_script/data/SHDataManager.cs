@@ -76,33 +76,21 @@ public class SHDataManager : SHSingleton<SHDataManager>
         return m_pLoader.IsLoadDone(eType);
     }
     
-    void GetLoadList(eSceneType eType, Action<List<Dictionary<string, SHLoadData>>> pCallback)
+    private async void GetLoadList(eSceneType eType, Action<List<Dictionary<string, SHLoadData>>> pCallback)
     {
-        Table.GetLoadList(eType, (pTableList) => 
+        pCallback(new List<Dictionary<string, SHLoadData>>()
         {
-            Resources.GetLoadList(eType, (pResourcesList) => 
-            {
-                pCallback(new List<Dictionary<string, SHLoadData>>()
-                {
-                    pTableList,
-                    pResourcesList
-                });
-            });
+            await Table.GetLoadList(eType),
+            await Resources.GetLoadList(eType)
         });
     }
     
-    void GetPatchList(Action<List<Dictionary<string, SHLoadData>>> pCallback)
+    private async void GetPatchList(Action<List<Dictionary<string, SHLoadData>>> pCallback)
     {
-        Table.GetPatchList((pTableList) => 
+        pCallback(new List<Dictionary<string, SHLoadData>>()
         {
-            Resources.GetPatchList((pResourcesList) => 
-            {
-                pCallback(new List<Dictionary<string, SHLoadData>>()
-                {
-                    pTableList,
-                    pResourcesList
-                });
-            });
+            await Table.GetPatchList(),
+            await Resources.GetPatchList()
         });
     }
     

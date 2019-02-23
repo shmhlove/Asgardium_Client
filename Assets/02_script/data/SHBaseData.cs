@@ -12,17 +12,15 @@ public class SHBaseData
     public virtual void OnFinalize() { }
     public virtual void FrameMove() { }
 
-    public async virtual void GetLoadList(eSceneType eType, Action<Dictionary<string, SHLoadData>> pCallback)
+    public async virtual Task<Dictionary<string, SHLoadData>>  GetLoadList(eSceneType eType)
     {
-        pCallback(new Dictionary<string, SHLoadData>());
-        await Task.Run(() => { });
+        return await Task.Run(() => { return new Dictionary<string, SHLoadData>(); });
     }
-    public async virtual void GetPatchList(Action<Dictionary<string, SHLoadData>> pCallback)
+    public async virtual Task<Dictionary<string, SHLoadData>>  GetPatchList()
     {
-        pCallback(new Dictionary<string, SHLoadData>());
-        await Task.Run(() => { });
+        return await Task.Run(() => { return new Dictionary<string, SHLoadData>(); });
     }
-
+    
     // 로드가 성공하든 실패하든 pDone를 반드시 호출해줘야 한다~!!
     // pDone이 호출되지 않으면 로더가 무한히 기다린다. 
     // 데이터별 로드시간이 천차만별이기에 타임아웃을 넣을 수도 없다.

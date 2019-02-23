@@ -44,11 +44,11 @@ public class SHConverterTableToByte
         if (null == pBytes)
             return false;
         
-        SHUtils.SaveByte(pBytes, string.Format("{0}/{1}{2}", strSavePath, pTable.m_strByteFileName, ".bytes"));
+        SHUtils.SaveByte(pBytes, string.Format("{0}/{1}{2}", strSavePath, pTable.GetFileName(eTableLoadType.Byte), ".bytes"));
 
         Debug.Log(string.Format("[LSH] {0} To Converter Byte Files : {1}",
                     (true == pTable.IsLoadTable() ? "<color=yellow>Success</color>" : "<color=red>Fail!!</color>"),
-                    pTable.m_strFileName));
+                    pTable.GetFileName(eTableLoadType.Byte)));
 
         return true;
     }

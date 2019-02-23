@@ -25,7 +25,7 @@ public class SHSceneUpdate : MonoBehaviour
             }
             else
             {
-                // 재시도 처리
+                // 업데이트 실패!! 재시도 유도 처리
             }
         }, 
         (pProgressInfo)=>

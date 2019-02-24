@@ -78,7 +78,10 @@ public class SHBusinessLogin : MonoBehaviour
             var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
             pUIRoot.ShowAlert(reply.ToString(), () => 
             {
-                Single.Scene.LoadScene(eSceneType.Lobby, bIsUseFade:true);
+                if (reply.isSucceed)
+                {
+                    Single.Scene.LoadScene(eSceneType.Lobby, bIsUseFade: true);
+                }
             });
         });
     }

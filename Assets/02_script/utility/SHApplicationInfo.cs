@@ -52,11 +52,6 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
         }
     }
     
-    void OnGUI()
-    {
-        DrawAppInformation();
-    }
-    
     async void SetApplicationInfo()
     {
         var pTable = await Single.Table.GetTable<SHTableClientConfig>();
@@ -217,26 +212,26 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
     }
     
     // 디버그 : 앱 정보 출력
-    async void DrawAppInformation()
+    void DrawAppInformation()
     {
-        var pTable = await Single.Table.GetTable<SHTableClientConfig>();
+        //var pTable = await Single.Table.GetTable<SHTableClientConfig>();
 
-        GUIStyle pStyle = new GUIStyle(GUI.skin.box)
-        {
-            fontSize = GetRatioW(20)
-        };
+        //GUIStyle pStyle = new GUIStyle(GUI.skin.box)
+        //{
+        //    fontSize = GetRatioW(20)
+        //};
 
-        // Left Bottom
-        GUI.Box(new Rect(5, (Screen.height - GetRatioH(35)), GetRatioW(250), GetRatioH(30)),
-            string.Format("{0} : {1} Scene", GetRuntimePlatform(), Single.Scene.GetActiveScene()), pStyle);
+        //// Left Bottom
+        //GUI.Box(new Rect(5, (Screen.height - GetRatioH(35)), GetRatioW(250), GetRatioH(30)),
+        //    string.Format("{0} : {1} Scene", GetRuntimePlatform(), Single.Scene.GetActiveScene()), pStyle);
         
-        // Center Bottom
-        GUI.Box(new Rect((Screen.width * 0.5f) - (GetRatioW(120) * 0.5f), (Screen.height - GetRatioH(35)), GetRatioW(120), GetRatioH(30)),
-            string.Format("v{0}", pTable.Version), pStyle);
+        //// Center Bottom
+        //GUI.Box(new Rect((Screen.width * 0.5f) - (GetRatioW(120) * 0.5f), (Screen.height - GetRatioH(35)), GetRatioW(120), GetRatioH(30)),
+        //    string.Format("v{0}", pTable.Version), pStyle);
         
-        // Right Bottom
-        GUI.Box(new Rect(Screen.width - GetRatioW(255), (Screen.height - GetRatioH(35)), GetRatioW(250), GetRatioH(30)),
-            string.Format("ServiceMode : {0}", pTable.ServiceMode), pStyle);
+        //// Right Bottom
+        //GUI.Box(new Rect(Screen.width - GetRatioW(255), (Screen.height - GetRatioH(35)), GetRatioW(250), GetRatioH(30)),
+        //    string.Format("ServiceMode : {0}", pTable.ServiceMode), pStyle);
     }
     
     // 디버그 : 실시간 로드 리소스 리스트

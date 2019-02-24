@@ -8,46 +8,51 @@ using LitJson;
 
 public class SHBusinessLogin : MonoBehaviour
 {
+    [Header("UI Objects")]
+    private SHUIPanelSignin m_pUIPanelSignin = null;
+    private SHUIPanelSignup m_pUIPanelSignup = null;
+
     private void Awake()
     {
         Single.AppInfo.CreateSingleton();
     }
 
-    private void Start()
-    {
-        ShowLoginPanel(
-            SHPlayerPrefs.GetString("auth_email"), 
-            SHPlayerPrefs.GetString("auth_password"),
-            (0 == SHPlayerPrefs.GetInt("auth_is_save")) ? (bool?)null : (1 == SHPlayerPrefs.GetInt("auth_is_save")));
-    }
-
-    private async void ShowLoginPanel(string strEmail, string strPass, bool? bIsSave)
+    private async void Start()
     {
         var pUIRoot = await Single.UI.GetRoot<SHUIRootLogin>(SHUIConstant.ROOT_LOGIN);
-        pUIRoot.CloseSignupPanel();
+        m_pUIPanelSignin = await pUIRoot.GetPanel<SHUIPanelSignin>(SHUIConstant.PANEL_SIGNIN);
+        m_pUIPanelSignup = await pUIRoot.GetPanel<SHUIPanelSignup>(SHUIConstant.PANEL_SIGNUP);
+
+        ShowSigninPanel(SHPlayerPrefs.GetString("auth_email"), 
+                        SHPlayerPrefs.GetString("auth_password"),
+                        SHPlayerPrefs.GetBool("auth_is_save"));
+    }
+
+    private void ShowSigninPanel(string strEmail, string strPass, bool? bIsSave)
+    {
+        m_pUIPanelSignup.Close();
 
         Action<string, string, bool> EventLogin = OnClickLogin;
         Action<string, string> EventSignup = OnClickSignup;
 
-        pUIRoot.ShowLoginPanel(EventLogin, EventSignup, strEmail, strPass, bIsSave);
+        m_pUIPanelSignin.Show(EventLogin, EventSignup, strEmail, strPass, bIsSave);
     }
 
-    private async void ShowSignupPanel(string strEmail)
+    private void ShowSignupPanel(string strEmail)
     {
-        var pUIRoot = await Single.UI.GetRoot<SHUIRootLogin>(SHUIConstant.ROOT_LOGIN);
-        pUIRoot.CloseLoginPanel();
+        m_pUIPanelSignin.Close();
 
         Action<string, string, string> EventRegistrationUser = OnClickRegistrationUser;
         Action<string, string, string> EventGoBackLogin = OnClickGoBackLogin;
 
-        pUIRoot.ShowSignupPanel(EventRegistrationUser, EventGoBackLogin, strEmail);
+        m_pUIPanelSignup.Show(EventRegistrationUser, EventGoBackLogin, strEmail);
     }
 
     private async void OnClickLogin(string strEmail, string strPassword, bool bIsSave)
     {
         if (false == SHUtils.IsValidEmail(strEmail))
         {
-            var pUIRoot = await Single.UI.GetGlobalRoot();
+            var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
             pUIRoot.ShowAlert("올바른 이메일 형식이 아닙니다.");
             return;
         }
@@ -66,17 +71,14 @@ public class SHBusinessLogin : MonoBehaviour
                 
                 SHPlayerPrefs.SetString("auth_email", bIsSave ? pUserInfo.UserEmail : string.Empty);
                 SHPlayerPrefs.SetString("auth_password", bIsSave ? pUserInfo.Password : string.Empty);
-                SHPlayerPrefs.SetInt("auth_is_save", bIsSave ? 1 : 2);
+                SHPlayerPrefs.SetBool("auth_is_save", bIsSave);
                 SHPlayerPrefs.Save();
             }
             
-            var pUIRoot = await Single.UI.GetGlobalRoot();
+            var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
             pUIRoot.ShowAlert(reply.ToString(), () => 
             {
-                if (reply.isSucceed)
-                {
-                    Single.Scene.LoadScene(eSceneType.Lobby, bIsUseFade:true);
-                }
+                Single.Scene.LoadScene(eSceneType.Lobby, bIsUseFade:true);
             });
         });
     }
@@ -90,7 +92,7 @@ public class SHBusinessLogin : MonoBehaviour
     {
         if (false == SHUtils.IsValidEmail(strEmail))
         {
-            var pUIRoot = await Single.UI.GetGlobalRoot();
+            var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
             pUIRoot.ShowAlert("올바른 이메일 형식이 아닙니다.");
             return;
         }
@@ -103,12 +105,12 @@ public class SHBusinessLogin : MonoBehaviour
         };
         Single.Network.POST(SHAPIs.SH_API_SIGNUP, json, async (reply) =>
         {
-            var pUIRoot = await Single.UI.GetGlobalRoot();
+            var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
             pUIRoot.ShowAlert(reply.ToString(), () => 
             {
                 if (reply.isSucceed)
                 {
-                    ShowLoginPanel(strEmail, "", null);
+                    ShowSigninPanel(strEmail, "", null);
                 }
             });
         });
@@ -116,6 +118,6 @@ public class SHBusinessLogin : MonoBehaviour
 
     private void OnClickGoBackLogin(string strEmail, string strName, string strPassword)
     {
-        ShowLoginPanel(strEmail, "", null);
+        ShowSigninPanel(strEmail, "", null);
     }
 }

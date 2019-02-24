@@ -46,6 +46,23 @@ public class SHPlayerPrefs
     #endregion
 
 
+    #region Interface bool
+    public static void SetBool(string strKey, bool bValue)
+    {
+        PlayerPrefs.SetInt(strKey, bValue ? 1 : 0);
+        SaveEncryption(strKey, "int", (bValue ? 1 : 0).ToString());
+    }
+
+    public static bool? GetBool(string strKey)
+    {
+        int iValue = PlayerPrefs.GetInt(strKey);
+        if (false == CheckEncryption(strKey, "int", iValue.ToString()))
+            return null;
+
+        return (0 != iValue);
+    }
+    #endregion
+
     #region Interface Int
     public static void SetInt(string strKey, int iValue)
     {
@@ -53,12 +70,12 @@ public class SHPlayerPrefs
         SaveEncryption(strKey, "int", iValue.ToString());
     }
     
-    public static int GetInt(string strKey)
+    public static int? GetInt(string strKey)
     {
-        return GetInt(strKey, 0);
+        return GetInt(strKey, null);
     }
     
-    public static int GetInt(string strKey, int iDefaultValue)
+    public static int? GetInt(string strKey, int? iDefaultValue)
     {
         int iValue = PlayerPrefs.GetInt(strKey);
         if (false == CheckEncryption(strKey, "int", iValue.ToString()))
@@ -76,16 +93,16 @@ public class SHPlayerPrefs
         SaveEncryption(strKey, "float", Mathf.Floor(fValue * 1000.0f).ToString());
     }
     
-    public static float GetFloat(string strKey)
+    public static float? GetFloat(string strKey)
     {
-        return GetFloat(strKey, 0f);
+        return GetFloat(strKey, null);
     }
     
-    public static float GetFloat(string strKey, float iDefaultValue)
+    public static float? GetFloat(string strKey, float? fDefaultValue)
     {
         float fValue = PlayerPrefs.GetFloat(strKey);
         if (false == CheckEncryption(strKey, "float", Mathf.Floor(fValue * 1000.0f).ToString()))
-            return iDefaultValue;
+            return fDefaultValue;
 
         return fValue;
     }
@@ -101,14 +118,14 @@ public class SHPlayerPrefs
     
     public static string GetString(string strKey)
     {
-        return GetString(strKey, "");
+        return GetString(strKey, string.Empty);
     }
     
-    public static string GetString(string strKey, string iDefaultValue)
+    public static string GetString(string strKey, string strDefaultValue)
     {
         string value = PlayerPrefs.GetString(strKey);
         if (false == CheckEncryption(strKey, "string", value))
-            return iDefaultValue;
+            return strDefaultValue;
 
         return value;
     }

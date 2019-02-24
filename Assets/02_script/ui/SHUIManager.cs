@@ -67,9 +67,4 @@ public class SHUIManager : SHSingleton<SHUIManager>
         
         return await pPromise.Task;
     }
-
-    public async Task<SHUIRootGlobal> GetGlobalRoot()
-    {
-        return await GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-    }
 }

@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+// UI 리소스 관리와 동적로드에 필요한 파일이름 리스트
 public static class SHUIConstant
 {
     // Global Root
@@ -25,7 +26,6 @@ public static class SHUIConstant
 
     // Lobby Root
     public static string ROOT_LOBBY = "UI Root - Lobby";
-    public static string PANEL_MENU_BAR = "Panel - MenuBar";
     public static string PANEL_MINING = "Panel - Mining";
     public static string PANEL_STORAGE = "Panel - Storage";
     public static string PANEL_MARKET = "Panel - Market";

@@ -46,7 +46,8 @@ public partial class SHBusinessLobby : MonoBehaviour
         if ((null == m_pUserInfo) || (null == m_pServerConfig))
             return;
 
-        var LastMiningPowerAt = m_pUserInfo.MiningPowerAt;
+        var Epsilon = 500;
+        var LastMiningPowerAt = m_pUserInfo.MiningPowerAt - Epsilon;
 
         var timeSpan = (DateTime.UtcNow - SHUtils.GetUCTTimeByMillisecond(LastMiningPowerAt));
         var curPowerCount = (int)(timeSpan.TotalMilliseconds / m_pServerConfig.BasicChargeTime);

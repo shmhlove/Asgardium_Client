@@ -359,7 +359,7 @@ public abstract class SHBaseTable
         if (true == string.IsNullOrEmpty(strDate))
             return DateTime.Now;
 
-        return SHUtils.GetDateTimeToString(strDate, strFormat);
+        return SHUtils.GetDateTimeByString(strDate, strFormat);
     }
     #endregion
 }

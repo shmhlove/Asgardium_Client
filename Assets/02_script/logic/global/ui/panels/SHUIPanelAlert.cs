@@ -41,7 +41,7 @@ public class SHUIPanelAlert : SHUIPanel
 
             m_pTextListBody.Clear();
             m_pTextListBody.textLabel.pivot = UIWidget.Pivot.Center;
-            m_pTextListBody.Add((string)pArgs[1]);
+            m_pTextListBody.Add("[BAC4C4]" + (string)pArgs[1] + "[-]");
 
             switch ((eAlertButtonType)pArgs[2])
             {

@@ -17,19 +17,19 @@ public static partial class SHUtils
         return ((DateTime.Now - pTime).TotalMilliseconds / 1000.0);
     }
 
-    public static DateTime GetDateTimeToString(string strDate, string strFormat)
+    public static DateTime GetDateTimeByString(string strDate, string strFormat)
     {
         return DateTime.ParseExact(strDate, strFormat, System.Globalization.CultureInfo.InstalledUICulture);
     }
     
-    public static string GetStringToDateTime(DateTime pTime, string strFormat)
+    public static string GetStringByDateTime(DateTime pTime, string strFormat)
     {
         return pTime.ToString(strFormat, System.Globalization.CultureInfo.InstalledUICulture);
     }
 
-    public static DateTime GetDateTimeByMillisecond(long milliseconds)
+    public static DateTime GetUCTTimeByMillisecond(long milliseconds)
     {
-        return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(milliseconds).ToLocalTime();
+        return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(milliseconds).ToUniversalTime();
     }
 
     public static long GetTotalMillisecondsForUTC()

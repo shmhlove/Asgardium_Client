@@ -40,6 +40,30 @@ public class SHTableUserInfo : SHBaseTable
         UpdatedAt = GetLongToJson(pJson, "updated_at");
         MiningPowerAt = GetLongToJson(pJson, "mining_power_at");
 
+        m_bIsLoaded = true;
+
         return eErrorCode.Succeed;
+    }
+    
+    public void CheckUserInfoLoadedForDevelop()
+    {
+        if (true == m_bIsLoaded)
+            return;
+        
+        JsonData json = new JsonData
+        {
+            ["email"] = "shmhlove@naver.com",
+            ["password"] = "1234"
+        };
+        Single.Network.POST(SHAPIs.SH_API_LOGIN, json, async (reply) =>
+        {
+            if (reply.isSucceed)
+            {
+                LoadJsonTable(reply.data);
+            }
+            
+            var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
+            pUIRoot.ShowAlert(reply.ToString());
+        });
     }
 }

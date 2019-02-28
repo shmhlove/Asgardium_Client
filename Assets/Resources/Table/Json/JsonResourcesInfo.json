@@ -20,16 +20,24 @@
         "s_Name" : "JsonClientConfig",
         "s_FileName" : "JsonClientConfig.json",
         "s_Extension" : ".json",
-        "s_Size"      : "401",
-        "s_Hash"      : "4E4044D7E48B4D8D9BA1BDF1E4CB8E6A",
+        "s_Size"      : "434",
+        "s_Hash"      : "B24A4F38901315C75F6A408CCD266FE4",
         "s_Path"      : "Table/Json/JsonClientConfig"
+    },
+    {
+        "s_Name" : "JsonClientString_en",
+        "s_FileName" : "JsonClientString_en.json",
+        "s_Extension" : ".json",
+        "s_Size"      : "447",
+        "s_Hash"      : "A6A5BF4F2074ECBA303FA6800214612C",
+        "s_Path"      : "Table/Json/JsonClientString_en"
     },
     {
         "s_Name" : "JsonClientString_kr",
         "s_FileName" : "JsonClientString_kr.json",
         "s_Extension" : ".json",
-        "s_Size"      : "171",
-        "s_Hash"      : "6097DC36555E2940A2C56E1E17029D95",
+        "s_Size"      : "499",
+        "s_Hash"      : "834AF6A23B54CAD4D28A663C2A7BD0BB",
         "s_Path"      : "Table/Json/JsonClientString_kr"
     },
     {
@@ -44,8 +52,8 @@
         "s_Name" : "JsonResourcesInfo",
         "s_FileName" : "JsonResourcesInfo.json",
         "s_Extension" : ".json",
-        "s_Size"      : "1136",
-        "s_Hash"      : "90F4CE1CFD3F98A562FA587F4D44AD11",
+        "s_Size"      : "1657",
+        "s_Hash"      : "0C3BF4B8471781EAA132E41D34CA415E",
         "s_Path"      : "Table/Json/JsonResourcesInfo"
     }
 ]

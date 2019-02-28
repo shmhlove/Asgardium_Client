@@ -1,0 +1,20 @@
+
+[
+  {
+    // 시스템 에러
+    "1000" : "Login is required.",
+    "1001" : "This is not a valid email format.",
+
+    // 로그인
+    "10000": "Email",
+    "10001": "Password",
+    "10002": "Nickname",
+    "10003": "Sing-in",
+    "10004": "Sing-up",
+    "10005": "Regist",
+    "10006": "Please enter an email.",
+    "10007": "Please enter your Password.",
+    "10008": "Save login information",
+    "10009": "Please enter your nickname."
+  }
+]

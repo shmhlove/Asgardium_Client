@@ -69,7 +69,8 @@ public partial class SHBusinessLobby : MonoBehaviour
         if (null == m_pUserInfo)
         {
             var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-            pUIRoot.ShowAlert("로그인이 안되어 있어서 지금 통신못함.");
+            var pTable = await Single.Table.GetTable<SHTableClientString>();
+            pUIRoot.ShowAlert(pTable.GetString("1000"));
             return;
         }
 
@@ -103,7 +104,8 @@ public partial class SHBusinessLobby : MonoBehaviour
         if (null == m_pUserInfo)
         {
             var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-            pUIRoot.ShowAlert("로그인이 안되어 있어서 지금 통신못함.");
+            var pTable = await Single.Table.GetTable<SHTableClientString>();
+            pUIRoot.ShowAlert(pTable.GetString("1000"));
             return;
         }
 

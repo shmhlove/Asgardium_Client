@@ -53,7 +53,8 @@ public class SHBusinessLogin : MonoBehaviour
         if (false == SHUtils.IsValidEmail(strEmail))
         {
             var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-            pUIRoot.ShowAlert("올바른 이메일 형식이 아닙니다.");
+            var pTable = await Single.Table.GetTable<SHTableClientString>();
+            pUIRoot.ShowAlert(pTable.GetString("1001"));
             return;
         }
 
@@ -96,7 +97,8 @@ public class SHBusinessLogin : MonoBehaviour
         if (false == SHUtils.IsValidEmail(strEmail))
         {
             var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-            pUIRoot.ShowAlert("올바른 이메일 형식이 아닙니다.");
+            var pTable = await Single.Table.GetTable<SHTableClientString>();
+            pUIRoot.ShowAlert(pTable.GetString("1001"));
             return;
         }
 

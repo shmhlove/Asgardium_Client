@@ -48,6 +48,14 @@ public class SHTableClientString : SHBaseTable
         LoadJson(pCallback);
     }
     
+    public string GetString(string strID)
+    {
+        if (false == m_dicData.ContainsKey(strID))
+            return string.Format("string value empty for '{0}'", strID);
+        
+        return m_dicData[strID];
+    }
+
     private string GetLanguageCode(SystemLanguage eLanguage)
     {
         switch(eLanguage)

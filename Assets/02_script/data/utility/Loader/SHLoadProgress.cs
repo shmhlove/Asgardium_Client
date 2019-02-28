@@ -234,7 +234,16 @@ public class SHLoadProgress
 
     public bool IsDone()
     {
-        return ((0 == m_dicLoadingData.Count) && (0 == m_qLoadDataWaitQueue.Count));
+        foreach (var outkvp in m_dicAllLoadData)
+        {
+            foreach (var inkvp in outkvp.Value)
+            {
+                if (false == inkvp.Value.IsDone())
+                    return false;
+            }
+        }
+        
+        return true;
     }
 
     public bool IsDone(string strFileName)

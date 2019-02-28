@@ -212,7 +212,7 @@ public partial class SHResourceData : SHBaseData
         var pInfo = pTable.GetResouceInfo(strFileName);
         if (null == pInfo)
         {
-            Debug.Log(string.Format("[LSH] 리소스 테이블에 {0}가 없습니다.(파일이 없거나 리소스 리스팅이 안되었음)", strFileName));
+            Debug.LogErrorFormat("[LSH] 리소스 테이블에 {0}가 없습니다.(파일이 없거나 리소스 리스팅이 안되었음)", strFileName);
             pPromise.TrySetResult(null);
         }
         else

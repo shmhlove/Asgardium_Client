@@ -22,9 +22,11 @@ public partial class SHTableData : SHBaseData
         m_dicTables.Add(typeof(SHTableClientConfig),           new SHTableClientConfig());
         m_dicTables.Add(typeof(SHTableClientPreloadResources), new SHTableClientPreloadResources());
         m_dicTables.Add(typeof(SHTableClientResources),        new SHTableClientResources());
+        m_dicTables.Add(typeof(SHTableClientString),           new SHTableClientString());
 
         // 서버 테이블
         m_dicTables.Add(typeof(SHTableServerConfig),           new SHTableServerConfig());
+        m_dicTables.Add(typeof(SHTableServerOracleCompanyAM),  new SHTableServerOracleCompanyAM());
     }
     
     public override void OnFinalize()

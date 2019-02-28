@@ -97,7 +97,7 @@ public class SHReply
 
         if (null != this.data)
         {
-            Debug.LogFormat("[RESPONSE Succeed] : {0} {1}\n{2}",
+            Debug.LogFormat("[RESPONSE] : {0} {1}\n{2}",
                 request.method,
                 request.url,
                 this.data.ToJson());
@@ -105,7 +105,7 @@ public class SHReply
 
         if (null != this.error)
         {
-            Debug.LogFormat("[RESPONSE Error] : {0} {1}\n{2}",
+            Debug.LogErrorFormat("[RESPONSE] : {0} {1}\n{2}",
                 request.method,
                 request.url,
                 this.error.ToString());
@@ -115,7 +115,7 @@ public class SHReply
           && (null == this.error)
           && (null != this.rawResponse))
         {
-            Debug.LogFormat("[RESPONSE rawData] : {0} {1}\n{2}",
+            Debug.LogFormat("[RESPONSE] : {0} {1}\n{2}",
                 request.method,
                 request.url,
                 this.rawResponse.ToJson());

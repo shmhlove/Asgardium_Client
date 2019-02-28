@@ -51,16 +51,16 @@ public partial class SHBusinessLobby : MonoBehaviour
 
         var timeSpan = (DateTime.UtcNow - SHUtils.GetUCTTimeByMillisecond(LastMiningPowerAt));
         var curPowerCount = (int)(timeSpan.TotalMilliseconds / m_pServerConfig.BasicChargeTime);
-        var curPowerremindTime = (timeSpan.TotalMilliseconds % m_pServerConfig.BasicChargeTime);
+        var curLeftTime = (timeSpan.TotalMilliseconds % m_pServerConfig.BasicChargeTime);
 
-        curPowerCount = Math.Min(curPowerCount, m_pServerConfig.BasicMiningPower);
-        string strCountInfo = string.Format("{0}/{1}", curPowerCount, m_pServerConfig.BasicMiningPower);
+        curPowerCount = Math.Min(curPowerCount, m_pServerConfig.BasicMiningPowerCount);
+        string strCountInfo = string.Format("{0}/{1}", curPowerCount, m_pServerConfig.BasicMiningPowerCount);
 
-        var pRemindTime = TimeSpan.FromMilliseconds(m_pServerConfig.BasicChargeTime - curPowerremindTime);
+        var pLeftTime = TimeSpan.FromMilliseconds(m_pServerConfig.BasicChargeTime - curLeftTime);
         
-        var iRemindMinutes = (int)(pRemindTime.TotalSeconds / 60);
-        var iRemindSecond = (int)(pRemindTime.TotalSeconds % 60);
-        string strTimer = (curPowerCount < m_pServerConfig.BasicMiningPower) ? string.Format("{0:00}:{1:00}", iRemindMinutes, iRemindSecond) : "--:--";
+        var iLeftMinutes = (int)(pLeftTime.TotalSeconds / 60);
+        var iLeftSecond = (int)(pLeftTime.TotalSeconds % 60);
+        string strTimer = (curPowerCount < m_pServerConfig.BasicMiningPowerCount) ? string.Format("{0:00}:{1:00}", iLeftMinutes, iLeftSecond) : "--:--";
         m_pUIPanelMining.SetActiveInformation(strCountInfo, strTimer);
     }
 
@@ -81,7 +81,11 @@ public partial class SHBusinessLobby : MonoBehaviour
         {
             if (reply.isSucceed)
             {
-                m_pUserInfo.LoadJsonTable(reply.data);
+                // 시간차 문제가 있어 1초 뒤 갱신해주도록 해보았다.
+                Single.Coroutine.WaitTime(1.0f, () => 
+                {
+                    m_pUserInfo.LoadJsonTable(reply.data);
+                });
             }
             else
             {
@@ -90,7 +94,7 @@ public partial class SHBusinessLobby : MonoBehaviour
             }
         });
         
-        // var milliSeconds = SHUtils.GetTotalMillisecondsForUTC() - (m_pServerConfig.BasicChargeTime * m_pServerConfig.BasicMiningPower);
+        // var milliSeconds = SHUtils.GetTotalMillisecondsForUTC() - (m_pServerConfig.BasicChargeTime * m_pServerConfig.BasicMiningPowerCount);
         // m_pUserInfo.MiningPowerAt = milliSeconds;
     }
 
@@ -111,7 +115,11 @@ public partial class SHBusinessLobby : MonoBehaviour
         {
             if (reply.isSucceed)
             {
-                m_pUserInfo.LoadJsonTable(reply.data);
+                // 시간차 문제가 있어 1초 뒤 갱신해주도록 해보았다.
+                Single.Coroutine.WaitTime(1.0f, () => 
+                {
+                    m_pUserInfo.LoadJsonTable(reply.data);
+                });
             }
             else
             {
@@ -135,13 +143,13 @@ public partial class SHBusinessLobby : MonoBehaviour
             if (null == m_pUserInfo)
             {
                 ResetUserInfo();
-                yield return null;
+                yield return new WaitForSeconds(3.0f);
             }
 
             if (null == m_pServerConfig)
             {
                 ResetServerConfig();
-                yield return null;
+                yield return new WaitForSeconds(3.0f);
             }
 
             UpdateActiveInformation();

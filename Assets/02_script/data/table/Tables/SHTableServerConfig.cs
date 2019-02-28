@@ -9,7 +9,7 @@ using LitJson;
 
 public class SHTableServerConfig : SHBaseTable
 {
-    public int BasicMiningPower = 0;
+    public int BasicMiningPowerCount = 0;
     public int BasicChargeTime = 0;
 	
     public SHTableServerConfig()
@@ -42,7 +42,7 @@ public class SHTableServerConfig : SHBaseTable
         if (null == pJson)
             return eErrorCode.Table_LoadFailed;
         
-        BasicMiningPower = GetIntToJson(pJson, "basic_mining_power");
+        BasicMiningPowerCount = GetIntToJson(pJson, "basic_mining_power_count");
         BasicChargeTime = GetIntToJson(pJson, "basic_charge_time");
 
         return eErrorCode.Succeed;

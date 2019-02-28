@@ -21,6 +21,8 @@ public partial class SHBusinessLobby : MonoBehaviour
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
         pUserInfo.CheckUserInfoLoadedForDevelop();
 
+        var pOracleCompanyAM = await Single.Table.GetTable<SHTableServerOracleCompanyAM>();
+
         var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
         m_pUIPanelMining = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
         

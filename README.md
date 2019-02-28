@@ -56,6 +56,14 @@ Having trouble with Pages? Check out our [documentation](https://help.github.com
 
 --------------------------------------------------------------------------------------------------------------------
 
+# nodemon
+재시작 하는게 귀찮다면 nodemon 도구를 사용해서 서버를 실행하면 서버가 수정 될 때마다 자동으로 재시작
+
+npm install -g nodemon
+nodemon server.js
+
+--------------------------------------------------------------------------------------------------------------------
+
 # 웹 접속 IP
 	http://13.124.43.70:3000
 
@@ -88,12 +96,21 @@ kill -9 "PID"
 # MongoDB
 ubuntu@ip-172-31-24-134:~/Asgardium$ sudo service mongodb stop
 ubuntu@ip-172-31-24-134:~/Asgardium$ sudo service mongodb start
-
 ubuntu@ip-172-31-24-134:~$ mongo
+---
 > use Asgardium
 > db.Users.insert({username:"test", password:"1234", admin:false})
 > db.Users.find()
 
+---
+db.getCollection('oracle_Company_AM').insertMany(
+   [{ "name": "John", "surname": "Type" },
+    { "name": "Master", "surname": "Freez" },
+    { "name": "Top", "surname": "Cat" }],
+   {
+      ordered: false
+   }
+)
 --------------------------------------------------------------------------------------------------------------------
 
 # 용량 확인

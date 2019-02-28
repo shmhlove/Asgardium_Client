@@ -58,8 +58,9 @@ public class SHLoadStartInfo
 
     public float GetProgress()
     {
-        if (null != m_pAsync) return m_pAsync.progress;
-
+        if (null != m_pAsync)
+            return m_pAsync.progress;
+        
         return 0.0f;
     }
 }
@@ -153,6 +154,9 @@ public class SHLoadDataStateInfo
 
     public float GetProgress()
     {
+        if (null == m_pStartInfo)
+            return 0.0f;
+
         return m_pStartInfo.GetProgress();
     }
 }

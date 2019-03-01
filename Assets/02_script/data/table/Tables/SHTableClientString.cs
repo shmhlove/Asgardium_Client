@@ -17,7 +17,6 @@ public class SHTableClientString : SHBaseTable
         if (string.IsNullOrEmpty(strLanguage))
         {
             strLanguage = GetLanguageCode(Single.AppInfo.GetSystemLanguage());
-            SHPlayerPrefs.SetString("language", strLanguage);
         }
         
         m_strIdentity = string.Format("ClientString_{0}", strLanguage);

@@ -94,9 +94,6 @@ public partial class SHBusinessLobby : MonoBehaviour
                 pUIRoot.ShowAlert(reply.ToString());
             }
         });
-        
-        // var milliSeconds = SHUtils.GetTotalMillisecondsForUTC() - (m_pServerConfig.BasicChargeTime * m_pServerConfig.BasicMiningPowerCount);
-        // m_pUserInfo.MiningPowerAt = milliSeconds;
     }
 
     public async void OnClickDebugUsePower()
@@ -129,8 +126,6 @@ public partial class SHBusinessLobby : MonoBehaviour
                 pUIRoot.ShowAlert(reply.ToString());
             }
         });
-        
-        //m_pUserInfo.MiningPowerAt = m_pUserInfo.MiningPowerAt + m_pServerConfig.BasicChargeTime;
     }
 
     private IEnumerator CoroutineForMiningActive()

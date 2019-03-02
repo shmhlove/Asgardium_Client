@@ -83,10 +83,10 @@ public partial class SHBusinessLobby : MonoBehaviour
             if (reply.isSucceed)
             {
                 // 시간차 문제가 있어 1초 뒤 갱신해주도록 해보았다.
-                Single.Coroutine.WaitTime(1.0f, () => 
-                {
+                //Single.Coroutine.WaitTime(1.0f, () => 
+                //{
                     m_pUserInfo.LoadJsonTable(reply.data);
-                });
+                //});
             }
             else
             {
@@ -115,10 +115,10 @@ public partial class SHBusinessLobby : MonoBehaviour
             if (reply.isSucceed)
             {
                 // 시간차 문제가 있어 1초 뒤 갱신해주도록 해보았다.
-                Single.Coroutine.WaitTime(1.0f, () => 
-                {
+                //Single.Coroutine.WaitTime(1.0f, () => 
+                //{
                     m_pUserInfo.LoadJsonTable(reply.data);
-                });
+                //});
             }
             else
             {

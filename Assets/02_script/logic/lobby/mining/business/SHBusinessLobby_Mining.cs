@@ -13,32 +13,7 @@ public partial class SHBusinessLobby : MonoBehaviour
     private SHTableUserInfo m_pUserInfo = null;
     private SHTableServerConfig m_pServerConfig = null;
 
-    // 여기서 데이터 조립해서 UI에 던져주자.
-    // SHActiveSlotData
-
-    // 서버에서 아이디값으로 통신할 것이므로 필요한것
-    // 기본 광물정보
-    // 기본 회사정보
-
-    // 액티브
-
-    // 2.
-    // 스크롤뷰 구성 - 출력해야할 리스트 서버로 부터 받아 슬롯구성할 수 있도록 스크롤뷰클래스에 전달
-
-    // 1.
-    // 서버가 켜질때 마이닝셋 테이블에 기본 회사를 넣어준다.
-    // 일단 GET 으로 마이닝셋 테이블을 가져갈 수 있도록 추가
-    // 클라는 코루틴 돌면서 마이닝셋 테이블을 Web통신으로 가져가자
-    // 정상동작 확인되면 웹소켓으로 변경해보자.
-
-    // 3.
-    // 필터동작시 이벤트 받아 스크롤뷰 재구성, 필터내용은 저장하여 켜질때 그대로 셋팅될 수 있도록
-
-    // 패시브
-
-    // 컴퍼니
-
-    private async void ResetUserInfo()
+    private async void ReloadUserInfo()
     {
         m_pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
 
@@ -48,7 +23,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         }
     }
 
-    private async void ResetServerConfig()
+    private async void ReloadServerConfig()
     {
         m_pServerConfig = await Single.Table.GetTable<SHTableServerConfig>();
 
@@ -87,17 +62,108 @@ public partial class SHBusinessLobby : MonoBehaviour
 
     private void UpdateActiveScrollview()
     {
-        // 소켓통신 전 테스트용으로 3초 간격으로 코루틴 돌자.
+        // public class SHActiveSlotData
+        // {
+        //     public string m_strActiveUID;
+
+        //     public string m_strCompanyName;
+        //     public string m_strCompanyIcon;
+        //     public string m_iResourceIcon;
+        //     public int m_iResourceQuantity;
+        //     public int m_iSupplyQuantity;
+        //     public int m_iPurchaseCost;
+
+        //     public Action<string> m_pEventPurchaseButton;
+        // }
+
+        // 여기서 데이터 조립해서 Mining Panel UI에 던져주자.
+        // SHActiveSlotData
+
         // dictionary로 관리하고, 정렬 후 List로 뽑아서 던져주기
         // SHActiveSlotData
         // m_pUIPanelMining.SetActiveScrollview();
-    }
 
+        // 2.
+        // 스크롤뷰 구성 - 출력해야할 리스트 서버로 부터 받아 슬롯구성할 수 있도록 스크롤뷰클래스에 전달
+
+        // 1.
+        // 서버가 켜질때 마이닝셋 테이블에 기본 회사를 넣어준다.
+        // 일단 GET 으로 마이닝셋 테이블을 가져갈 수 있도록 추가
+        // 클라는 코루틴 돌면서 마이닝셋 테이블을 Web통신으로 가져가자
+        // 정상동작 확인되면 웹소켓으로 변경해보자.
+
+        // 3.
+        // 필터동작시 이벤트 받아 스크롤뷰 재구성, 필터내용은 저장하여 켜질때 그대로 셋팅될 수 있도록
+
+    }
+    
+    public void OnEventOfChangeMiningStage(eMiningStageType eType)
+    {
+        switch(eType)
+        {
+            case eMiningStageType.Active:
+                StartCoroutine(CoroutineForMiningActiveScrollview());
+            break;
+            case eMiningStageType.Passive:
+            break;
+            case eMiningStageType.Company:
+            break;
+        }
+
+        //StopCoroutine(CoroutineForMiningActiveScrollview());
+    }
+    
     public void OnEventOfPurchaseMining(string strActiveUID)
     {
 
     }
 
+    private IEnumerator CoroutineForMiningActiveInformation()
+    {
+        while (true)
+        {
+            if (null == m_pUIPanelMining)
+            {
+                yield return null;
+            }
+            
+            if (null == m_pUserInfo)
+            {
+                ReloadUserInfo();
+                yield return new WaitForSeconds(0.5f);
+            }
+
+            if (null == m_pServerConfig)
+            {
+                ReloadServerConfig();
+                yield return new WaitForSeconds(0.5f);
+            }
+
+            UpdateActiveInformation();
+
+            yield return null;
+        }
+    }
+
+    [Obsolete("This Coroutine is Deprecated When run socket.io")]
+    private IEnumerator CoroutineForMiningActiveScrollview()
+    {
+        while (true)
+        {
+            if (null == m_pUIPanelMining)
+            {
+                yield return null;
+            }
+
+            UpdateActiveScrollview();
+
+            yield return null;
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////////
+    // 테스트 코드
+    //////////////////////////////////////////////////////////////////////
     public async void OnClickDebugReset()
     {
         if (null == m_pUserInfo)
@@ -160,59 +226,5 @@ public partial class SHBusinessLobby : MonoBehaviour
                 pUIRoot.ShowAlert(reply.ToString());
             }
         });
-    }
-
-    private IEnumerator CoroutineForMiningActiveInformation()
-    {
-        while (true)
-        {
-            if (null == m_pUIPanelMining)
-            {
-                yield return null;
-            }
-
-            if (null == m_pUserInfo)
-            {
-                ResetUserInfo();
-                yield return new WaitForSeconds(0.5f);
-            }
-
-            if (null == m_pServerConfig)
-            {
-                ResetServerConfig();
-                yield return new WaitForSeconds(0.5f);
-            }
-
-            UpdateActiveInformation();
-
-            yield return null;
-        }
-    }
-
-    private IEnumerator CoroutineForMiningActiveScrollview()
-    {
-        while (true)
-        {
-            if (null == m_pUIPanelMining)
-            {
-                yield return null;
-            }
-
-            if (null == m_pUserInfo)
-            {
-                ResetUserInfo();
-                yield return new WaitForSeconds(0.5f);
-            }
-
-            if (null == m_pServerConfig)
-            {
-                ResetServerConfig();
-                yield return new WaitForSeconds(0.5f);
-            }
-
-            UpdateActiveInformation();
-
-            yield return null;
-        }
     }
 }

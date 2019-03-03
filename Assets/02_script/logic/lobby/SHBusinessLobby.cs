@@ -21,28 +21,22 @@ public partial class SHBusinessLobby : MonoBehaviour
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
         pUserInfo.CheckUserInfoLoadedForDevelop();
 
+        // 필요한 테이블 Get해서 로드되어 있도록
         var pOracleCompanyAM = await Single.Table.GetTable<SHTableServerOracleCompanyAM>();
 
+        // UI와 Contact 처리
         var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
         m_pUIPanelMining = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
-        
-        // 필터 이벤트를 받아 Active를 업데이트 시켜줘야한다.
-        // 버튼이벤트를 받아 각 Object별 업데이트를 시켜줘야한다.
+        m_pUIPanelMining.SetEventOfChangeStage(OnEventOfChangeMiningStage);
     }
 
     private void OnEnable()
     {
         StartCoroutine(CoroutineForMiningActiveInformation());
-
-        // 이건 Active가 활성화 되었을때
-        StartCoroutine(CoroutineForMiningActiveScrollview());
     }
 
     private void OnDisable()
     {
         StopCoroutine(CoroutineForMiningActiveInformation());
-
-        // 이건 Active가 비 활성화 되었을때
-        StopCoroutine(CoroutineForMiningActiveScrollview());
     }
 }

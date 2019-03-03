@@ -90,6 +90,11 @@ public partial class SHTableData : SHBaseData
         };
     }
     
+    public bool IsLoaded<T>() where T : SHBaseTable
+    {
+        return m_dicTables.ContainsKey(typeof(T));
+    }
+
     public async Task<T> GetTable<T>() where T : SHBaseTable
     {
         return await GetTable(typeof(T)) as T;

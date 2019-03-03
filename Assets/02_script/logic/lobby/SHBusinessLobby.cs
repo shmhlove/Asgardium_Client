@@ -32,11 +32,17 @@ public partial class SHBusinessLobby : MonoBehaviour
 
     private void OnEnable()
     {
-        StartCoroutine(CoroutineForMiningActive());
+        StartCoroutine(CoroutineForMiningActiveInformation());
+
+        // 이건 Active가 활성화 되었을때
+        StartCoroutine(CoroutineForMiningActiveScrollview());
     }
 
     private void OnDisable()
     {
-        StopCoroutine(CoroutineForMiningActive());
+        StopCoroutine(CoroutineForMiningActiveInformation());
+
+        // 이건 Active가 비 활성화 되었을때
+        StopCoroutine(CoroutineForMiningActiveScrollview());
     }
 }

@@ -13,9 +13,26 @@ public partial class SHBusinessLobby : MonoBehaviour
     private SHTableUserInfo m_pUserInfo = null;
     private SHTableServerConfig m_pServerConfig = null;
 
+    // 여기서 데이터 조립해서 UI에 던져주자.
+    // SHActiveSlotData
+
+    // 서버에서 아이디값으로 통신할 것이므로 필요한것
+    // 기본 광물정보
+    // 기본 회사정보
+
     // 액티브
-    // 필터동작시 이벤트 받아 스크롤뷰 재구성, 필터내용은 저장하여 켜질때 그대로 셋팅될 수 있도록
+
+    // 2.
     // 스크롤뷰 구성 - 출력해야할 리스트 서버로 부터 받아 슬롯구성할 수 있도록 스크롤뷰클래스에 전달
+
+    // 1.
+    // 서버가 켜질때 마이닝셋 테이블에 기본 회사를 넣어준다.
+    // 일단 GET 으로 마이닝셋 테이블을 가져갈 수 있도록 추가
+    // 클라는 코루틴 돌면서 마이닝셋 테이블을 Web통신으로 가져가자
+    // 정상동작 확인되면 웹소켓으로 변경해보자.
+
+    // 3.
+    // 필터동작시 이벤트 받아 스크롤뷰 재구성, 필터내용은 저장하여 켜질때 그대로 셋팅될 수 있도록
 
     // 패시브
 
@@ -49,19 +66,36 @@ public partial class SHBusinessLobby : MonoBehaviour
         var Epsilon = 500;
         var LastMiningPowerAt = m_pUserInfo.MiningPowerAt - Epsilon;
 
-        var timeSpan = (DateTime.UtcNow - SHUtils.GetUCTTimeByMillisecond(LastMiningPowerAt));
-        var curPowerCount = (int)(timeSpan.TotalMilliseconds / m_pServerConfig.BasicChargeTime);
-        var curLeftTime = (timeSpan.TotalMilliseconds % m_pServerConfig.BasicChargeTime);
+        // 남은 시간과 파워갯수 구하기
+        var pTimeSpan = (DateTime.UtcNow - SHUtils.GetUCTTimeByMillisecond(LastMiningPowerAt));
+        var iCurPowerCount = (int)(pTimeSpan.TotalMilliseconds / m_pServerConfig.BasicChargeTime);
+        var iCurLeftTime = (pTimeSpan.TotalMilliseconds % m_pServerConfig.BasicChargeTime);
 
-        curPowerCount = Math.Min(curPowerCount, m_pServerConfig.BasicMiningPowerCount);
-        string strCountInfo = string.Format("{0}/{1}", curPowerCount, m_pServerConfig.BasicMiningPowerCount);
+        // 파워갯수 출력형태로 구성
+        iCurPowerCount = Math.Min(iCurPowerCount, m_pServerConfig.BasicMiningPowerCount);
+        string strCountInfo = string.Format("{0}/{1}", iCurPowerCount, m_pServerConfig.BasicMiningPowerCount);
 
-        var pLeftTime = TimeSpan.FromMilliseconds(m_pServerConfig.BasicChargeTime - curLeftTime);
-        
+        // 남은 시간 출력형태로 구성
+        var pLeftTime = TimeSpan.FromMilliseconds(m_pServerConfig.BasicChargeTime - iCurLeftTime);
         var iLeftMinutes = (int)(pLeftTime.TotalSeconds / 60);
         var iLeftSecond = (int)(pLeftTime.TotalSeconds % 60);
-        string strTimer = (curPowerCount < m_pServerConfig.BasicMiningPowerCount) ? string.Format("{0:00}:{1:00}", iLeftMinutes, iLeftSecond) : "--:--";
+        string strTimer = (iCurPowerCount < m_pServerConfig.BasicMiningPowerCount) ? string.Format("{0:00}:{1:00}", iLeftMinutes, iLeftSecond) : "--:--";
+
+        // UI 업데이트
         m_pUIPanelMining.SetActiveInformation(strCountInfo, strTimer);
+    }
+
+    private void UpdateActiveScrollview()
+    {
+        // 소켓통신 전 테스트용으로 3초 간격으로 코루틴 돌자.
+        // dictionary로 관리하고, 정렬 후 List로 뽑아서 던져주기
+        // SHActiveSlotData
+        // m_pUIPanelMining.SetActiveScrollview();
+    }
+
+    public void OnEventOfPurchaseMining(string strActiveUID)
+    {
+
     }
 
     public async void OnClickDebugReset()
@@ -128,7 +162,34 @@ public partial class SHBusinessLobby : MonoBehaviour
         });
     }
 
-    private IEnumerator CoroutineForMiningActive()
+    private IEnumerator CoroutineForMiningActiveInformation()
+    {
+        while (true)
+        {
+            if (null == m_pUIPanelMining)
+            {
+                yield return null;
+            }
+
+            if (null == m_pUserInfo)
+            {
+                ResetUserInfo();
+                yield return new WaitForSeconds(3.0f);
+            }
+
+            if (null == m_pServerConfig)
+            {
+                ResetServerConfig();
+                yield return new WaitForSeconds(3.0f);
+            }
+
+            UpdateActiveInformation();
+
+            yield return null;
+        }
+    }
+
+    private IEnumerator CoroutineForMiningActiveScrollview()
     {
         while (true)
         {

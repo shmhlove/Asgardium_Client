@@ -12,6 +12,7 @@ public class SHActiveSlotData
     public string m_strCompanyIcon;
     public string m_iResourceIcon;
     public int m_iResourceQuantity;
+    public int m_iResourceLevel;
     public int m_iSupplyQuantity;
     public int m_iPurchaseCost;
 
@@ -31,6 +32,9 @@ public class SHUIScrollSlotForActive : MonoBehaviour
     public UILabel m_pLabelSupplyQuantity;
     public UILabel m_pLabelPurchaseCost;
 
+    public UISprite m_pSpriteResourceLevel;
+    public UILabel m_pLabelResourceLevel;
+
     [ReadOnlyField] public Action<string> m_pEventPurchaseButton;
 
     public void SetData(SHActiveSlotData pData)
@@ -39,8 +43,12 @@ public class SHUIScrollSlotForActive : MonoBehaviour
         m_pSpriteCompany.spriteName = pData.m_strCompanyIcon;
         m_pSpriteResource.spriteName = pData.m_iResourceIcon;
         m_pLabelResourceQuantity.text = pData.m_iResourceQuantity.ToString();
+        m_pLabelResourceLevel.text = pData.m_iResourceLevel.ToString();
         m_pLabelSupplyQuantity.text = pData.m_iSupplyQuantity.ToString();
         m_pLabelPurchaseCost.text = pData.m_iPurchaseCost.ToString();
+
+        m_pSpriteResourceLevel.gameObject.SetActive(1 < pData.m_iResourceLevel);
+        
 
         m_strActiveUID = pData.m_strActiveUID;
         m_pEventPurchaseButton = pData.m_pEventPurchaseButton;

@@ -61,23 +61,40 @@ public partial class SHBusinessLobby : MonoBehaviour
     }
 
     private void UpdateActiveScrollview()
-    {
+    {        
+        // 참조해야할 테이블리스트
+        // 1. 인스턴스 마이닝 액티브 테이블 oracle_company_am과 동일한 구조
+        /*
+            resource_id -> asgardium_resource_data참조
+            >> name_strid -> 회사이름
+            emblem_id -> 회사앰블럼인데 현재 무시옵션
+            >> efficiency_lv -> 광물 레벨
+            supply_lv -> 공급량 레벨
+        */
+        // 2. asgardium_resource_data 테이블
+        /*
+            name_strid -> 무시
+            >> icon_name -> 광물 아이콘 파일이름
+            >> value -> 채굴시 번개 소모량
+            rid_fuel1 -> 무시
+            rid_fuel2 -> 무시
+        */
+
+        // 여기서 데이터 조립해서 Mining Panel UI에 던져주자.
         // public class SHActiveSlotData
         // {
-        //     public string m_strActiveUID;
+        //     public string m_strActiveUID; 인스턴스 마이닝 액티브 테이블의 UID
 
-        //     public string m_strCompanyName;
-        //     public string m_strCompanyIcon;
-        //     public string m_iResourceIcon;
+        //     public string m_strCompanyName; 인스턴스 마이닝 액티브 테이블의 name_strid 필드
+        //     public string m_strCompanyIcon; 인스턴스 마이닝 액티브 테이블의 emblem_id 필드
+        //     public string m_iResourceIcon; asgardium_resource_data 테이블의 icon_name 필드
         //     public int m_iResourceQuantity;
+        //     public int m_iResourceLevel;
         //     public int m_iSupplyQuantity;
         //     public int m_iPurchaseCost;
 
         //     public Action<string> m_pEventPurchaseButton;
         // }
-        
-        // 여기서 데이터 조립해서 Mining Panel UI에 던져주자.
-        // SHActiveSlotData
 
         // dictionary로 관리하고, 정렬 후 List로 뽑아서 던져주기
         // SHActiveSlotData

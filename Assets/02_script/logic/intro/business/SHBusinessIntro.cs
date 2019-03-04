@@ -2,6 +2,7 @@
 using UnityEngine.SceneManagement;
 
 using System;
+using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -12,9 +13,9 @@ public class SHBusinessIntro : MonoBehaviour
         Single.AppInfo.CreateSingleton();
     }
 
-    void Start()
+    async void Start()
     {
-        Single.Scene.LoadScene(eSceneType.Patch, bIsUseFade: true, pCallback: (pReply) => 
+        await Single.Scene.LoadScene(eSceneType.Patch, bIsUseFade: true, pCallback: (pReply) => 
         {
 
         });

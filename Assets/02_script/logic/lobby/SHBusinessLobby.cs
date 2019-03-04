@@ -10,12 +10,12 @@ public partial class SHBusinessLobby : MonoBehaviour
     [Header("UI Objects")]
     private SHUIPanelMining m_pUIPanelMining = null;
 
-    private void Awake()
+    void Awake()
     {
         Single.AppInfo.CreateSingleton();
     }
 
-    private async void Start()
+    async void Start()
     {
         // 로그인 체크 후 테스트 계정으로 로그인 시켜주기
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();

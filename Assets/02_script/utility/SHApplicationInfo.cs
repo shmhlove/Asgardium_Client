@@ -23,12 +23,12 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
     // 기타(디버그) : 실시간 로드 리소스 리스트
     [HideInInspector] private DicResourceLoadInfo m_pDicResourceLoadInfo   = new DicResourceLoadInfo();
 
-    public override void OnInitialize()
+    public override async void OnInitialize()
     {
         SetDontDestroy();
 
         // 어플리케이션 정보설정
-        SetApplicationInfo();
+        await SetApplicationInfo();
 
         // 디바이스 정보 로그
         PrintDeviceInfo();
@@ -52,7 +52,7 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
         }
     }
     
-    async void SetApplicationInfo()
+    async Task SetApplicationInfo()
     {
         var pTable = await Single.Table.GetTable<SHTableClientConfig>();
         

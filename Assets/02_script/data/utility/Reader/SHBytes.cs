@@ -4,6 +4,7 @@ using UnityEngine.Networking;
 using System;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;

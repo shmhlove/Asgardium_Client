@@ -12,13 +12,13 @@ public class SHBusinessPatch : MonoBehaviour
         Single.AppInfo.CreateSingleton();
     }
     
-    void Start()
+    async void Start()
     {
-        Single.Data.Load(eSceneType.Patch, (pLoadInfo)=>
+        await Single.Data.Load(eSceneType.Patch, async (pLoadInfo)=>
         {
             if (pLoadInfo.IsSucceed())
             {
-                Single.Scene.LoadScene(eSceneType.Login, pCallback: (pReply) => 
+                await Single.Scene.LoadScene(eSceneType.Login, pCallback: (pReply) => 
                 {
 
                 });

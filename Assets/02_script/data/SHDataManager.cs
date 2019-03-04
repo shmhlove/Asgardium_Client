@@ -2,6 +2,7 @@
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -35,11 +36,11 @@ public class SHDataManager : SHSingleton<SHDataManager>
         Resources.FrameMove();
     }
     
-    public void Load(eSceneType eType, Action<SHLoadingInfo> pDone, Action<SHLoadingInfo> pProgress)
+    public async Task Load(eSceneType eType, Action<SHLoadingInfo> pDone, Action<SHLoadingInfo> pProgress)
     {
         OnEventToLoadStart();
 
-        GetLoadList(eType, (pLoadList) => 
+        await GetLoadList(eType, (pLoadList) => 
         {
             m_pLoader.Process(pLoadList, (pLoadInfo) => 
             {
@@ -53,9 +54,9 @@ public class SHDataManager : SHSingleton<SHDataManager>
         });
     }
     
-    public void Patch(Action<SHLoadingInfo> pDone, Action<SHLoadingInfo> pProgress)
+    public async Task Patch(Action<SHLoadingInfo> pDone, Action<SHLoadingInfo> pProgress)
     {
-        GetPatchList((pPatchList) => 
+        await GetPatchList((pPatchList) => 
         {
             m_pLoader.Process(pPatchList, pDone, pProgress);
         });
@@ -76,7 +77,7 @@ public class SHDataManager : SHSingleton<SHDataManager>
         return m_pLoader.IsLoadDone(eType);
     }
     
-    private async void GetLoadList(eSceneType eType, Action<List<Dictionary<string, SHLoadData>>> pCallback)
+    private async Task GetLoadList(eSceneType eType, Action<List<Dictionary<string, SHLoadData>>> pCallback)
     {
         pCallback(new List<Dictionary<string, SHLoadData>>()
         {
@@ -85,7 +86,7 @@ public class SHDataManager : SHSingleton<SHDataManager>
         });
     }
     
-    private async void GetPatchList(Action<List<Dictionary<string, SHLoadData>>> pCallback)
+    private async Task GetPatchList(Action<List<Dictionary<string, SHLoadData>>> pCallback)
     {
         pCallback(new List<Dictionary<string, SHLoadData>>()
         {

@@ -12,12 +12,12 @@ public class SHBusinessLogin : MonoBehaviour
     private SHUIPanelSignin m_pUIPanelSignin = null;
     private SHUIPanelSignup m_pUIPanelSignup = null;
 
-    private void Awake()
+    void Awake()
     {
         Single.AppInfo.CreateSingleton();
     }
 
-    private async void Start()
+    async void Start()
     {
         var pUIRoot = await Single.UI.GetRoot<SHUIRootLogin>(SHUIConstant.ROOT_LOGIN);
         m_pUIPanelSignin = await pUIRoot.GetPanel<SHUIPanelSignin>(SHUIConstant.PANEL_SIGNIN);
@@ -54,7 +54,7 @@ public class SHBusinessLogin : MonoBehaviour
         {
             var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
             var pTable = await Single.Table.GetTable<SHTableClientString>();
-            pUIRoot.ShowAlert(pTable.GetString("1001"));
+            await pUIRoot.ShowAlert(pTable.GetString("1001"));
             return;
         }
 
@@ -77,11 +77,11 @@ public class SHBusinessLogin : MonoBehaviour
             }
             
             var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-            pUIRoot.ShowAlert(reply.ToString(), () => 
+            await pUIRoot.ShowAlert(reply.ToString(), async () => 
             {
                 if (reply.isSucceed)
                 {
-                    Single.Scene.LoadScene(eSceneType.Lobby, bIsUseFade: true);
+                    await Single.Scene.LoadScene(eSceneType.Lobby, bIsUseFade: true);
                 }
             });
         });
@@ -98,7 +98,7 @@ public class SHBusinessLogin : MonoBehaviour
         {
             var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
             var pTable = await Single.Table.GetTable<SHTableClientString>();
-            pUIRoot.ShowAlert(pTable.GetString("1001"));
+            await pUIRoot.ShowAlert(pTable.GetString("1001"));
             return;
         }
 
@@ -111,7 +111,7 @@ public class SHBusinessLogin : MonoBehaviour
         Single.Network.POST(SHAPIs.SH_API_SIGNUP, json, async (reply) =>
         {
             var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-            pUIRoot.ShowAlert(reply.ToString(), () => 
+            await pUIRoot.ShowAlert(reply.ToString(), () => 
             {
                 if (reply.isSucceed)
                 {

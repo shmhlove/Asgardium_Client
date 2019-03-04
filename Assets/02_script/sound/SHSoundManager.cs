@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 using System;
+using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -39,23 +40,24 @@ public class SHSoundManager : SHSingleton<SHSoundManager>
         StopAllCoroutines();
     }
 
-    public async void PlayBGM(string strName)
+    public async Task PlayBGM(string strName)
     {
         if (false == m_dicSoundTable.ContainsKey(strName))
         {
             Debug.LogError("[LSH] SHSound::PlayBGM() - Not Found TableInfo!!");
-            return;
         }
-        
-        var pInfo = m_dicSoundTable[strName];
-        var pClip = await Single.Resources.GetSound(pInfo.m_strFileName);
-        m_dicBGMChannel[pInfo.m_eBGMChannel].clip   = pClip;
-        m_dicBGMChannel[pInfo.m_eBGMChannel].loop   = pInfo.m_bIsLoop;
-        m_dicBGMChannel[pInfo.m_eBGMChannel].volume = 0.0f;
-        m_dicBGMChannel[pInfo.m_eBGMChannel].Play();
-        m_dicBGMChannel[pInfo.m_eBGMChannel].Pause();
-        m_dicBGMChannel[pInfo.m_eBGMChannel].Play();
-        StartCoroutine(CoroutineVolumeUP(m_dicBGMChannel[pInfo.m_eBGMChannel]));
+        else
+        {
+            var pInfo = m_dicSoundTable[strName];
+            var pClip = await Single.Resources.GetSound(pInfo.m_strFileName);
+            m_dicBGMChannel[pInfo.m_eBGMChannel].clip   = pClip;
+            m_dicBGMChannel[pInfo.m_eBGMChannel].loop   = pInfo.m_bIsLoop;
+            m_dicBGMChannel[pInfo.m_eBGMChannel].volume = 0.0f;
+            m_dicBGMChannel[pInfo.m_eBGMChannel].Play();
+            m_dicBGMChannel[pInfo.m_eBGMChannel].Pause();
+            m_dicBGMChannel[pInfo.m_eBGMChannel].Play();
+            StartCoroutine(CoroutineVolumeUP(m_dicBGMChannel[pInfo.m_eBGMChannel]));
+        }
     }
 
     public void StopBGM(string strName)
@@ -71,22 +73,23 @@ public class SHSoundManager : SHSingleton<SHSoundManager>
             m_dicBGMChannel[pInfo.m_eBGMChannel], m_dicBGMChannel[pInfo.m_eBGMChannel].Stop));
     }
 
-    public async void PlayEffect(string strName)
+    public async Task PlayEffect(string strName)
     {
         if (false == m_dicSoundTable.ContainsKey(strName))
         {
             Debug.LogError("[LSH] SHSound::PlayEffect() - Not Found TableInfo!!");
-            return;
         }
-        
-        var pInfo = m_dicSoundTable[strName];
-        var pObject = await Single.Resources.GetSound(pInfo.m_strFileName);
-        m_dicEffectChannel[pInfo.m_eEffectChannel].clip   = pObject;
-        m_dicEffectChannel[pInfo.m_eEffectChannel].loop   = pInfo.m_bIsLoop;
-        m_dicEffectChannel[pInfo.m_eEffectChannel].volume = 1.0f;
-        m_dicEffectChannel[pInfo.m_eEffectChannel].Play();
-        m_dicEffectChannel[pInfo.m_eEffectChannel].Pause();
-        m_dicEffectChannel[pInfo.m_eEffectChannel].Play();
+        else
+        {
+            var pInfo = m_dicSoundTable[strName];
+            var pObject = await Single.Resources.GetSound(pInfo.m_strFileName);
+            m_dicEffectChannel[pInfo.m_eEffectChannel].clip   = pObject;
+            m_dicEffectChannel[pInfo.m_eEffectChannel].loop   = pInfo.m_bIsLoop;
+            m_dicEffectChannel[pInfo.m_eEffectChannel].volume = 1.0f;
+            m_dicEffectChannel[pInfo.m_eEffectChannel].Play();
+            m_dicEffectChannel[pInfo.m_eEffectChannel].Pause();
+            m_dicEffectChannel[pInfo.m_eEffectChannel].Play();
+        }
     }
 
     public void StopEffect(string strName)

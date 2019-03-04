@@ -75,7 +75,7 @@ public partial class SHBusinessLobby : MonoBehaviour
 
         //     public Action<string> m_pEventPurchaseButton;
         // }
-
+        
         // 여기서 데이터 조립해서 Mining Panel UI에 던져주자.
         // SHActiveSlotData
 
@@ -170,7 +170,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         {
             var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
             var pTable = await Single.Table.GetTable<SHTableClientString>();
-            pUIRoot.ShowAlert(pTable.GetString("1000"));
+            await pUIRoot.ShowAlert(pTable.GetString("1000"));
             return;
         }
 
@@ -191,7 +191,7 @@ public partial class SHBusinessLobby : MonoBehaviour
             else
             {
                 var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-                pUIRoot.ShowAlert(reply.ToString());
+                await pUIRoot.ShowAlert(reply.ToString());
             }
         });
     }
@@ -202,7 +202,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         {
             var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
             var pTable = await Single.Table.GetTable<SHTableClientString>();
-            pUIRoot.ShowAlert(pTable.GetString("1000"));
+            await pUIRoot.ShowAlert(pTable.GetString("1000"));
             return;
         }
 
@@ -223,7 +223,7 @@ public partial class SHBusinessLobby : MonoBehaviour
             else
             {
                 var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-                pUIRoot.ShowAlert(reply.ToString());
+                await pUIRoot.ShowAlert(reply.ToString());
             }
         });
     }

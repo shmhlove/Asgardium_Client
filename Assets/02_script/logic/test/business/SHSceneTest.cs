@@ -2,6 +2,7 @@
 using UnityEngine.Networking;
 
 using System;
+using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -19,7 +20,7 @@ public class SHSceneTest : MonoBehaviour
         Single.Network.GET(SHAPIs.SH_API_TEST, null, async (reply) =>
         {
             var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-            pUIRoot.ShowAlert(reply.ToString());
+            await pUIRoot.ShowAlert(reply.ToString());
         });
     }
 }

@@ -63,7 +63,7 @@ public class SHTableUserInfo : SHBaseTable
             }
             
             var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-            pUIRoot.ShowAlert(reply.ToString());
+            await pUIRoot.ShowAlert(reply.ToString());
         });
     }
 }

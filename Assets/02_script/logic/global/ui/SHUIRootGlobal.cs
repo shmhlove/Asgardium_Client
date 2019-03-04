@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 using System;
+using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -12,20 +13,20 @@ public class SHUIRootGlobal : SHUIRoot
         DontDestroyOnLoad(this);
     }
 
-    public async void ShowFadePanel(Action pCallback = null)
+    public async Task ShowFadePanel(Action pCallback = null)
     {
         var pPanel = await GetPanel<SHUIPanelFade>(SHUIConstant.PANEL_FADE);
         pPanel.Show(pCallback);
     }
 
-    public async void CloseFadePanel(Action pCallback = null)
+    public async Task CloseFadePanel(Action pCallback = null)
     {
         var pPanel = await GetPanel<SHUIPanelFade>(SHUIConstant.PANEL_FADE);
         pPanel.SetActive(true);
         pPanel.Close(pCallback);
     }
 
-    public async void ShowAlert(string strMessage, Action pCallback = null)
+    public async Task ShowAlert(string strMessage, Action pCallback = null)
     {
         var pPanel = await GetPanel<SHUIPanelAlert>(SHUIConstant.PANEL_ALERT);
 
@@ -37,13 +38,13 @@ public class SHUIRootGlobal : SHUIRoot
         pPanel.Show("", strMessage, eAlertButtonType.OneButton, pResult);
     }
     
-    public async void ShowIndicator()
+    public async Task ShowIndicator()
     {
         var pPanel = await GetPanel<SHUIPanelIndicator>(SHUIConstant.PANEL_INDICATOR);
         pPanel.Show();
     }
 
-    public async void CloseIndicator()
+    public async Task CloseIndicator()
     {
         var pPanel = await GetPanel<SHUIPanelIndicator>(SHUIConstant.PANEL_INDICATOR);
         pPanel.Close();

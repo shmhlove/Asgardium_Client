@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 using System;
+using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -37,23 +38,23 @@ public class SHObjectPoolManager : SHSingleton<SHObjectPoolManager>
         Single.Scene.DelEventForBeforeLoadScene(OnEventOfLoadedScene);
     }
 
-    public void Get<T>(string  strName, 
+    public async Task Get<T>(string  strName, 
         eObjectPoolReturnType  eReturnType, 
         eObjectPoolDestroyType eDestroyType,
         Action<T>              pCallback) where T : Component
     {
-        Get(strName, eReturnType, eDestroyType, (pObject) => 
+        await Get(strName, eReturnType, eDestroyType, (pObject) => 
         {
             pCallback(SHGameObject.GetComponent<T>(pObject));
         });
     }
 
-    public void Get(string     strName, 
+    public async Task Get(string     strName, 
         eObjectPoolReturnType  eReturnType, 
         eObjectPoolDestroyType eDestroyType,
         Action<GameObject>     pCallback)
     {
-        GetInactiveObject(strName, eReturnType, eDestroyType, (pObject) => 
+        await GetInactiveObject(strName, eReturnType, eDestroyType, (pObject) => 
         {
             SetActiveObject(strName, pObject);
             pCallback(pObject.m_pObject);
@@ -129,7 +130,7 @@ public class SHObjectPoolManager : SHSingleton<SHObjectPoolManager>
             return m_dicInactives[strName];
     }
 
-    private async void GetInactiveObject(string                  strName, 
+    private async Task GetInactiveObject(string                  strName, 
                                          eObjectPoolReturnType   eReturnType, 
                                          eObjectPoolDestroyType  eDestroyType,
                                          Action<SHObjectPool>    pCallback)

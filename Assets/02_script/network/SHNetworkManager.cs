@@ -3,6 +3,7 @@ using UnityEngine.Networking;
 
 using System;
 using System.Text;
+using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -165,12 +166,12 @@ public class SHNetworkManager : SHSingleton<SHNetworkManager>
     private async void ShowIndicator()
     {
         var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-        pUIRoot.ShowIndicator();
+        await pUIRoot.ShowIndicator();
     }
 
     private async void CloseIndicator()
     {
         var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-        pUIRoot.CloseIndicator();
+        await pUIRoot.CloseIndicator();
     }
 }

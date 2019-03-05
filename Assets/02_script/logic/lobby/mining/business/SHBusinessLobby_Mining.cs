@@ -69,7 +69,7 @@ public partial class SHBusinessLobby : MonoBehaviour
             >> name_strid -> 회사이름
             emblem_id -> 회사앰블럼인데 현재 무시옵션
             >> efficiency_lv -> 광물 레벨
-            supply_lv -> 공급량 레벨
+            >> supply_lv -> 공급량 레벨
         */
         // 2. asgardium_resource_data 테이블
         /*
@@ -88,15 +88,16 @@ public partial class SHBusinessLobby : MonoBehaviour
         //     public string m_strCompanyName; 인스턴스 마이닝 액티브 테이블의 name_strid 필드
         //     public string m_strCompanyIcon; 인스턴스 마이닝 액티브 테이블의 emblem_id 필드
         //     public string m_iResourceIcon; asgardium_resource_data 테이블의 icon_name 필드
-        //     public int m_iResourceQuantity;
-        //     public int m_iResourceLevel;
-        //     public int m_iSupplyQuantity;
-        //     public int m_iPurchaseCost;
+        //     public int m_iResourceQuantity; 인스턴스 마이닝 액티브 테이블의 Efficiency_lv을 참고해서 active_mining_quantity에서 quantity 필드
+        //     public int m_iResourceLevel; 인스턴스 마이닝 액티브 테이블의 Efficiency_lv 필드
+        //     public int m_iSupplyQuantity; 인스턴스 마이닝 액티브 테이블의 supply_lv를 참조하여 active_mining_supply 테이블에 찾기(단, 기본 회사일 경우 ServerConfig테이블의 basic_active_mining_supply 필드 사용)
+        //     public int m_iPurchaseCost; asgardium_resource_data 테이블의 value 필드
 
         //     public Action<string> m_pEventPurchaseButton;
         // }
 
         // dictionary로 관리하고, 정렬 후 List로 뽑아서 던져주기
+        // List로 뽑을때는 Efficiency_lv기준으로 정렬하고, 레벨이 같을때는 공급량을 기준으로 정렬(다중정렬)
         // SHActiveSlotData
         // m_pUIPanelMining.SetActiveScrollview();
 

@@ -277,12 +277,21 @@ alt+오른쪽|앞으로 이동|workbench.action.navigateForward
 		* ~~클라 : 스크롤뷰 재사용 적용~~
 		* ~~마이닝 파워 카운팅 로직 개발~~
 		* ~~기본 마이닝 슬롯 UI 개발~~
-		* 마이닝 비지니스 로직 개발
 	* ~~DB : 서버 테이블 관리구조 설계~~
-	* 서버/클라 : 테이블 적용
+	* 서버/클라 : 마이닝 비지니스 로직 개발
 		* ~~서버/클라 : Config 테이블 적용~~
 		* ~~서버/클라 : 기본 마이닝 데이터 테이블 적용~~
 		* ~~서버/클라 : 기본 리소스 데이터 테이블 적용~~
+		* 서버 : 인스턴스 마이닝 액티브 테이블을 구성 (oracle_company_am과 스키마 동일)
+		* 서버 : 인스턴스 마이닝 액티브 테이블 초기설정(UID시스템 + 서버가 켜질때 항상 oracle_company_am을 읽어 추가 혹은 업데이트 해주기)
+		* 서버 : 인스턴스 마이닝 액티브 테이블 Get API 제공
+		* 서버 : 스테틱 테이블 active_mining_quantity 추가 및 Get API 제공
+		* 서버 : 스테틱 테이블 active_mining_supply 추가 및 Get API 제공
+		* 클라 : 스테틱 테이블 추가 (active_mining_quantity, active_mining_supply)
+		* 클라 : 인스턴스 마이닝 액티브 테이블 추가
+		* 클라 : 인스턴스 마이닝 액티브 테이블을 Update에서 폴링 요청하고, 갱신하며, 테이블들을 조합해서 Slot UI 로드명령
+		* 서버 : 채굴 API 제공 : 클라로 부터 UID를 받은 후 resource_id를 이용해서 asgardium_resource_data의 Value를 참조해서 MiningPower 소모 처리하고, Supply 수량 감소시키고, Response로 UserInfo와 해당 회사의 인스턴스 마이닝 정보 전달
+		* 클라 : Slot UI에서 구매버튼 이벤트로 채굴 API 호출하고, Response를 받아 UserInfo와 인스턴스 마이닝 액티브 테이블 업데이트 해주기
 ---
 * 인증
 	* 서버 : OAuth 2.0 도입

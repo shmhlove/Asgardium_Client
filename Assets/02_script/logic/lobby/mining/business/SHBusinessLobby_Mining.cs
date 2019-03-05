@@ -43,39 +43,40 @@ public partial class SHBusinessLobby : MonoBehaviour
 
         // 남은 시간과 파워갯수 구하기
         var pTimeSpan = (DateTime.UtcNow - SHUtils.GetUCTTimeByMillisecond(LastMiningPowerAt));
-        var iCurPowerCount = (int)(pTimeSpan.TotalMilliseconds / m_pServerConfig.BasicChargeTime);
-        var iCurLeftTime = (pTimeSpan.TotalMilliseconds % m_pServerConfig.BasicChargeTime);
+        var iCurPowerCount = (int)(pTimeSpan.TotalMilliseconds / (double)m_pServerConfig.BasicChargeTime);
+        var fCurLeftTime = (pTimeSpan.TotalMilliseconds % (double)m_pServerConfig.BasicChargeTime);
 
         // 파워갯수 출력형태로 구성
         iCurPowerCount = Math.Min(iCurPowerCount, m_pServerConfig.BasicMiningPowerCount);
         string strCountInfo = string.Format("{0}/{1}", iCurPowerCount, m_pServerConfig.BasicMiningPowerCount);
 
         // 남은 시간 출력형태로 구성
-        var pLeftTime = TimeSpan.FromMilliseconds(m_pServerConfig.BasicChargeTime - iCurLeftTime);
+        var pLeftTime = TimeSpan.FromMilliseconds(m_pServerConfig.BasicChargeTime - fCurLeftTime);
         var iLeftMinutes = (int)(pLeftTime.TotalSeconds / 60);
         var iLeftSecond = (int)(pLeftTime.TotalSeconds % 60);
-        string strTimer = (iCurPowerCount < m_pServerConfig.BasicMiningPowerCount) ? string.Format("{0:00}:{1:00}", iLeftMinutes, iLeftSecond) : "--:--";
+        string strTimer = (iCurPowerCount < m_pServerConfig.BasicMiningPowerCount) ? 
+            string.Format("{0:00}:{1:00}", iLeftMinutes, iLeftSecond) : "--:--";
 
         // UI 업데이트
         m_pUIPanelMining.SetActiveInformation(strCountInfo, strTimer);
     }
 
     private void UpdateActiveScrollview()
-    {        
-        // 참조해야할 테이블리스트
+    {
+        // 참조 해야할 테이블리스트
         // 1. 인스턴스 마이닝 액티브 테이블 oracle_company_am과 동일한 구조
         /*
             resource_id -> asgardium_resource_data참조
-            >> name_strid -> 회사이름
+            ==>> name_strid -> 회사이름
             emblem_id -> 회사앰블럼인데 현재 무시옵션
-            >> efficiency_lv -> 광물 레벨
-            >> supply_lv -> 공급량 레벨
+            ==>> efficiency_lv -> 광물 레벨
+            ==>> supply_lv -> 공급량 레벨
         */
         // 2. asgardium_resource_data 테이블
         /*
             name_strid -> 무시
-            >> icon_name -> 광물 아이콘 파일이름
-            >> value -> 채굴시 번개 소모량
+            ==>> icon_name -> 광물 아이콘 파일이름
+            ==>> value -> 채굴시 번개 소모량
             rid_fuel1 -> 무시
             rid_fuel2 -> 무시
         */
@@ -87,8 +88,8 @@ public partial class SHBusinessLobby : MonoBehaviour
 
         //     public string m_strCompanyName; 인스턴스 마이닝 액티브 테이블의 name_strid 필드
         //     public string m_strCompanyIcon; 인스턴스 마이닝 액티브 테이블의 emblem_id 필드
-        //     public string m_iResourceIcon; asgardium_resource_data 테이블의 icon_name 필드
-        //     public int m_iResourceQuantity; 인스턴스 마이닝 액티브 테이블의 Efficiency_lv을 참고해서 active_mining_quantity에서 quantity 필드
+        //     public string m_iResourceIcon; 인스턴스 마이닝 액티브 테이블의 resource_id필드를 이용해서 asgardium_resource_data 테이블의 icon_name 필드 참고
+        //     public int m_iResourceQuantity; 인스턴스 마이닝 액티브 테이블의 Efficiency_lv을 이용해서 active_mining_quantity에서 quantity 필드
         //     public int m_iResourceLevel; 인스턴스 마이닝 액티브 테이블의 Efficiency_lv 필드
         //     public int m_iSupplyQuantity; 인스턴스 마이닝 액티브 테이블의 supply_lv를 참조하여 active_mining_supply 테이블에 찾기(단, 기본 회사일 경우 ServerConfig테이블의 basic_active_mining_supply 필드 사용)
         //     public int m_iPurchaseCost; asgardium_resource_data 테이블의 value 필드
@@ -114,21 +115,20 @@ public partial class SHBusinessLobby : MonoBehaviour
         // 필터동작시 이벤트 받아 스크롤뷰 재구성, 필터내용은 저장하여 켜질때 그대로 셋팅될 수 있도록
 
     }
-    
+
     public void OnEventOfChangeMiningStage(eMiningStageType eType)
     {
-        switch(eType)
+        // 맞을 때
+        if (eType == eMiningStageType.Active)
         {
-            case eMiningStageType.Active:
-                StartCoroutine(CoroutineForMiningActiveScrollview());
-            break;
-            case eMiningStageType.Passive:
-            break;
-            case eMiningStageType.Company:
-            break;
+            StartCoroutine(CoroutineForMiningActiveScrollview());
         }
 
-        //StopCoroutine(CoroutineForMiningActiveScrollview());
+        // 아닐 때
+        if (eType != eMiningStageType.Active)
+        {
+            StopCoroutine(CoroutineForMiningActiveScrollview());
+        }
     }
     
     public void OnEventOfPurchaseMining(string strActiveUID)
@@ -175,7 +175,7 @@ public partial class SHBusinessLobby : MonoBehaviour
 
             UpdateActiveScrollview();
 
-            yield return null;
+            yield return new WaitForSeconds(1.0f);
         }
     }
 
@@ -200,11 +200,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         {
             if (reply.isSucceed)
             {
-                // 시간차 문제가 있어 1초 뒤 갱신해주도록 해보았다.
-                //Single.Coroutine.WaitTime(1.0f, () => 
-                //{
-                    m_pUserInfo.LoadJsonTable(reply.data);
-                //});
+                m_pUserInfo.LoadJsonTable(reply.data);
             }
             else
             {
@@ -232,11 +228,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         {
             if (reply.isSucceed)
             {
-                // 시간차 문제가 있어 1초 뒤 갱신해주도록 해보았다.
-                //Single.Coroutine.WaitTime(1.0f, () => 
-                //{
-                    m_pUserInfo.LoadJsonTable(reply.data);
-                //});
+                m_pUserInfo.LoadJsonTable(reply.data);
             }
             else
             {

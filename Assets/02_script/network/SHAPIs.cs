@@ -12,4 +12,8 @@ public static class SHAPIs
     public static string SH_API_GET_CONFIG = "/static/config";
     public static string SH_API_GET_ORACLE_COMPANY_AM = "/static/oracle_company_am";
     public static string SH_API_GET_ASGARDIUM_RESOURCE = "/static/asgardium_resource_data";
+
+    public static string SH_API_GET_COMPANY_FOR_MINING = "/mining/company_for_mining";
+    public static string SH_API_GET_ACTIVE_MINING_QUANTITY = "/mining/active_mining_quantity";
+    public static string SH_API_GET_ACTIVE_MINING_SUPPLY = "/mining/active_mining_supply";
 }

@@ -9,8 +9,8 @@ public class SHUIScrollViewForActive : SHUIMassiveScrollView
 
     protected override void OnInitialized()
     {
-        SetSlotCount(50);
-        SetFocus(0, true);
+        // SetSlotCount(50);
+        // SetFocus(0, true);
     }
 
     protected override void SetSlotData(GameObject go, int index)
@@ -30,7 +30,14 @@ public class SHUIScrollViewForActive : SHUIMassiveScrollView
 
     public void ResetDatas(List<SHActiveSlotData> pDatas)
     {
-        m_pDatas = pDatas;
-        SetSlotCount(m_pDatas.Count);
+        if (m_pDatas.Count != pDatas.Count)
+        {
+            m_pDatas = pDatas;
+            SetSlotCount(m_pDatas.Count);
+        }
+        else
+        {
+            m_pDatas = pDatas;
+        }
     }
 }

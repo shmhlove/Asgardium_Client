@@ -11,8 +11,8 @@ public class SHTableServerAsgardiumResourceData
 {
     public int m_iResourceId;
     public int m_iNameStrid;
-    public int m_iIconId;
-    public int m_iValue;
+    public string m_strIconImage;
+    public int m_iWorth;
     public int m_iRIDFuel_1;
     public int m_iRIDFuel_2;
 }
@@ -58,13 +58,21 @@ public class SHTableServerAsgardiumResource : SHBaseTable
             var pData = new SHTableServerAsgardiumResourceData();
             pData.m_iResourceId = GetIntToJson(pJson[iLoop], "resource_id");
             pData.m_iNameStrid = GetIntToJson(pJson[iLoop], "name_strid");
-            pData.m_iIconId = GetIntToJson(pJson[iLoop], "icon_id");
-            pData.m_iValue = GetIntToJson(pJson[iLoop], "value");
+            pData.m_strIconImage = GetStrToJson(pJson[iLoop], "icon_image");
+            pData.m_iWorth = GetIntToJson(pJson[iLoop], "worth");
             pData.m_iRIDFuel_1 = GetIntToJson(pJson[iLoop], "rid_fuel1");
             pData.m_iRIDFuel_2 = GetIntToJson(pJson[iLoop], "rid_fuel2");
             m_dicDatas.Add(pData.m_iResourceId, pData);
         }
 
         return eErrorCode.Succeed;
+    }
+
+    public SHTableServerAsgardiumResourceData GetData(int iResourceId)
+    {
+        if (false == m_dicDatas.ContainsKey(iResourceId))
+            return new SHTableServerAsgardiumResourceData();
+
+        return m_dicDatas[iResourceId];
     }
 }

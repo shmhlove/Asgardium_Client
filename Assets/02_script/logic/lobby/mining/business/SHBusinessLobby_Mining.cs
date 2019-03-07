@@ -43,77 +43,60 @@ public partial class SHBusinessLobby : MonoBehaviour
 
         // 남은 시간과 파워갯수 구하기
         var pTimeSpan = (DateTime.UtcNow - SHUtils.GetUCTTimeByMillisecond(LastMiningPowerAt));
-        var iCurPowerCount = (int)(pTimeSpan.TotalMilliseconds / (double)m_pServerConfig.BasicChargeTime);
-        var fCurLeftTime = (pTimeSpan.TotalMilliseconds % (double)m_pServerConfig.BasicChargeTime);
+        var iCurPowerCount = (int)(pTimeSpan.TotalMilliseconds / (double)m_pServerConfig.m_iBasicChargeTime);
+        var fCurLeftTime = (pTimeSpan.TotalMilliseconds % (double)m_pServerConfig.m_iBasicChargeTime);
 
         // 파워갯수 출력형태로 구성
-        iCurPowerCount = Math.Min(iCurPowerCount, m_pServerConfig.BasicMiningPowerCount);
-        string strCountInfo = string.Format("{0}/{1}", iCurPowerCount, m_pServerConfig.BasicMiningPowerCount);
+        iCurPowerCount = Math.Min(iCurPowerCount, m_pServerConfig.m_iBasicMiningPowerCount);
+        string strCountInfo = string.Format("{0}/{1}", iCurPowerCount, m_pServerConfig.m_iBasicMiningPowerCount);
 
         // 남은 시간 출력형태로 구성
-        var pLeftTime = TimeSpan.FromMilliseconds(m_pServerConfig.BasicChargeTime - fCurLeftTime);
+        var pLeftTime = TimeSpan.FromMilliseconds(m_pServerConfig.m_iBasicChargeTime - fCurLeftTime);
         var iLeftMinutes = (int)(pLeftTime.TotalSeconds / 60);
         var iLeftSecond = (int)(pLeftTime.TotalSeconds % 60);
-        string strTimer = (iCurPowerCount < m_pServerConfig.BasicMiningPowerCount) ? 
+        string strTimer = (iCurPowerCount < m_pServerConfig.m_iBasicMiningPowerCount) ? 
             string.Format("{0:00}:{1:00}", iLeftMinutes, iLeftSecond) : "--:--";
 
         // UI 업데이트
         m_pUIPanelMining.SetActiveInformation(strCountInfo, strTimer);
     }
 
-    private void UpdateActiveScrollview()
+    private async void UpdateActiveScrollview()
     {
-        // 참조 해야할 테이블리스트
-        // 1. 인스턴스 마이닝 액티브 테이블 oracle_company_am과 동일한 구조
-        /*
-            resource_id -> asgardium_resource_data참조
-            ==>> name_strid -> 회사이름
-            emblem_id -> 회사앰블럼인데 현재 무시옵션
-            ==>> efficiency_lv -> 광물 레벨
-            ==>> supply_lv -> 공급량 레벨
-        */
-        // 2. asgardium_resource_data 테이블
-        /*
-            name_strid -> 무시
-            ==>> icon_name -> 광물 아이콘 파일이름
-            ==>> value -> 채굴시 번개 소모량
-            rid_fuel1 -> 무시
-            rid_fuel2 -> 무시
-        */
+        var pCompanyTable = await Single.Table.GetTable<SHTableServerCompanyForMining>();
+        //pCompanyTable.LoadServerTable(async (errorCode) => 
+        //{
+            // if (eErrorCode.Succeed != errorCode)
+            //     return;
 
-        // 여기서 데이터 조립해서 Mining Panel UI에 던져주자.
-        // public class SHActiveSlotData
-        // {
-        //     public string m_strActiveUID; 인스턴스 마이닝 액티브 테이블의 UID
+            var pStringTable = await Single.Table.GetTable<SHTableClientString>();
+            var pAsgardiumResourceTable = await Single.Table.GetTable<SHTableServerAsgardiumResource>();
+            var pActiveMiningQuantityTable = await Single.Table.GetTable<SHTableServerAactiveMiningQuantity>();
 
-        //     public string m_strCompanyName; 인스턴스 마이닝 액티브 테이블의 name_strid 필드
-        //     public string m_strCompanyIcon; 인스턴스 마이닝 액티브 테이블의 emblem_id 필드
-        //     public string m_iResourceIcon; 인스턴스 마이닝 액티브 테이블의 resource_id필드를 이용해서 asgardium_resource_data 테이블의 icon_name 필드 참고
-        //     public int m_iResourceQuantity; 인스턴스 마이닝 액티브 테이블의 Efficiency_lv을 이용해서 active_mining_quantity에서 quantity 필드
-        //     public int m_iResourceLevel; 인스턴스 마이닝 액티브 테이블의 Efficiency_lv 필드
-        //     public int m_iSupplyQuantity; 인스턴스 마이닝 액티브 테이블의 supply_lv를 참조하여 active_mining_supply 테이블에 찾기(단, 기본 회사일 경우 ServerConfig테이블의 basic_active_mining_supply 필드 사용)
-        //     public int m_iPurchaseCost; asgardium_resource_data 테이블의 value 필드
+            List<SHActiveSlotData> pSlotDatas = new List<SHActiveSlotData>();
+            foreach (var kvp in pCompanyTable.m_dicDatas)
+            {
+                var pData = new SHActiveSlotData();
+                pData.m_strInstanceId = kvp.Value.m_strInstanceId;
+                pData.m_strCompanyName = pStringTable.GetString(kvp.Value.m_iNameStrid.ToString());
+                //pData.m_strCompanyIcon = 인스턴스 마이닝 액티브 테이블의 emblem_id 필드 참고(emblem_name으로 변경필요)
+                pData.m_strResourceIcon = pAsgardiumResourceTable.GetData(kvp.Value.m_iResourceId).m_strIconImage;
+                pData.m_iResourceQuantity = pActiveMiningQuantityTable.GetData(kvp.Value.m_iEfficiencyLV).m_iQuantity;
+                pData.m_iResourceLevel = kvp.Value.m_iEfficiencyLV;
+                pData.m_iSupplyQuantity = kvp.Value.m_iSupplyCount;
+                pData.m_iPurchaseCost = pAsgardiumResourceTable.GetData(kvp.Value.m_iResourceId).m_iWorth;
+                pData.m_pEventPurchaseButton = OnEventOfPurchaseMining;
+                pSlotDatas.Add(pData);
+            }
 
-        //     public Action<string> m_pEventPurchaseButton;
-        // }
+            pSlotDatas.Sort((x, y) =>
+            {
+                return (x.m_iResourceLevel == y.m_iResourceLevel) ? 
+                    ((x.m_iSupplyQuantity < y.m_iSupplyQuantity) ? 1 : -1) : ((x.m_iResourceLevel < y.m_iResourceLevel) ? 1 : -1);
+            });
 
-        // dictionary로 관리하고, 정렬 후 List로 뽑아서 던져주기
-        // List로 뽑을때는 Efficiency_lv기준으로 정렬하고, 레벨이 같을때는 공급량을 기준으로 정렬(다중정렬)
-        // SHActiveSlotData
-        // m_pUIPanelMining.SetActiveScrollview();
-
-        // 2.
-        // 스크롤뷰 구성 - 출력해야할 리스트 서버로 부터 받아 슬롯구성할 수 있도록 스크롤뷰클래스에 전달
-
-        // 1.
-        // 서버가 켜질때 마이닝셋 테이블에 기본 회사를 넣어준다.
-        // 일단 GET 으로 마이닝셋 테이블을 가져갈 수 있도록 추가
-        // 클라는 코루틴 돌면서 마이닝셋 테이블을 Web통신으로 가져가자
-        // 정상동작 확인되면 웹소켓으로 변경해보자.
-
-        // 3.
-        // 필터동작시 이벤트 받아 스크롤뷰 재구성, 필터내용은 저장하여 켜질때 그대로 셋팅될 수 있도록
-
+            m_pUIPanelMining.SetActiveScrollview(pSlotDatas);
+        //});
     }
 
     public void OnEventOfChangeMiningStage(eMiningStageType eType)
@@ -130,10 +113,15 @@ public partial class SHBusinessLobby : MonoBehaviour
             StopCoroutine(CoroutineForMiningActiveScrollview());
         }
     }
-    
-    public void OnEventOfPurchaseMining(string strActiveUID)
+    public async void ShowAlert(string strMessage)
     {
+        var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
+        await pUIRoot.ShowAlert(strMessage);
+    }
 
+    public void OnEventOfPurchaseMining(string strInstanceId)
+    {
+        ShowAlert(string.Format("채굴 요청 : {0}", strInstanceId));
     }
 
     private IEnumerator CoroutineForMiningActiveInformation()

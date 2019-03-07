@@ -9,8 +9,13 @@ using LitJson;
 
 public class SHTableServerConfig : SHBaseTable
 {
-    public int BasicMiningPowerCount = 0;
-    public int BasicChargeTime = 0;
+    public int m_iBasicMiningPowerCount = 0;
+    public int m_iBasicChargeTime = 0;
+    public int m_iBasicActiveMiningSupply = 0;
+    public int m_iBasicRefreshTimeOUMining = 0;
+    public int m_iCostUnitCompany1 = 0;
+    public int m_iCostUnitCompany2 = 0;
+    public int m_iCostUnitCompany3 = 0;
 	
     public SHTableServerConfig()
     {
@@ -42,8 +47,13 @@ public class SHTableServerConfig : SHBaseTable
         if (null == pJson)
             return eErrorCode.Table_LoadFailed;
         
-        BasicMiningPowerCount = GetIntToJson(pJson, "basic_mining_power_count");
-        BasicChargeTime = GetIntToJson(pJson, "basic_charge_time");
+        m_iBasicMiningPowerCount = GetIntToJson(pJson, "basic_mining_power_count");
+        m_iBasicChargeTime = GetIntToJson(pJson, "basic_charge_time");
+        m_iBasicActiveMiningSupply = GetIntToJson(pJson, "basic_active_mining_supply");
+        m_iBasicRefreshTimeOUMining = GetIntToJson(pJson, "basic_refresh_time_ou_mining");
+        m_iCostUnitCompany1 = GetIntToJson(pJson, "cost_unit_company1");
+        m_iCostUnitCompany2 = GetIntToJson(pJson, "cost_unit_company2");
+        m_iCostUnitCompany3 = GetIntToJson(pJson, "cost_unit_company3");
 
         return eErrorCode.Succeed;
     }

@@ -28,6 +28,9 @@ public partial class SHTableData : SHBaseData
         m_dicTables.Add(typeof(SHTableServerConfig),            new SHTableServerConfig());
         m_dicTables.Add(typeof(SHTableServerOracleCompanyAM),   new SHTableServerOracleCompanyAM());
         m_dicTables.Add(typeof(SHTableServerAsgardiumResource), new SHTableServerAsgardiumResource());
+        m_dicTables.Add(typeof(SHTableServerAactiveMiningQuantity), new SHTableServerAactiveMiningQuantity());
+        m_dicTables.Add(typeof(SHTableServerActiveMiningSupply), new SHTableServerActiveMiningSupply());
+        m_dicTables.Add(typeof(SHTableServerCompanyForMining),  new SHTableServerCompanyForMining());
     }
     
     public override void OnFinalize()

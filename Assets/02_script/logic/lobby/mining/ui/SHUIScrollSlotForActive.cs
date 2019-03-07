@@ -6,11 +6,11 @@ using System.Collections.Generic;
 
 public class SHActiveSlotData
 {
-    public string m_strActiveUID;
+    public string m_strInstanceId;
 
     public string m_strCompanyName;
     public string m_strCompanyIcon;
-    public string m_iResourceIcon;
+    public string m_strResourceIcon;
     public int m_iResourceQuantity;
     public int m_iResourceLevel;
     public int m_iSupplyQuantity;
@@ -21,7 +21,7 @@ public class SHActiveSlotData
 
 public class SHUIScrollSlotForActive : MonoBehaviour
 {
-    [ReadOnlyField] public string m_strActiveUID;
+    [ReadOnlyField] public string m_strInstanceId;
 
     public UILabel m_pLabelCompany;
     public UISprite m_pSpriteCompany;
@@ -41,21 +41,20 @@ public class SHUIScrollSlotForActive : MonoBehaviour
     {
         m_pLabelCompany.text = pData.m_strCompanyName;
         m_pSpriteCompany.spriteName = pData.m_strCompanyIcon;
-        m_pSpriteResource.spriteName = pData.m_iResourceIcon;
+        m_pSpriteResource.spriteName = pData.m_strResourceIcon;
         m_pLabelResourceQuantity.text = pData.m_iResourceQuantity.ToString();
         m_pLabelResourceLevel.text = pData.m_iResourceLevel.ToString();
         m_pLabelSupplyQuantity.text = pData.m_iSupplyQuantity.ToString();
         m_pLabelPurchaseCost.text = pData.m_iPurchaseCost.ToString();
 
         m_pSpriteResourceLevel.gameObject.SetActive(1 < pData.m_iResourceLevel);
-        
 
-        m_strActiveUID = pData.m_strActiveUID;
+        m_strInstanceId = pData.m_strInstanceId;
         m_pEventPurchaseButton = pData.m_pEventPurchaseButton;
     }
 
     public void OnClickButton()
     {
-        m_pEventPurchaseButton?.Invoke(m_strActiveUID);
+        m_pEventPurchaseButton?.Invoke(m_strInstanceId);
     }
 }

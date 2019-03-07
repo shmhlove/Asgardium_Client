@@ -79,7 +79,7 @@ public partial class SHBusinessLobby : MonoBehaviour
                 var pData = new SHActiveSlotData();
                 pData.m_strInstanceId = kvp.Value.m_strInstanceId;
                 pData.m_strCompanyName = pStringTable.GetString(kvp.Value.m_iNameStrid.ToString());
-                //pData.m_strCompanyIcon = 인스턴스 마이닝 액티브 테이블의 emblem_id 필드 참고(emblem_name으로 변경필요)
+                pData.m_strCompanyIcon = kvp.Value.m_strEmblemImage;
                 pData.m_strResourceIcon = pAsgardiumResourceTable.GetData(kvp.Value.m_iResourceId).m_strIconImage;
                 pData.m_iResourceQuantity = pActiveMiningQuantityTable.GetData(kvp.Value.m_iEfficiencyLV).m_iQuantity;
                 pData.m_iResourceLevel = kvp.Value.m_iEfficiencyLV;

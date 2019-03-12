@@ -7,17 +7,17 @@ public enum eErrorCode
 
     // network error (Sync Server)
     Net_Common_HTTP = 1000,
-    Net_Common_InvalidParam = 1001,
-    Net_Common_NotFoundCollection = 1002,
-    Net_Common_DatabaseWrite = 1003,
-    Net_Common_InvalidResponseData = 1004,
-    Net_Common_JsonParse = 1005,
-    Net_Common_CollectionRead = 1006,
+    Net_Common_InvalidParameter = 1001,
+    Net_Common_FailedGetCollection = 1002,
+    Net_Common_FailedFindCollection = 1003,
+    Net_Common_FailedWriteDocument = 1004,
+    Net_Common_InvalidResponseData = 1005,
+    Net_Common_JsonParse = 1006,
     Net_Common_EmptyCollection = 1007,
-
-    Net_Auth_NotFoundUser = 2001,
-    Net_Auth_AlreadySignupUser = 2002,
-    Net_Auth_InvalidPassword = 2003,
+    
+    Net_Auth_AlreadySignupUser = 2001,
+    Net_Auth_NoSignupUser = 2002,
+    Net_Auth_NoMatchPassword = 2003,
 
     // data error
     Data_NotImplementation = 1000001,

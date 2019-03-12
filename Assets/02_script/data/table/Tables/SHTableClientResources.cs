@@ -31,12 +31,7 @@ public class SHTableClientResources : SHBaseTable
     {
         m_pData.Clear();
     }
-
-    public override bool IsLoadTable()
-    {
-        return m_bIsLoaded;
-    }
-
+    
     public override void LoadJson(Action<eErrorCode> pCallback)
     {
         var pTextAsset = Resources.Load<TextAsset>(string.Format("Table/Json/{0}", GetFileName(eTableLoadType.Json)));

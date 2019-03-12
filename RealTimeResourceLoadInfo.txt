@@ -1,7 +1,0 @@
-Scene : Intro
-Load : JsonClientConfig(0.118953sec)
-Scene : Intro
-Load : UI Root - Global(0.494069sec)
-Scene : Intro
-Instantiate : UI Root - Global(0.004573sec)
-

@@ -25,12 +25,12 @@ public partial class SHTableData : SHBaseData
         m_dicTables.Add(typeof(SHTableClientString),            new SHTableClientString());
 
         // 서버 테이블
-        m_dicTables.Add(typeof(SHTableServerConfig),            new SHTableServerConfig());
-        m_dicTables.Add(typeof(SHTableServerOracleCompanyAM),   new SHTableServerOracleCompanyAM());
-        m_dicTables.Add(typeof(SHTableServerAsgardiumResource), new SHTableServerAsgardiumResource());
-        m_dicTables.Add(typeof(SHTableServerAactiveMiningQuantity), new SHTableServerAactiveMiningQuantity());
-        m_dicTables.Add(typeof(SHTableServerActiveMiningSupply), new SHTableServerActiveMiningSupply());
-        m_dicTables.Add(typeof(SHTableServerCompanyForMining),  new SHTableServerCompanyForMining());
+        m_dicTables.Add(typeof(SHTableServerGlobalConfig),      new SHTableServerGlobalConfig());
+        m_dicTables.Add(typeof(SHTableServerGlobalUnitData),    new SHTableServerGlobalUnitData());
+        m_dicTables.Add(typeof(SHTableServerMiningActiveCompanyNPC), new SHTableServerMiningActiveCompanyNPC());
+        m_dicTables.Add(typeof(SHTableServerMiningActiveQuantity), new SHTableServerMiningActiveQuantity());
+        m_dicTables.Add(typeof(SHTableServerMiningActiveSupply), new SHTableServerMiningActiveSupply());
+        m_dicTables.Add(typeof(SHTableServerInstanceMiningActiveCompany),  new SHTableServerInstanceMiningActiveCompany());
     }
     
     public override void OnFinalize()

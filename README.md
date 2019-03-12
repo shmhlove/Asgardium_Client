@@ -111,6 +111,12 @@ db.getCollection('oracle_Company_AM').insertMany(
       ordered: false
    }
 )
+---
+collection.update({ name: 'Slime' }, { $set: { hp: 30 } });
+collection.findAndModify({ query: { name: 'Demon' }, update: { $set: { att: 150 } }, new: true }); // { 데몬 }
+collection.updateOne({ name: 'Slime' }, { $set: { hp: 25 } });
+collection.findOneAndUpdate({ name: 'Demon' }, { $set: { att: 150 } }, { returnNewDocument: true });
+
 --------------------------------------------------------------------------------------------------------------------
 
 # 용량 확인
@@ -290,10 +296,12 @@ alt+오른쪽|앞으로 이동|workbench.action.navigateForward
 		* ~~클라 : 스테틱 테이블 추가 (company_for_mining, active_mining_quantity, active_mining_supply)~~
 		* ~~클라 : 인스턴스 마이닝 액티브 테이블을 Update에서 폴링 요청하고, 갱신하며, 테이블들을 조합해서 Slot UI 로드명령~~
 		* ~~서버 : 채굴 API 제공 : 클라로 부터 UID를 받은 후 resource_id를 이용해서 asgardium_resource_data의 Value를 참조해서 MiningPower 소모 처리하고, Supply 수량 감소시키고, Response로 UserInfo와 해당 회사의 인스턴스 마이닝 정보 전달~~
-		* 클라 : Slot UI에서 구매버튼 이벤트로 채굴 API 호출하고, Response를 받아 UserInfo와 인스턴스 마이닝 액티브 테이블 업데이트 해주기
-		* 서버 : 정적 테이블 관리방법 설계필요
+		* ~~DB : 테이블 이름변경~~
+		* ~~서버 : 정적 테이블 관리방법 설계필요~~
 		* 서버 : 초기화 부분에 어싱크 처리 then방식 적용필요
 		* 클라 : 초기 액티브 스크롤뷰 출력되는 타이밍 안좋음
+		* 클라/서버 : 소켓통신 시작하자.
+		* 클라 : Slot UI에서 구매버튼 이벤트로 채굴 API 호출하고, Response를 받아 UserInfo와 인스턴스 마이닝 액티브 테이블 업데이트 해주기
 		* 클라 : 폴링 돌리니깐 계속 인디케이터 뜸 소켓들어가면 없어질 문제
 		* 클라 : 스크롤뷰 갱신에 대한 문제가 있음 -> 갱신 프로세스를 변경하기로 함.(갯수변화 처리안함, 클라기준 정보업데이트만)
 ---

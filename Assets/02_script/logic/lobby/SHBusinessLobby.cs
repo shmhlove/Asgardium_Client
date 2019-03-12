@@ -22,7 +22,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         pUserInfo.CheckUserInfoLoadedForDevelop();
 
         // 필요한 테이블 Get해서 로드되어 있도록
-        var pOracleCompanyAM = await Single.Table.GetTable<SHTableServerOracleCompanyAM>();
+        var pServerInstanceMiningActiveCompany = await Single.Table.GetTable<SHTableServerInstanceMiningActiveCompany>();
 
         // UI와 Contact 처리
         var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);

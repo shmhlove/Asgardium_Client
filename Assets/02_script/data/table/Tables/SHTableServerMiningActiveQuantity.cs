@@ -7,20 +7,20 @@ using System.Collections.Generic;
 
 using LitJson;
 
-public class SHTableServerActiveMiningSupplyData
+public class SHTableServerMiningActiveQuantityData
 {
     public int m_iLevel;
-    public int m_iCostUnit;
-    public int m_iSupply;
+    public int m_iCostUnitPerWeight;
+    public int m_iQuantity;
 }
 
-public class SHTableServerActiveMiningSupply : SHBaseTable
+public class SHTableServerMiningActiveQuantity : SHBaseTable
 {
-    public Dictionary<int, SHTableServerActiveMiningSupplyData> m_dicDatas = new Dictionary<int, SHTableServerActiveMiningSupplyData>();
+    public Dictionary<int, SHTableServerMiningActiveQuantityData> m_dicDatas = new Dictionary<int, SHTableServerMiningActiveQuantityData>();
 	
-    public SHTableServerActiveMiningSupply()
+    public SHTableServerMiningActiveQuantity()
     {
-        m_strIdentity = "ServerActiveMiningSupply";
+        m_strIdentity = "ServerMiningActiveQuantity";
     }
     
     public override eErrorCode LoadServerTable(Action<eErrorCode> pCallback)
@@ -28,7 +28,7 @@ public class SHTableServerActiveMiningSupply : SHBaseTable
         if (null == pCallback)
             return eErrorCode.Table_LoadFailed;
 
-        Single.Network.GET(SHAPIs.SH_API_GET_ACTIVE_MINING_SUPPLY, null, (reply) => 
+        Single.Network.GET(SHAPIs.SH_API_GET_MINING_ACTIVE_QUANTITY_TABLE, null, (reply) => 
         {
             if (reply.isSucceed)
             {
@@ -52,13 +52,21 @@ public class SHTableServerActiveMiningSupply : SHBaseTable
 
         for (int iLoop = 0; iLoop < pJson.Count; ++iLoop)
         {
-            var pData = new SHTableServerActiveMiningSupplyData();
+            var pData = new SHTableServerMiningActiveQuantityData();
             pData.m_iLevel = GetIntToJson(pJson[iLoop], "level");
-            pData.m_iCostUnit = GetIntToJson(pJson[iLoop], "cost_unit");
-            pData.m_iSupply = GetIntToJson(pJson[iLoop], "supply");
+            pData.m_iCostUnitPerWeight = GetIntToJson(pJson[iLoop], "cost_unit_per_weight");
+            pData.m_iQuantity = GetIntToJson(pJson[iLoop], "quantity");
             m_dicDatas.Add(pData.m_iLevel, pData);
         }
         
         return eErrorCode.Succeed;
+    }
+
+    public SHTableServerMiningActiveQuantityData GetData(int iLevel)
+    {
+        if (false == m_dicDatas.ContainsKey(iLevel))
+            return new SHTableServerMiningActiveQuantityData();
+
+        return m_dicDatas[iLevel];
     }
 }

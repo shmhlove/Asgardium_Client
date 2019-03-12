@@ -7,10 +7,10 @@ using System.Collections.Generic;
 
 using LitJson;
 
-public class SHTableServerCompanyForMiningData
+public class SHTableServerInstanceMiningActiveCompanyData
 {
     public string m_strInstanceId;
-    public int m_iResourceId;
+    public int m_iUnitId;
     public int m_iNameStrid;
     public string m_strEmblemImage;
     public int m_iEfficiencyLV;
@@ -18,13 +18,13 @@ public class SHTableServerCompanyForMiningData
     public bool m_bIsBasicCompany;
 }
 
-public class SHTableServerCompanyForMining : SHBaseTable
+public class SHTableServerInstanceMiningActiveCompany : SHBaseTable
 {
-    public Dictionary<string, SHTableServerCompanyForMiningData> m_dicDatas = new Dictionary<string, SHTableServerCompanyForMiningData>();
+    public Dictionary<string, SHTableServerInstanceMiningActiveCompanyData> m_dicDatas = new Dictionary<string, SHTableServerInstanceMiningActiveCompanyData>();
 	
-    public SHTableServerCompanyForMining()
+    public SHTableServerInstanceMiningActiveCompany()
     {
-        m_strIdentity = "ServerCompanyForMining";
+        m_strIdentity = "ServerInstanceMiningActiveCompany";
     }
     
     public override eErrorCode LoadServerTable(Action<eErrorCode> pCallback)
@@ -32,7 +32,7 @@ public class SHTableServerCompanyForMining : SHBaseTable
         if (null == pCallback)
             return eErrorCode.Table_LoadFailed;
 
-        Single.Network.GET(SHAPIs.SH_API_GET_COMPANY_FOR_MINING, null, (reply) => 
+        Single.Network.GET(SHAPIs.SH_API_GET_MINING_ACTIVE_COMPANY_TABLE, null, (reply) => 
         {
             if (reply.isSucceed)
             {
@@ -56,10 +56,10 @@ public class SHTableServerCompanyForMining : SHBaseTable
 
         for (int iLoop = 0; iLoop < pJson.Count; ++iLoop)
         {
-            var pData = new SHTableServerCompanyForMiningData();
+            var pData = new SHTableServerInstanceMiningActiveCompanyData();
             pData.m_strInstanceId = GetStrToJson(pJson[iLoop], "instance_id");
-            pData.m_iResourceId = GetIntToJson(pJson[iLoop], "resource_id");
-            pData.m_iNameStrid = GetIntToJson(pJson[iLoop], "name_strid");
+            pData.m_iUnitId = GetIntToJson(pJson[iLoop], "unit_id");
+            pData.m_iNameStrid = GetIntToJson(pJson[iLoop], "name_str_id");
             pData.m_strEmblemImage = GetStrToJson(pJson[iLoop], "emblem_image");
             pData.m_iEfficiencyLV = GetIntToJson(pJson[iLoop], "efficiency_lv");
             pData.m_iSupplyCount = GetIntToJson(pJson[iLoop], "supply_count");

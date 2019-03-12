@@ -11,7 +11,7 @@ using LitJson;
 public partial class SHBusinessLobby : MonoBehaviour
 {
     private SHTableUserInfo m_pUserInfo = null;
-    private SHTableServerConfig m_pServerConfig = null;
+    private SHTableServerGlobalConfig m_pServerGlobalConfig = null;
 
     private async void ReloadUserInfo()
     {
@@ -25,17 +25,17 @@ public partial class SHBusinessLobby : MonoBehaviour
 
     private async void ReloadServerConfig()
     {
-        m_pServerConfig = await Single.Table.GetTable<SHTableServerConfig>();
+        m_pServerGlobalConfig = await Single.Table.GetTable<SHTableServerGlobalConfig>();
 
-        if (false == m_pServerConfig.m_bIsLoaded)
+        if (false == m_pServerGlobalConfig.m_bIsLoaded)
         {
-            m_pServerConfig = null;
+            m_pServerGlobalConfig = null;
         }
     }
 
     private void UpdateActiveInformation()
     {
-        if ((null == m_pUserInfo) || (null == m_pServerConfig))
+        if ((null == m_pUserInfo) || (null == m_pServerGlobalConfig))
             return;
 
         var Epsilon = 500;
@@ -43,18 +43,18 @@ public partial class SHBusinessLobby : MonoBehaviour
 
         // 남은 시간과 파워갯수 구하기
         var pTimeSpan = (DateTime.UtcNow - SHUtils.GetUCTTimeByMillisecond(LastMiningPowerAt));
-        var iCurPowerCount = (int)(pTimeSpan.TotalMilliseconds / (double)m_pServerConfig.m_iBasicChargeTime);
-        var fCurLeftTime = (pTimeSpan.TotalMilliseconds % (double)m_pServerConfig.m_iBasicChargeTime);
+        var iCurPowerCount = (int)(pTimeSpan.TotalMilliseconds / (double)m_pServerGlobalConfig.m_iBasicChargeTime);
+        var fCurLeftTime = (pTimeSpan.TotalMilliseconds % (double)m_pServerGlobalConfig.m_iBasicChargeTime);
 
         // 파워갯수 출력형태로 구성
-        iCurPowerCount = Math.Min(iCurPowerCount, m_pServerConfig.m_iBasicMiningPowerCount);
-        string strCountInfo = string.Format("{0}/{1}", iCurPowerCount, m_pServerConfig.m_iBasicMiningPowerCount);
+        iCurPowerCount = Math.Min(iCurPowerCount, m_pServerGlobalConfig.m_iBasicMiningPowerCount);
+        string strCountInfo = string.Format("{0}/{1}", iCurPowerCount, m_pServerGlobalConfig.m_iBasicMiningPowerCount);
 
         // 남은 시간 출력형태로 구성
-        var pLeftTime = TimeSpan.FromMilliseconds(m_pServerConfig.m_iBasicChargeTime - fCurLeftTime);
+        var pLeftTime = TimeSpan.FromMilliseconds(m_pServerGlobalConfig.m_iBasicChargeTime - fCurLeftTime);
         var iLeftMinutes = (int)(pLeftTime.TotalSeconds / 60);
         var iLeftSecond = (int)(pLeftTime.TotalSeconds % 60);
-        string strTimer = (iCurPowerCount < m_pServerConfig.m_iBasicMiningPowerCount) ? 
+        string strTimer = (iCurPowerCount < m_pServerGlobalConfig.m_iBasicMiningPowerCount) ? 
             string.Format("{0:00}:{1:00}", iLeftMinutes, iLeftSecond) : "--:--";
 
         // UI 업데이트
@@ -63,15 +63,15 @@ public partial class SHBusinessLobby : MonoBehaviour
 
     private async void UpdateActiveScrollview()
     {
-        var pCompanyTable = await Single.Table.GetTable<SHTableServerCompanyForMining>();
+        var pCompanyTable = await Single.Table.GetTable<SHTableServerInstanceMiningActiveCompany>();
         //pCompanyTable.LoadServerTable(async (errorCode) => 
         //{
             // if (eErrorCode.Succeed != errorCode)
             //     return;
 
             var pStringTable = await Single.Table.GetTable<SHTableClientString>();
-            var pAsgardiumResourceTable = await Single.Table.GetTable<SHTableServerAsgardiumResource>();
-            var pActiveMiningQuantityTable = await Single.Table.GetTable<SHTableServerAactiveMiningQuantity>();
+            var pServerGlobalUnitData = await Single.Table.GetTable<SHTableServerGlobalUnitData>();
+            var pActiveMiningQuantityTable = await Single.Table.GetTable<SHTableServerMiningActiveQuantity>();
 
             List<SHActiveSlotData> pSlotDatas = new List<SHActiveSlotData>();
             foreach (var kvp in pCompanyTable.m_dicDatas)
@@ -80,11 +80,11 @@ public partial class SHBusinessLobby : MonoBehaviour
                 pData.m_strInstanceId = kvp.Value.m_strInstanceId;
                 pData.m_strCompanyName = pStringTable.GetString(kvp.Value.m_iNameStrid.ToString());
                 pData.m_strCompanyIcon = kvp.Value.m_strEmblemImage;
-                pData.m_strResourceIcon = pAsgardiumResourceTable.GetData(kvp.Value.m_iResourceId).m_strIconImage;
+                pData.m_strResourceIcon = pServerGlobalUnitData.GetData(kvp.Value.m_iUnitId).m_strIconImage;
                 pData.m_iResourceQuantity = pActiveMiningQuantityTable.GetData(kvp.Value.m_iEfficiencyLV).m_iQuantity;
                 pData.m_iResourceLevel = kvp.Value.m_iEfficiencyLV;
                 pData.m_iSupplyQuantity = kvp.Value.m_iSupplyCount;
-                pData.m_iPurchaseCost = pAsgardiumResourceTable.GetData(kvp.Value.m_iResourceId).m_iWorth;
+                pData.m_iPurchaseCost = pServerGlobalUnitData.GetData(kvp.Value.m_iUnitId).m_iWeight;
                 pData.m_pEventPurchaseButton = OnEventOfPurchaseMining;
                 pSlotDatas.Add(pData);
             }
@@ -139,7 +139,7 @@ public partial class SHBusinessLobby : MonoBehaviour
                 yield return new WaitForSeconds(0.5f);
             }
 
-            if (null == m_pServerConfig)
+            if (null == m_pServerGlobalConfig)
             {
                 ReloadServerConfig();
                 yield return new WaitForSeconds(0.5f);

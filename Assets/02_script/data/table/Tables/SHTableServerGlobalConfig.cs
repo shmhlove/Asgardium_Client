@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 using LitJson;
 
-public class SHTableServerConfig : SHBaseTable
+public class SHTableServerGlobalConfig : SHBaseTable
 {
     public int m_iBasicMiningPowerCount = 0;
     public int m_iBasicChargeTime = 0;
@@ -17,9 +17,9 @@ public class SHTableServerConfig : SHBaseTable
     public int m_iCostUnitCompany2 = 0;
     public int m_iCostUnitCompany3 = 0;
 	
-    public SHTableServerConfig()
+    public SHTableServerGlobalConfig()
     {
-        m_strIdentity = "ServerConfig";
+        m_strIdentity = "ServerGlobalConfig";
     }
     
     public override eErrorCode LoadServerTable(Action<eErrorCode> pCallback)
@@ -27,7 +27,7 @@ public class SHTableServerConfig : SHBaseTable
         if (null == pCallback)
             return eErrorCode.Table_LoadFailed;
 
-        Single.Network.GET(SHAPIs.SH_API_GET_CONFIG, null, (reply) => 
+        Single.Network.GET(SHAPIs.SH_API_GET_CONFIG_TABLE, null, (reply) => 
         {
             if (reply.isSucceed)
             {

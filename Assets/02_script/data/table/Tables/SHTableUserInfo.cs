@@ -55,7 +55,7 @@ public class SHTableUserInfo : SHBaseTable
             ["email"] = "shmhlove@naver.com",
             ["password"] = "1234"
         };
-        Single.Network.POST(SHAPIs.SH_API_LOGIN, json, async (reply) =>
+        Single.Network.POST(SHAPIs.SH_API_SIGNIN, json, async (reply) =>
         {
             if (reply.isSucceed)
             {

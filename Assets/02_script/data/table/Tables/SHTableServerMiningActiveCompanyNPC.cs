@@ -7,23 +7,22 @@ using System.Collections.Generic;
 
 using LitJson;
 
-public class SHTableServerOracleCompanyAMData
+public class SHTableServerMiningActiveCompanyNPCData
 {
-    public int m_iResourceId;
+    public int m_iUnitId;
     public int m_iNameStrid;
     public int m_iEmblemId;
     public int m_iEfficiencyLV;
     public int m_iSupplyLV;
 }
 
-
-public class SHTableServerOracleCompanyAM : SHBaseTable
+public class SHTableServerMiningActiveCompanyNPC : SHBaseTable
 {
-    public List<SHTableServerOracleCompanyAMData> m_pDatas = new List<SHTableServerOracleCompanyAMData>();
+    public List<SHTableServerMiningActiveCompanyNPCData> m_pDatas = new List<SHTableServerMiningActiveCompanyNPCData>();
 	
-    public SHTableServerOracleCompanyAM()
+    public SHTableServerMiningActiveCompanyNPC()
     {
-        m_strIdentity = "ServerOracleCompanyAM";
+        m_strIdentity = "ServerMiningActiveCompanyNPC";
     }
     
     public override eErrorCode LoadServerTable(Action<eErrorCode> pCallback)
@@ -31,7 +30,7 @@ public class SHTableServerOracleCompanyAM : SHBaseTable
         if (null == pCallback)
             return eErrorCode.Table_LoadFailed;
 
-        Single.Network.GET(SHAPIs.SH_API_GET_ORACLE_COMPANY_AM, null, (reply) => 
+        Single.Network.GET(SHAPIs.SH_API_GET_MINING_ACTIVE_COMPANY_NPC_TABLE, null, (reply) => 
         {
             if (reply.isSucceed)
             {
@@ -55,9 +54,9 @@ public class SHTableServerOracleCompanyAM : SHBaseTable
 
         for (int iLoop = 0; iLoop < pJson.Count; ++iLoop)
         {
-            var pData = new SHTableServerOracleCompanyAMData();
-            pData.m_iResourceId = GetIntToJson(pJson[iLoop], "resource_id");
-            pData.m_iNameStrid = GetIntToJson(pJson[iLoop], "name_strid");
+            var pData = new SHTableServerMiningActiveCompanyNPCData();
+            pData.m_iUnitId = GetIntToJson(pJson[iLoop], "unit_id");
+            pData.m_iNameStrid = GetIntToJson(pJson[iLoop], "name_str_id");
             pData.m_iEmblemId = GetIntToJson(pJson[iLoop], "emblem_id");
             pData.m_iEfficiencyLV = GetIntToJson(pJson[iLoop], "efficiency_lv");
             pData.m_iSupplyLV = GetIntToJson(pJson[iLoop], "supply_lv");

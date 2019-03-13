@@ -21,23 +21,22 @@ public partial class SHBusinessLobby : MonoBehaviour
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
         pUserInfo.CheckUserInfoLoadedForDevelop();
 
-        // 필요한 테이블 Get해서 로드되어 있도록
-        var pServerInstanceMiningActiveCompany = await Single.Table.GetTable<SHTableServerInstanceMiningActiveCompany>();
-
         // UI와 Contact 처리
         var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
         m_pUIPanelMining = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
         m_pUIPanelMining.SetEventOfChangeStage(OnEventOfChangeMiningStage);
-        OnEventOfChangeMiningStage(eMiningStageType.Active);
+
+        // 초기화
+        SetChangeMiningStage(eMiningStageType.Active);
     }
 
     private void OnEnable()
     {
-        StartCoroutine(CoroutineForMiningActiveInformation());
+        StartCoroutine("CoroutineForMiningActiveInformation");
     }
 
     private void OnDisable()
     {
-        StopCoroutine(CoroutineForMiningActiveInformation());
+        StopCoroutine("CoroutineForMiningActiveInformation");
     }
 }

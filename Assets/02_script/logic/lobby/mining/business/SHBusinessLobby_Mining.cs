@@ -10,51 +10,43 @@ using LitJson;
 
 public partial class SHBusinessLobby : MonoBehaviour
 {
-    private SHTableUserInfo m_pUserInfo = null;
-    private SHTableServerGlobalConfig m_pServerGlobalConfig = null;
-
-    private async void ReloadUserInfo()
+    private void SetChangeMiningStage(eMiningStageType eType)
     {
-        m_pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
-
-        if (false == m_pUserInfo.m_bIsLoaded)
+        // 맞을 때
+        if (eType == eMiningStageType.Active)
         {
-            m_pUserInfo = null;
+            StartCoroutine("CoroutineForMiningActiveScrollview");
+        }
+
+        // 아닐 때
+        if (eType != eMiningStageType.Active)
+        {
+            StopCoroutine("CoroutineForMiningActiveScrollview");
         }
     }
 
-    private async void ReloadServerConfig()
+    private async void UpdateActiveInformation()
     {
-        m_pServerGlobalConfig = await Single.Table.GetTable<SHTableServerGlobalConfig>();
-
-        if (false == m_pServerGlobalConfig.m_bIsLoaded)
-        {
-            m_pServerGlobalConfig = null;
-        }
-    }
-
-    private void UpdateActiveInformation()
-    {
-        if ((null == m_pUserInfo) || (null == m_pServerGlobalConfig))
-            return;
+        var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
+        var pServerGlobalConfig = await Single.Table.GetTable<SHTableServerGlobalConfig>();
 
         var Epsilon = 500;
-        var LastMiningPowerAt = m_pUserInfo.MiningPowerAt - Epsilon;
+        var LastMiningPowerAt = pUserInfo.MiningPowerAt - Epsilon;
 
         // 남은 시간과 파워갯수 구하기
         var pTimeSpan = (DateTime.UtcNow - SHUtils.GetUCTTimeByMillisecond(LastMiningPowerAt));
-        var iCurPowerCount = (int)(pTimeSpan.TotalMilliseconds / (double)m_pServerGlobalConfig.m_iBasicChargeTime);
-        var fCurLeftTime = (pTimeSpan.TotalMilliseconds % (double)m_pServerGlobalConfig.m_iBasicChargeTime);
+        var iCurPowerCount = (int)(pTimeSpan.TotalMilliseconds / (double)pServerGlobalConfig.m_iBasicChargeTime);
+        var fCurLeftTime = (pTimeSpan.TotalMilliseconds % (double)pServerGlobalConfig.m_iBasicChargeTime);
 
         // 파워갯수 출력형태로 구성
-        iCurPowerCount = Math.Min(iCurPowerCount, m_pServerGlobalConfig.m_iBasicMiningPowerCount);
-        string strCountInfo = string.Format("{0}/{1}", iCurPowerCount, m_pServerGlobalConfig.m_iBasicMiningPowerCount);
+        iCurPowerCount = Math.Min(iCurPowerCount, pServerGlobalConfig.m_iBasicMiningPowerCount);
+        string strCountInfo = string.Format("{0}/{1}", iCurPowerCount, pServerGlobalConfig.m_iBasicMiningPowerCount);
 
         // 남은 시간 출력형태로 구성
-        var pLeftTime = TimeSpan.FromMilliseconds(m_pServerGlobalConfig.m_iBasicChargeTime - fCurLeftTime);
+        var pLeftTime = TimeSpan.FromMilliseconds(pServerGlobalConfig.m_iBasicChargeTime - fCurLeftTime);
         var iLeftMinutes = (int)(pLeftTime.TotalSeconds / 60);
         var iLeftSecond = (int)(pLeftTime.TotalSeconds % 60);
-        string strTimer = (iCurPowerCount < m_pServerGlobalConfig.m_iBasicMiningPowerCount) ? 
+        string strTimer = (iCurPowerCount < pServerGlobalConfig.m_iBasicMiningPowerCount) ? 
             string.Format("{0:00}:{1:00}", iLeftMinutes, iLeftSecond) : "--:--";
 
         // UI 업데이트
@@ -101,18 +93,9 @@ public partial class SHBusinessLobby : MonoBehaviour
 
     public void OnEventOfChangeMiningStage(eMiningStageType eType)
     {
-        // 맞을 때
-        if (eType == eMiningStageType.Active)
-        {
-            StartCoroutine(CoroutineForMiningActiveScrollview());
-        }
-
-        // 아닐 때
-        if (eType != eMiningStageType.Active)
-        {
-            StopCoroutine(CoroutineForMiningActiveScrollview());
-        }
+        SetChangeMiningStage(eType);
     }
+
     public async void ShowAlert(string strMessage)
     {
         var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
@@ -128,40 +111,24 @@ public partial class SHBusinessLobby : MonoBehaviour
     {
         while (true)
         {
-            if (null == m_pUIPanelMining)
+            if (m_pUIPanelMining)
             {
-                yield return null;
+                UpdateActiveInformation();
             }
             
-            if (null == m_pUserInfo)
-            {
-                ReloadUserInfo();
-                yield return new WaitForSeconds(0.5f);
-            }
-
-            if (null == m_pServerGlobalConfig)
-            {
-                ReloadServerConfig();
-                yield return new WaitForSeconds(0.5f);
-            }
-
-            UpdateActiveInformation();
-
             yield return null;
         }
     }
-
+    
     [Obsolete("This Coroutine is Deprecated When run socket.io")]
     private IEnumerator CoroutineForMiningActiveScrollview()
     {
         while (true)
         {
-            if (null == m_pUIPanelMining)
+            if (m_pUIPanelMining)
             {
-                yield return null;
+                UpdateActiveScrollview();
             }
-
-            UpdateActiveScrollview();
 
             yield return new WaitForSeconds(1.0f);
         }
@@ -172,23 +139,17 @@ public partial class SHBusinessLobby : MonoBehaviour
     //////////////////////////////////////////////////////////////////////
     public async void OnClickDebugReset()
     {
-        if (null == m_pUserInfo)
-        {
-            var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-            var pTable = await Single.Table.GetTable<SHTableClientString>();
-            await pUIRoot.ShowAlert(pTable.GetString("1000"));
-            return;
-        }
+        var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
 
         JsonData json = new JsonData
         {
-            ["user_id"] = m_pUserInfo.UserId
+            ["user_id"] = pUserInfo.UserId
         };
         Single.Network.POST(SHAPIs.SH_API_TEST_RESET_POWER, json, async (reply) => 
         {
             if (reply.isSucceed)
             {
-                m_pUserInfo.LoadJsonTable(reply.data);
+                pUserInfo.LoadJsonTable(reply.data);
             }
             else
             {
@@ -200,23 +161,18 @@ public partial class SHBusinessLobby : MonoBehaviour
 
     public async void OnClickDebugUsePower()
     {
-        if (null == m_pUserInfo)
-        {
-            var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-            var pTable = await Single.Table.GetTable<SHTableClientString>();
-            await pUIRoot.ShowAlert(pTable.GetString("1000"));
-            return;
-        }
+        var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
 
         JsonData json = new JsonData
         {
-            ["user_id"] = m_pUserInfo.UserId
+            ["user_id"] = pUserInfo.UserId
         };
+
         Single.Network.POST(SHAPIs.SH_API_TEST_USE_POWER, json, async (reply) => 
         {
             if (reply.isSucceed)
             {
-                m_pUserInfo.LoadJsonTable(reply.data);
+                pUserInfo.LoadJsonTable(reply.data);
             }
             else
             {

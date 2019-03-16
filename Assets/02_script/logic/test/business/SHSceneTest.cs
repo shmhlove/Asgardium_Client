@@ -17,10 +17,9 @@ public class SHSceneTest : MonoBehaviour
 
     void Start ()
     {
-        Single.Network.GET(SHAPIs.SH_API_TEST, null, async (reply) =>
+        Single.Network.GET(SHAPIs.SH_API_TEST, null, (reply) =>
         {
-            var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-            await pUIRoot.ShowAlert(reply.ToString());
+            Single.BusinessGlobal.ShowAlertUI(reply.ToString());
         });
     }
 }

@@ -31,6 +31,9 @@ public static class Single
     public static SHApplicationInfo         AppInfo     { get { return SHApplicationInfo.Instance; } }
     public static SHCoroutine               Coroutine   { get { return SHCoroutine.Instance; } }
     public static SHObjectPoolManager       ObjectPool  { get { return SHObjectPoolManager.Instance; } }
+
+    // 비지니스
+    public static SHBusinessGlobal          BusinessGlobal { get { return SHBusinessGlobal.Instance; } }
 }
 
 public abstract class SHSingleton<T> : MonoBehaviour where T : SHSingleton<T>

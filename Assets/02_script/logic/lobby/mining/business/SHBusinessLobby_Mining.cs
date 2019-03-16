@@ -15,12 +15,14 @@ public partial class SHBusinessLobby : MonoBehaviour
         // 맞을 때
         if (eType == eMiningStageType.Active)
         {
+            // 서버에게 마이닝 회사 정보 업데이트 승인 요청
             StartCoroutine("CoroutineForMiningActiveScrollview");
         }
 
         // 아닐 때
         if (eType != eMiningStageType.Active)
         {
+            // 서버에게 마이닝 회사 정보 업데이트 취소 요청
             StopCoroutine("CoroutineForMiningActiveScrollview");
         }
     }
@@ -96,15 +98,9 @@ public partial class SHBusinessLobby : MonoBehaviour
         SetChangeMiningStage(eType);
     }
 
-    public async void ShowAlert(string strMessage)
-    {
-        var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-        await pUIRoot.ShowAlert(strMessage);
-    }
-
     public void OnEventOfPurchaseMining(string strInstanceId)
     {
-        ShowAlert(string.Format("채굴 요청 : {0}", strInstanceId));
+        Single.BusinessGlobal.ShowAlertUI(string.Format("채굴 요청 : {0}", strInstanceId));
     }
 
     private IEnumerator CoroutineForMiningActiveInformation()
@@ -113,7 +109,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         {
             if (m_pUIPanelMining)
             {
-                UpdateActiveInformation();
+                //UpdateActiveInformation();
             }
             
             yield return null;
@@ -127,7 +123,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         {
             if (m_pUIPanelMining)
             {
-                UpdateActiveScrollview();
+                //UpdateActiveScrollview();
             }
 
             yield return new WaitForSeconds(1.0f);
@@ -145,7 +141,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         {
             ["user_id"] = pUserInfo.UserId
         };
-        Single.Network.POST(SHAPIs.SH_API_TEST_RESET_POWER, json, async (reply) => 
+        Single.Network.POST(SHAPIs.SH_API_TEST_RESET_POWER, json, (reply) => 
         {
             if (reply.isSucceed)
             {
@@ -153,8 +149,7 @@ public partial class SHBusinessLobby : MonoBehaviour
             }
             else
             {
-                var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-                await pUIRoot.ShowAlert(reply.ToString());
+                Single.BusinessGlobal.ShowErrorAlertUI(reply);
             }
         });
     }
@@ -176,8 +171,7 @@ public partial class SHBusinessLobby : MonoBehaviour
             }
             else
             {
-                var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-                await pUIRoot.ShowAlert(reply.ToString());
+                Single.BusinessGlobal.ShowErrorAlertUI(reply);
             }
         });
     }

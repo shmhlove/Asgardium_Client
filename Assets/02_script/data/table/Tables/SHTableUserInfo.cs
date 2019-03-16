@@ -61,9 +61,10 @@ public class SHTableUserInfo : SHBaseTable
             {
                 LoadJsonTable(reply.data);
             }
-            
-            var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-            await pUIRoot.ShowAlert(reply.ToString());
+            else
+            {
+                Single.BusinessGlobal.ShowErrorAlertUI(reply);
+            }
         });
     }
 }

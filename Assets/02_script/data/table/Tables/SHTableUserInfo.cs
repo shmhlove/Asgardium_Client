@@ -55,7 +55,7 @@ public class SHTableUserInfo : SHBaseTable
             ["email"] = "shmhlove@naver.com",
             ["password"] = "1234"
         };
-        Single.Network.POST(SHAPIs.SH_API_SIGNIN, json, async (reply) =>
+        Single.Network.POST(SHAPIs.SH_API_SIGNIN, json, (reply) =>
         {
             if (reply.isSucceed)
             {
@@ -63,7 +63,7 @@ public class SHTableUserInfo : SHBaseTable
             }
             else
             {
-                Single.BusinessGlobal.ShowErrorAlertUI(reply);
+                Single.BusinessGlobal.ShowAlertUI(reply);
             }
         });
     }

@@ -17,20 +17,33 @@ public class SHReply
     public SHError error;
     public JsonData rawResponse;
 
+    public string requestMethod;
+    public string requestUrl;
+
+    public eErrorCode errorCode
+    {
+        get
+        {
+            if (null == error)
+            {
+                if (isSucceed)
+                    return eErrorCode.Succeed;
+                else
+                    return eErrorCode.Failed;
+            }
+            
+            return error.code;
+        }
+    }
+
     public SHReply()
     {
         this.isSucceed = true;
         this.data = null;
         this.error = null;
         this.rawResponse = null;
-    }
-
-    public SHReply(JsonData data)
-    {
-        this.isSucceed = true;
-        this.data = data;
-        this.error = null;
-        this.rawResponse = null;
+        this.requestMethod = string.Empty;
+        this.requestUrl = string.Empty;
     }
 
     public SHReply(SHError error)
@@ -39,6 +52,8 @@ public class SHReply
         this.data = null;
         this.error = error;
         this.rawResponse = null;
+        this.requestMethod = string.Empty;
+        this.requestUrl = string.Empty;
     }
 
     public SHReply(UnityWebRequest request)
@@ -46,7 +61,9 @@ public class SHReply
         this.data = null;
         this.error = null;
         this.rawResponse = null;
-
+        this.requestMethod = request.method;
+        this.requestUrl = request.url;
+        
 #if UNITY_2017_1_OR_NEWER
         if (request.isNetworkError)
 #else
@@ -74,51 +91,31 @@ public class SHReply
                         this.isSucceed = (bool)this.rawResponse["result"];
                     }
 
-                    if ((true == this.rawResponse.Keys.Contains("data")) && (null != this.rawResponse["data"]))
+                    if ((true == this.rawResponse.Keys.Contains("data")) 
+                        && (null != this.rawResponse["data"]))
                     {
                         this.data = this.rawResponse["data"];
                     }
 
-                    if ((true == this.rawResponse.Keys.Contains("error")) && (null != this.rawResponse["error"]))
+                    if ((true == this.rawResponse.Keys.Contains("error")) 
+                        && (null != this.rawResponse["error"]))
                     {
-                        if (this.rawResponse["error"].Keys.Contains("extras"))
-                            this.error = new SHError((eErrorCode)(int)this.rawResponse["error"]["code"], (string)this.rawResponse["error"]["message"], this.rawResponse["error"]["extras"]);
+                        var pError = this.rawResponse["error"];
+                        if (pError.Keys.Contains("extras"))
+                            this.error = new SHError((eErrorCode)(int)pError["code"], (string)pError["message"], pError["extras"]);
                         else
-                            this.error = new SHError((eErrorCode)(int)this.rawResponse["error"]["code"], (string)this.rawResponse["error"]["message"]);
+                            this.error = new SHError((eErrorCode)(int)pError["code"], (string)pError["message"]);
                     }
                 }
             }
             catch
             {
                 this.isSucceed = false;
-                this.error = new SHError(eErrorCode.Net_Common_JsonParse, string.Format("{0}\n{1}", "Err Json Parse With Server ResponseData", request.downloadHandler.text));
+                this.error = new SHError(
+                    eErrorCode.Net_Common_JsonParse, 
+                    string.Format("{0}\n{1}", "Err Json Parse With Server ResponseData", 
+                    request.downloadHandler.text));
             }
-        }
-
-        if (null != this.data)
-        {
-            Debug.LogFormat("[RESPONSE] : {0} {1}\n{2}",
-                request.method,
-                request.url,
-                this.data.ToJson());
-        }
-
-        if (null != this.error)
-        {
-            Debug.LogErrorFormat("[RESPONSE] : {0} {1}\n{2}",
-                request.method,
-                request.url,
-                this.error.ToString());
-        }
-        
-        if ( (null == this.data)
-          && (null == this.error)
-          && (null != this.rawResponse))
-        {
-            Debug.LogFormat("[RESPONSE] : {0} {1}\n{2}",
-                request.method,
-                request.url,
-                this.rawResponse.ToJson());
         }
 
         request.Dispose();
@@ -134,6 +131,11 @@ public class SHReply
         if (null != error)
         {
             return error.ToString();
+        }
+
+        if (null != rawResponse)
+        {
+            return rawResponse.ToJson();
         }
 
         return string.Empty;

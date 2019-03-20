@@ -18,7 +18,8 @@ public enum eErrorCode
     Net_Auth_AlreadySignupUser = 2001,
     Net_Auth_NoSignupUser = 2002,
     Net_Auth_NoMatchPassword = 2003,
-
+    Auth_InvalidEmaile = 2004,
+    
     // data error
     Data_NotImplementation = 1000001,
     Resources_NotExsitInTable = 1001002,

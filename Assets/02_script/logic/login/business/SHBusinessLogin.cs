@@ -48,13 +48,11 @@ public class SHBusinessLogin : MonoBehaviour
         m_pUIPanelSignup.Show(EventRegistrationUser, EventGoBackLogin, strEmail);
     }
 
-    private async void OnClickLogin(string strEmail, string strPassword, bool bIsSave)
+    private void OnClickLogin(string strEmail, string strPassword, bool bIsSave)
     {
         if (false == SHUtils.IsValidEmail(strEmail))
         {
-            var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-            var pTable = await Single.Table.GetTable<SHTableClientString>();
-            await pUIRoot.ShowAlert(pTable.GetString("1001"));
+            Single.BusinessGlobal.ShowAlertUI(new SHReply(new SHError(eErrorCode.Auth_InvalidEmaile, "")));
             return;
         }
 
@@ -76,8 +74,7 @@ public class SHBusinessLogin : MonoBehaviour
                 SHPlayerPrefs.Save();
             }
             
-            var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-            await pUIRoot.ShowAlert(reply.ToString(), async () => 
+            Single.BusinessGlobal.ShowAlertUI(reply, async (eBtnAction) => 
             {
                 if (reply.isSucceed)
                 {
@@ -92,13 +89,11 @@ public class SHBusinessLogin : MonoBehaviour
         ShowSignupPanel(strEmail);
     }
 
-    private async void OnClickRegistrationUser(string strEmail, string strName, string strPassword)
+    private void OnClickRegistrationUser(string strEmail, string strName, string strPassword)
     {
         if (false == SHUtils.IsValidEmail(strEmail))
         {
-            var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-            var pTable = await Single.Table.GetTable<SHTableClientString>();
-            await pUIRoot.ShowAlert(pTable.GetString("1001"));
+            Single.BusinessGlobal.ShowAlertUI(new SHReply(new SHError(eErrorCode.Auth_InvalidEmaile, "")));
             return;
         }
 
@@ -108,10 +103,9 @@ public class SHBusinessLogin : MonoBehaviour
             ["name"] = strName,
             ["password"] = strPassword
         };
-        Single.Network.POST(SHAPIs.SH_API_SIGNUP, json, async (reply) =>
+        Single.Network.POST(SHAPIs.SH_API_SIGNUP, json, (reply) =>
         {
-            var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-            await pUIRoot.ShowAlert(reply.ToString(), () => 
+            Single.BusinessGlobal.ShowAlertUI(reply, (eBtnAction) => 
             {
                 if (reply.isSucceed)
                 {

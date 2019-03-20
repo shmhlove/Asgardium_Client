@@ -26,16 +26,10 @@ public class SHUIRootGlobal : SHUIRoot
         pPanel.Close(pCallback);
     }
 
-    public async Task ShowAlert(string strMessage, Action pCallback = null)
+    public async void ShowAlert(SHUIAlertInfo pAletInfo)
     {
         var pPanel = await GetPanel<SHUIPanelAlert>(SHUIConstant.PANEL_ALERT);
-
-        Action<eAlertButtonAction> pResult = (eAction) =>
-        {
-            pPanel.Close(pCallback);
-        };
-        
-        pPanel.Show("", strMessage, eAlertButtonType.OneButton, pResult);
+        pPanel.Show(pAletInfo);
     }
     
     public async Task ShowIndicator()
@@ -43,7 +37,13 @@ public class SHUIRootGlobal : SHUIRoot
         var pPanel = await GetPanel<SHUIPanelIndicator>(SHUIConstant.PANEL_INDICATOR);
         pPanel.Show();
     }
-
+    
+    public async Task UpdateIndicatorMessage(string strMessage)
+    {
+        var pPanel = await GetPanel<SHUIPanelIndicator>(SHUIConstant.PANEL_INDICATOR);
+        pPanel.SetMessage(strMessage);
+    }
+    
     public async Task CloseIndicator()
     {
         var pPanel = await GetPanel<SHUIPanelIndicator>(SHUIConstant.PANEL_INDICATOR);

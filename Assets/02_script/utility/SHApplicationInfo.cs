@@ -18,17 +18,17 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
     [Header("Debug")]
     // 기타(디버그) : FPS 출력용 델타타임
     [ReadOnlyField]
-    [SerializeField] private float              m_fDeltaTime        = 0.0f;
+    [SerializeField] private float m_fDeltaTime = 0.0f;
 
     // 기타(디버그) : 실시간 로드 리소스 리스트
-    [HideInInspector] private DicResourceLoadInfo m_pDicResourceLoadInfo   = new DicResourceLoadInfo();
+    [HideInInspector] private DicResourceLoadInfo m_pDicResourceLoadInfo = new DicResourceLoadInfo();
 
-    public override async void OnInitialize()
+    public override void OnInitialize()
     {
         SetDontDestroy();
 
         // 어플리케이션 정보설정
-        await SetApplicationInfo();
+        SetApplicationInfo();
 
         // 디바이스 정보 로그
         PrintDeviceInfo();
@@ -52,7 +52,7 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
         }
     }
     
-    async Task SetApplicationInfo()
+    private async void SetApplicationInfo()
     {
         var pTable = await Single.Table.GetTable<SHTableClientConfig>();
         
@@ -175,23 +175,6 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
     [FuncButton]
     public void SaveLoadResourceList()
     {
-        // var pJsonData = new JsonData();
-        
-        // foreach (var kvp in m_pDicResourceLoadInfo)
-        // {
-        //     foreach (var pValue in kvp.Value)
-        //     {
-        //         pJsonData[string.Format("Scene : {0}", kvp.Key)].Add(pValue);
-        //     }
-        // }
-        
-        // var pJsonWriter = new JsonWriter();
-        // pJsonWriter.PrettyPrint = true;
-        // JsonMapper.ToJson(pJsonData, pJsonWriter);
-
-        // string strSavePath = string.Format("{0}/{1}.json", SHPath.GetAssets(), "RealTimeResourceLoadInfo");
-        // SHUtils.SaveFile(pJsonWriter.ToString(), strSavePath);
-
         string strBuff = string.Empty;
         foreach (var kvp in m_pDicResourceLoadInfo)
         {
@@ -205,6 +188,7 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
         SHUtils.SaveFile(strBuff, strSavePath);
         Process.Start(strSavePath);
     }
+    
     [FuncButton]
     public void ClearLoadResourceList()
     {

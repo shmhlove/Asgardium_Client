@@ -24,12 +24,23 @@ public class SHUIPanel : SHMonoWrapper
 
     public void Show(params object[] pArgs)
     {
+        // 켜져있는 상태에서 다시 켤때 애니메이션이 처음부터 시작하는게 어색해서..
+        bool bIsActive = IsActive();
+
         SetActive(true);
         OnBeforeShow(pArgs);
-        PlayAnim(eDirection.Front, m_pAnimRoot, m_pAnimOfOpen, ()=> 
+
+        if (true == bIsActive)
         {
             OnAfterShow(pArgs);
-        });
+        }
+        else
+        {
+            PlayAnim(eDirection.Front, m_pAnimRoot, m_pAnimOfOpen, ()=> 
+            {
+                OnAfterShow(pArgs);
+            });
+        }
     }
 
     public void Close(params object[] pArgs)

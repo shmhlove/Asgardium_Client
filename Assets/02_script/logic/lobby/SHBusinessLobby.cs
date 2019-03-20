@@ -30,7 +30,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         SetChangeMiningStage(eMiningStageType.Active);
 
         // 소켓 통신 해보자
-        Single.Network.ConnectWebSocket((reply) => {});
+        //Single.Network.ConnectWebSocket((reply) => {});
     }
 
     private void OnEnable()

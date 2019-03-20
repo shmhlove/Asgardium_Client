@@ -17,9 +17,9 @@ public class SHSceneTest : MonoBehaviour
 
     void Start ()
     {
-        Single.Network.GET(SHAPIs.SH_API_TEST, null, (reply) =>
+        Single.Network.GET(SHAPIs.SH_API_RETRY_REQUEST, null, (reply) =>
         {
-            Single.BusinessGlobal.ShowAlertUI(reply.ToString());
+            Single.BusinessGlobal.ShowAlertUI(reply);
         });
     }
 }

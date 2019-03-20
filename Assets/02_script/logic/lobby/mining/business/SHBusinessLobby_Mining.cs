@@ -109,7 +109,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         {
             if (m_pUIPanelMining)
             {
-                //UpdateActiveInformation();
+                UpdateActiveInformation();
             }
             
             yield return null;
@@ -123,7 +123,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         {
             if (m_pUIPanelMining)
             {
-                //UpdateActiveScrollview();
+                UpdateActiveScrollview();
             }
 
             yield return new WaitForSeconds(1.0f);
@@ -149,7 +149,7 @@ public partial class SHBusinessLobby : MonoBehaviour
             }
             else
             {
-                Single.BusinessGlobal.ShowErrorAlertUI(reply);
+                Single.BusinessGlobal.ShowAlertUI(reply);
             }
         });
     }
@@ -163,7 +163,7 @@ public partial class SHBusinessLobby : MonoBehaviour
             ["user_id"] = pUserInfo.UserId
         };
 
-        Single.Network.POST(SHAPIs.SH_API_TEST_USE_POWER, json, async (reply) => 
+        Single.Network.POST(SHAPIs.SH_API_TEST_USE_POWER, json, (reply) => 
         {
             if (reply.isSucceed)
             {
@@ -171,7 +171,7 @@ public partial class SHBusinessLobby : MonoBehaviour
             }
             else
             {
-                Single.BusinessGlobal.ShowErrorAlertUI(reply);
+                Single.BusinessGlobal.ShowAlertUI(reply);
             }
         });
     }

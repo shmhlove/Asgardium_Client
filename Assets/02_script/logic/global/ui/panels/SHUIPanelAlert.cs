@@ -13,9 +13,27 @@ public enum eAlertButtonType
 
 public enum eAlertButtonAction
 {
-    Close,
-    Ok,
-    Cancel
+    Right_Button,
+    Left_Button,
+    Close_Button
+}
+
+public class SHUIAlertInfo
+{
+    public string m_strTitle = string.Empty;
+    public string m_strMessage = string.Empty;
+    public string m_strOneBtnLabel = string.Empty;
+    public string m_strTwoLeftBtnLabel = string.Empty;
+    public string m_strTwoRightBtnLabel = string.Empty;
+    public eAlertButtonType m_eButtonType = eAlertButtonType.OneButton;
+    public Action<eAlertButtonAction> m_pCallback = (eBtnAction) => {};
+
+    public SHUIAlertInfo() { }
+    public SHUIAlertInfo(string strMessage, Action<eAlertButtonAction> pCallback = null)
+    {
+        m_strMessage = strMessage;
+        m_pCallback = (null == pCallback) ? (eBtnAction) => {} : pCallback;
+    }
 }
 
 public class SHUIPanelAlert : SHUIPanel
@@ -28,22 +46,42 @@ public class SHUIPanelAlert : SHUIPanel
     [Header("Buttons")]
     public GameObject m_pOneButton;
     public GameObject m_pTwoButton;
+    public UILabel m_pLabelOneButton;
+    public UILabel m_pLabelTwoLeftButton;
+    public UILabel m_pLabelTwoRightButton;
 
     [Header("Event")]
     private Action<eAlertButtonAction> m_pCallback;
 
     public override void OnBeforeShow(params object[] pArgs)
     {
-        Single.Coroutine.NextUpdate(() =>
+        Single.Coroutine.NextUpdate(async () =>
         {
-            m_pLabelTitle.text = (string)pArgs[0];
-            //m_pLabelBody.text = (string)pArgs[1];
+            var pStringTable = await Single.Table.GetTable<SHTableClientString>();
+
+            var pAlertInfo = (SHUIAlertInfo)pArgs[0];
+            m_pLabelTitle.text = pAlertInfo.m_strTitle;
 
             m_pTextListBody.Clear();
             m_pTextListBody.textLabel.pivot = UIWidget.Pivot.Center;
-            m_pTextListBody.Add("[BAC4C4]" + (string)pArgs[1] + "[-]");
+            m_pTextListBody.Add("[BAC4C4]" + (string)pAlertInfo.m_strMessage + "[-]");
 
-            switch ((eAlertButtonType)pArgs[2])
+            if (string.IsNullOrEmpty(pAlertInfo.m_strOneBtnLabel))
+                m_pLabelOneButton.text = pStringTable.GetString("10010");
+            else
+                m_pLabelOneButton.text = pAlertInfo.m_strOneBtnLabel;
+
+            if (string.IsNullOrEmpty(pAlertInfo.m_strTwoLeftBtnLabel))
+                m_pLabelTwoLeftButton.text = pStringTable.GetString("10010");
+            else
+                m_pLabelTwoLeftButton.text = pAlertInfo.m_strTwoLeftBtnLabel;
+
+            if (string.IsNullOrEmpty(pAlertInfo.m_strTwoRightBtnLabel))
+                m_pLabelTwoRightButton.text = pStringTable.GetString("10011");
+            else
+                m_pLabelTwoRightButton.text = pAlertInfo.m_strTwoRightBtnLabel;
+
+            switch (pAlertInfo.m_eButtonType)
             {
                 case eAlertButtonType.NoButton:
                     m_pOneButton.SetActive(false);
@@ -59,7 +97,7 @@ public class SHUIPanelAlert : SHUIPanel
                     break;
             }
 
-            m_pCallback = (Action<eAlertButtonAction>)pArgs[3];
+            m_pCallback = pAlertInfo.m_pCallback;
         });
     }
 
@@ -69,26 +107,34 @@ public class SHUIPanelAlert : SHUIPanel
         {
             return;
         }
+        
+        ((Action)pArgs[0])();
+    }
 
-        var pCallback = (Action)pArgs[0];
-        if (null != pCallback)
+    public void OnClickButtonLeft()
+    {
+        Action pAfterClose = () =>
         {
-            pCallback();
-        }
+            m_pCallback(eAlertButtonAction.Left_Button);
+        };
+        Close(pAfterClose);
     }
 
-    public void OnClickButton1()
+    public void OnClickButtonRight()
     {
-        m_pCallback(eAlertButtonAction.Ok);
-    }
-
-    public void OnClickButton2()
-    {
-        m_pCallback(eAlertButtonAction.Cancel);
+        Action pAfterClose = () =>
+        {
+            m_pCallback(eAlertButtonAction.Right_Button);
+        };
+        Close(pAfterClose);
     }
 
     public void OnClickButtonClose()
     {
-        m_pCallback(eAlertButtonAction.Close);
+        Action pAfterClose = () =>
+        {
+            m_pCallback(eAlertButtonAction.Close_Button);
+        };
+        Close(pAfterClose);
     }
 }

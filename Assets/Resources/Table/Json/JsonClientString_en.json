@@ -2,8 +2,18 @@
   {
     "0": "Form",
     "1": "Form",
+    
     "1000": "Login is required.",
     "1001": "This is not a valid email format.",
+    "1002": "A system error has occurred.",
+    "1003": "Email already registered.",
+    "1004": "Unregistered email.",
+    "1005": "This password does not match",
+    "1006": "The network status is unstable.",
+    "1007": "Transient system error.",
+    "1008": "Retrying({0}/{1})",
+    "1009": "Would you like to retry?",
+
     "10000": "Email",
     "10001": "Password",
     "10002": "Nickname",
@@ -14,6 +24,11 @@
     "10007": "Please enter your Password.",
     "10008": "Save login information",
     "10009": "Please enter your nickname.",
+    "10010": "OK",
+    "10011": "Cancel",
+    "10012": "Retry",
+    "10013": "Exit",
+
     "1010000": "점검 중이라 접속이 안된다 페코!",
     "1010001": "네크워크가 불안정 하다 페코! 다시 한번 접속 해 봐라 페코!",
     "1030000": "Apple 1",

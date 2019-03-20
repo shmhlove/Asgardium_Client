@@ -9,6 +9,9 @@ using LitJson;
 
 public class SHTableClientConfig : SHBaseTable
 {
+    public string ServerHost       = string.Empty;
+    public int MaxRetryRequestCount = 5;
+
     public string ServerConfigURL  = string.Empty;
     public string ServiceMode      = string.Empty;
     public string Version          = string.Empty;
@@ -36,6 +39,9 @@ public class SHTableClientConfig : SHBaseTable
 
         JsonData pDataNode = pJson[0];
 
+        ServerHost = GetStrToJson(pDataNode, "ServerHost");
+        MaxRetryRequestCount = GetIntToJson(pDataNode, "MaxRetryRequestCount");
+        
         ServerConfigURL = GetStrToJson(pDataNode, "ServerConfigURL");
         ServiceMode = GetStrToJson(pDataNode, "ServiceMode");
         Version = GetStrToJson(pDataNode, "Version");

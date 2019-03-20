@@ -136,8 +136,11 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         {
             StartCoroutine(CoroutineSendRequest(new SHWebRequestData(SHAPIs.SH_API_RETRY_REQUEST, HTTPMethodType.GET, null, (pReply) => 
             {
+                m_iRetryCount = 0;
                 m_bIsProcessingRetry = false;
                 Single.BusinessGlobal.UpdateIndicatorMessage(string.Empty);
+
+                Debug.LogFormat("[LSH] WebRequestQueue Count : {0}", m_pWebRequestQueue.Count);
 
                 foreach (var pReq in m_pWebRequestQueue)
                 {

@@ -17,8 +17,9 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
     public void ConnectWebSocket(Action<SHReply> callback)
     {
         //var test = Socket.Connect(m_strWebHost + "/sockettest");
-        var test = Socket.Connect(m_strWebHost);
-
+        //var test = Socket.Connect(m_strWebHost);
+        var test = Socket.Connect("http://13.124.43.70:3001");
+        
         // 소켓 연결되었을 때
         test.On(SystemEvents.connect, () =>
         {

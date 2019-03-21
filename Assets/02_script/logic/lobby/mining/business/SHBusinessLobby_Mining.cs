@@ -27,7 +27,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         }
     }
 
-    private async void UpdateActiveInformation()
+    private async void UpdateActiveInformation(Action pCallback)
     {
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
         var pServerGlobalConfig = await Single.Table.GetTable<SHTableServerGlobalConfig>();
@@ -53,9 +53,11 @@ public partial class SHBusinessLobby : MonoBehaviour
 
         // UI 업데이트
         m_pUIPanelMining.SetActiveInformation(strCountInfo, strTimer);
+
+        pCallback();
     }
 
-    private async void UpdateActiveScrollview()
+    private async void UpdateActiveScrollview(Action pCallback)
     {
         var pCompanyTable = await Single.Table.GetTable<SHTableServerInstanceMiningActiveCompany>();
         //pCompanyTable.LoadServerTable(async (errorCode) => 
@@ -90,6 +92,8 @@ public partial class SHBusinessLobby : MonoBehaviour
             });
 
             m_pUIPanelMining.SetActiveScrollview(pSlotDatas);
+
+            pCallback();
         //});
     }
 
@@ -109,7 +113,11 @@ public partial class SHBusinessLobby : MonoBehaviour
         {
             if (m_pUIPanelMining)
             {
-                UpdateActiveInformation();
+                bool isDone = false;
+                UpdateActiveInformation(() => isDone = true);
+
+                while (false == isDone)
+                    yield return null;
             }
             
             yield return null;
@@ -123,7 +131,11 @@ public partial class SHBusinessLobby : MonoBehaviour
         {
             if (m_pUIPanelMining)
             {
-                UpdateActiveScrollview();
+                bool isDone = false;
+                UpdateActiveScrollview(() => isDone = true);
+
+                while (false == isDone)
+                    yield return null;
             }
 
             yield return new WaitForSeconds(1.0f);

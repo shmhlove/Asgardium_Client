@@ -135,7 +135,6 @@ namespace socket.io {
                 var textIndex = www.text.IndexOf('{');
                 if (textIndex != -1) {
                     var json = www.text.Substring(textIndex);
-                    json = json.Substring(0, json.IndexOf('}') + 1);
                     var answer = JsonUtility.FromJson<PollingUrlAnswer>(json);
                     _urlQueries.Add("sid", answer.sid);
                 }

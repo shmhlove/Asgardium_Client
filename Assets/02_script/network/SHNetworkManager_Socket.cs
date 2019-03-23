@@ -17,7 +17,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
     public void ConnectWebSocket(Action<SHReply> callback)
     {
         //var test = Socket.Connect(m_strWebHost + "/sockettest");
-        var test = Socket.Connect(m_strWebHost);
+        var test = Socket.Connect(m_strWebHost, new SHCustomCertificateHandler());
         
         test.On(SystemEvents.connect, () =>
         {

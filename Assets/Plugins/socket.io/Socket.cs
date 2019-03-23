@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
+
 using System;
 using System.Collections.Generic;
 
@@ -18,6 +20,22 @@ namespace socket.io {
             var socket = new GameObject(string.Format("socket.io - {0}", url)).AddComponent<Socket>();
             socket.transform.SetParent(SocketManager.Instance.transform, false);
             socket.Url = new Uri(url);
+
+            SocketManager.Instance.Connect(socket);
+            return socket;
+        }
+
+        /// <summary>
+        /// Establishes a connection to a given url and certificateHandler
+        /// </summary>
+        /// <param name="url"> The URL of the remote host </param>
+        /// <param name="certificateHandler"> The CertificateHandler of the SSL </param>
+        /// <returns></returns>
+        public static Socket Connect(string url, CertificateHandler certificateHandler) {
+            var socket = new GameObject(string.Format("socket.io - {0}", url)).AddComponent<Socket>();
+            socket.transform.SetParent(SocketManager.Instance.transform, false);
+            socket.Url = new Uri(url);
+            socket.certificateHandler = certificateHandler;
 
             SocketManager.Instance.Connect(socket);
             return socket;
@@ -253,6 +271,11 @@ namespace socket.io {
         /// </summary>
         public Uri Url { get; private set; }
         
+        /// <summary>
+        /// The CertificateHandler of the SSL
+        /// </summary>
+        public CertificateHandler certificateHandler { get; private set; }
+
         /// <summary>
         /// Namespace ("/" is the default namespace which means global namespace.)
         /// </summary>

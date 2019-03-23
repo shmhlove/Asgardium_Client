@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
+
 using UniRx;
 using System;
 using System.Text;
@@ -49,7 +51,16 @@ namespace socket.io {
         /// </summary>
         public string WebSocketUrl {
             get {
-                var builder = new StringBuilder(BaseUrl.Replace("http://", "ws://"));
+                //var builder = new StringBuilder(BaseUrl.Replace("http://", "ws://"));
+                var builder = new StringBuilder();
+
+                if (BaseUrl.StartsWith("http://"))
+                    builder.Append(BaseUrl.Replace("http://", "ws://"));
+                else if (BaseUrl.StartsWith("https://"))
+                    builder.Append(BaseUrl.Replace("https://", "wss://"));
+                else
+                    Debug.Assert(false);
+
                 builder.Append("/socket.io/");
 
                 for (int i = 0; i < _urlQueries.Count; ++i) {
@@ -119,7 +130,16 @@ namespace socket.io {
             // Try get WebSocketTrigger instance if a connection already established _baseUrl.
             var webSocketTrigger = SocketManager.Instance.GetWebSocketTrigger(BaseUrl);
             if (webSocketTrigger == null || !webSocketTrigger.IsConnected) {
-                var www = new WWW(PollingUrl);
+                //var www = new WWW(PollingUrl);
+
+                var www = new UnityWebRequest(PollingUrl);
+                www.method = "GET";
+                www.downloadHandler = new DownloadHandlerBuffer();
+                www.certificateHandler = Socket.certificateHandler;
+                www.SetRequestHeader("Content-Type", "application/json; charset=utf-8");
+                www.SetRequestHeader("Accept", "application/json");
+
+                yield return www.SendWebRequest();
 
                 while (!www.isDone && !cancelToken.IsCancellationRequested )
                     yield return null;
@@ -131,10 +151,13 @@ namespace socket.io {
                     observer.OnError(new Exception(www.error));
                     yield break;
                 }
+                
+                var textLength = www.downloadHandler.text.Length;
+                var textStartIndex = www.downloadHandler.text.IndexOf('{');
+                var textEndIndex = www.downloadHandler.text.LastIndexOf('}');
 
-                var textIndex = www.text.IndexOf('{');
-                if (textIndex != -1) {
-                    var json = www.text.Substring(textIndex);
+                if ((textStartIndex != -1) && (textEndIndex != -1)) {
+                    var json = www.downloadHandler.text.Substring(textStartIndex, (textEndIndex - textStartIndex) + 1);
                     var answer = JsonUtility.FromJson<PollingUrlAnswer>(json);
                     _urlQueries.Add("sid", answer.sid);
                 }

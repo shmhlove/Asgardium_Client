@@ -29,16 +29,17 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 
     public override void OnInitialize()
     {
-        SetServerInfo();
+        SetServerInfo(() => {});
         SetStringTable();
         SetDontDestroy();
     }
     
-    private async void SetServerInfo()
+    private async void SetServerInfo(Action pCallback)
     {
         var pTable = await Single.Table.GetTable<SHTableClientConfig>();
         m_strWebHost     = pTable.ServerHost;
         m_iMaxRetryCount = pTable.MaxRetryRequestCount;
+        pCallback();
     }
     
     private async void SetStringTable()

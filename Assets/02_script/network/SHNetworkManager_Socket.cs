@@ -16,18 +16,21 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 {
     public void ConnectWebSocket(Action<SHReply> callback)
     {
-        //var test = Socket.Connect(m_strWebHost + "/sockettest");
-        var test = Socket.Connect(m_strWebHost, new SHCustomCertificateHandler());
-        
-        test.On(SystemEvents.connect, () =>
+        SetServerInfo(() => 
         {
-            Debug.Log("[LSH] Socket Event : SystemEvents.connect");
-            test.Emit("message", "i connection now");
-        });
-        
-        test.On("message", (string data) =>
-        {
-            Debug.Log("[RECIVE] " + data);
+            //var test = Socket.Connect(m_strWebHost + "/sockettest");
+            var test = Socket.Connect(m_strWebHost, new SHCustomCertificateHandler());
+            
+            test.On(SystemEvents.connect, () =>
+            {
+                Debug.Log("[LSH] Socket Event : SystemEvents.connect");
+                test.Emit("message", "i connection now");
+            });
+            
+            test.On("message", (string data) =>
+            {
+                Debug.Log("[RECIVE] " + data);
+            });
         });
     }
 }

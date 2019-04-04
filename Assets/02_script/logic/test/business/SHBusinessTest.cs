@@ -8,14 +8,15 @@ using System.Collections.Generic;
 
 using LitJson;
 
-public class SHSceneTest : MonoBehaviour
+public class SHBusinessTest : MonoBehaviour
 {
     void Awake()
     {
         Single.AppInfo.CreateSingleton();
     }
 
-    void Start ()
+    [FuncButton]
+    void OnClickSendRequest()
     {
         Single.Network.GET(SHAPIs.SH_API_RETRY_REQUEST, null, (reply) =>
         {

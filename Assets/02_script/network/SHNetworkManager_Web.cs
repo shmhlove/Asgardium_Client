@@ -222,11 +222,14 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         request.downloadHandler = new DownloadHandlerBuffer();
         request.certificateHandler = new SHCustomCertificateHandler();
         
+        var strJWT = JWTHeader.GetAuthorizationString();
+        Debug.Log(strJWT);
+        
         request.SetRequestHeader("Content-Type", "application/json; charset=utf-8");
         request.SetRequestHeader("Accept", "application/json");
-        //request.SetRequestHeader("Authorization", JWTHeader.GetAuthorizationString());
+        request.SetRequestHeader("Authorization", strJWT);
         request.useHttpContinue = false;
-
+        
         return request;
     }
 

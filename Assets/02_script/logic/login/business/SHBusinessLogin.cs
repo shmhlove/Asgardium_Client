@@ -93,7 +93,7 @@ public class SHBusinessLogin : MonoBehaviour
     {
         if (false == SHUtils.IsValidEmail(strEmail))
         {
-            Single.BusinessGlobal.ShowAlertUI(new SHReply(new SHError(eErrorCode.Auth_InvalidEmaile, "")));
+            Single.BusinessGlobal.ShowAlertUI(new SHReply(new SHError(eErrorCode.Auth_InvalidEmail, "")));
             return;
         }
 

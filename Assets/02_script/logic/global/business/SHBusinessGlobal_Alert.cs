@@ -49,7 +49,7 @@ public partial class SHBusinessGlobal : SHSingleton<SHBusinessGlobal>
                 case eErrorCode.Net_Auth_NoMatchPassword:
                     errorMessage = m_pStringTable.GetString("1005");
                     break;
-                case eErrorCode.Auth_InvalidEmaile:
+                case eErrorCode.Auth_InvalidEmail:
                     errorMessage = m_pStringTable.GetString("1001");
                     break;
             }

@@ -51,11 +51,8 @@ public partial class SHLoader
 
     void AddLoadEvent(Action<SHLoadingInfo> pDone, Action<SHLoadingInfo> pProgress)
     {
-        if (null != pDone)
-            EventToDone = pDone;
-
-        if (null != pProgress)
-            EventToProgress = pProgress;
+        EventToDone = pDone;
+        EventToProgress = pProgress;
     }
 
     void OnEventToLoadStart(string strFileName, SHLoadStartInfo pData)

@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Security.Cryptography.X509Certificates;
 
 using LitJson;
 using socket.io;

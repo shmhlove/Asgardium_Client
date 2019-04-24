@@ -16,21 +16,21 @@ public partial class SHTableData : SHBaseData
         m_dicTables.Clear();
         
         // 인스턴스 테이블
-        m_dicTables.Add(typeof(SHTableUserInfo),                new SHTableUserInfo());
+        m_dicTables.Add(typeof(SHTableUserInfo), new SHTableUserInfo());
 
         // 클라 테이블
-        m_dicTables.Add(typeof(SHTableClientConfig),            new SHTableClientConfig());
-        m_dicTables.Add(typeof(SHTableClientPreloadResources),  new SHTableClientPreloadResources());
-        m_dicTables.Add(typeof(SHTableClientResources),         new SHTableClientResources());
-        m_dicTables.Add(typeof(SHTableClientString),            new SHTableClientString());
+        m_dicTables.Add(typeof(SHTableClientConfig), new SHTableClientConfig());
+        m_dicTables.Add(typeof(SHTableClientPreloadResources), new SHTableClientPreloadResources());
+        m_dicTables.Add(typeof(SHTableClientResources), new SHTableClientResources());
+        m_dicTables.Add(typeof(SHTableClientString), new SHTableClientString());
 
         // 서버 테이블
-        m_dicTables.Add(typeof(SHTableServerGlobalConfig),      new SHTableServerGlobalConfig());
-        m_dicTables.Add(typeof(SHTableServerGlobalUnitData),    new SHTableServerGlobalUnitData());
+        m_dicTables.Add(typeof(SHTableServerGlobalConfig), new SHTableServerGlobalConfig());
+        m_dicTables.Add(typeof(SHTableServerGlobalUnitData), new SHTableServerGlobalUnitData());
         m_dicTables.Add(typeof(SHTableServerMiningActiveCompanyNPC), new SHTableServerMiningActiveCompanyNPC());
         m_dicTables.Add(typeof(SHTableServerMiningActiveQuantity), new SHTableServerMiningActiveQuantity());
         m_dicTables.Add(typeof(SHTableServerMiningActiveSupply), new SHTableServerMiningActiveSupply());
-        m_dicTables.Add(typeof(SHTableServerInstanceMiningActiveCompany),  new SHTableServerInstanceMiningActiveCompany());
+        m_dicTables.Add(typeof(SHTableServerInstanceMiningActiveCompany), new SHTableServerInstanceMiningActiveCompany());
     }
     
     public override void OnFinalize()

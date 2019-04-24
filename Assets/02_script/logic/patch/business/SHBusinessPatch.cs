@@ -31,11 +31,17 @@ public class SHBusinessPatch : MonoBehaviour
         (pProgressInfo)=>
         {
             // UI 표현 처리
-            
-            Debug.LogFormat("Data Load Progress : <color=red>{0}%({1}/{2})</color>",
+
+            // 콘솔로그 처리
+            string strFiles = string.Empty;
+            pProgressInfo.m_pLoadingDatas.ForEach((pItem) => strFiles += pItem.m_pLoadDataInfo.m_strName + " / ");
+            strFiles = string.IsNullOrEmpty(strFiles) ? "empty" : strFiles;
+
+            Debug.LogFormat("Data Load Progress : <color=yellow>{0}%({1}/{2}), Loading Now : {3}</color>",
                             pProgressInfo.GetPercent(),
                             pProgressInfo.m_iLoadDoneCount,
-                            pProgressInfo.m_iTotalDataCount);
+                            pProgressInfo.m_iTotalDataCount,
+                            strFiles);
         });
     }
 }

@@ -1,6 +1,6 @@
 /*
+    @@ 에러팝업출력 / 로그 / 인디케이터UI컨트롤 / 리트라이 하는 부분은 비지니스로 빼면 좋을꺼같다.
     @@ 여기는 진짜 요청받은대로 보내고, 받는것만 하고
-    @@ 에러출력 / 로그 / UI컨트롤 / 리트라이 하는 부분은 비지니스로 빼면 좋을꺼같다.
 */
 
 using UnityEngine;
@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Security.Cryptography.X509Certificates;
 
 using LitJson;
 using socket.io;
@@ -111,7 +110,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 
     private IEnumerator CoroutineRetryProcess(SHWebRequestData pRequestData)
     {
-        // 이미 Retry 진행 중이면 대기
+        // 이미 Retry 진행 중이면 대기(Retry 요청은 예외)
         if ((SHAPIs.SH_API_RETRY_REQUEST != pRequestData.m_strPath)
             && (true == m_bIsProcessingRetry) )
             yield break;
@@ -160,7 +159,8 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         }
 
         if (m_iRetryCount++ < m_iMaxRetryCount)
-        {            
+        {
+            // 자동 재시도 처리
             var strRetryInfo = string.Format(m_pStringTable.GetString("1008"), m_iRetryCount, m_iMaxRetryCount);
             Single.BusinessGlobal.UpdateIndicatorMessage(string.Format("{0}\n{1}", strRetryInfo, strErrorMessage));
 
@@ -175,9 +175,9 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
             pAlertInfo.m_strTwoLeftBtnLabel = m_pStringTable.GetString("10012");
             pAlertInfo.m_strTwoRightBtnLabel = m_pStringTable.GetString("10013");
             pAlertInfo.m_eButtonType = eAlertButtonType.TwoButton;
-            pAlertInfo.m_pCallback = (eSeletBtn) => 
+            pAlertInfo.m_pCallback = (eSelectBtnType) => 
             {
-                if (eAlertButtonAction.Left_Button == eSeletBtn)
+                if (eAlertButtonAction.Left_Button == eSelectBtnType)
                 {
                     m_iRetryCount = 0;
                     pRetryAction();

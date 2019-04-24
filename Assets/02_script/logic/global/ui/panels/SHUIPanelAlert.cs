@@ -26,13 +26,13 @@ public class SHUIAlertInfo
     public string m_strTwoLeftBtnLabel = string.Empty;
     public string m_strTwoRightBtnLabel = string.Empty;
     public eAlertButtonType m_eButtonType = eAlertButtonType.OneButton;
-    public Action<eAlertButtonAction> m_pCallback = (eBtnAction) => {};
+    public Action<eAlertButtonAction> m_pCallback = (eSelectBtnType) => {};
 
     public SHUIAlertInfo() { }
     public SHUIAlertInfo(string strMessage, Action<eAlertButtonAction> pCallback = null)
     {
         m_strMessage = strMessage;
-        m_pCallback = (null == pCallback) ? (eBtnAction) => {} : pCallback;
+        m_pCallback = (null == pCallback) ? (eSelectBtnType) => {} : pCallback;
     }
 }
 

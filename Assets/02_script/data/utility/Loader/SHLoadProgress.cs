@@ -173,7 +173,7 @@ public class SHLoadProgress
         if (true == pDataInfo.m_bIsDone)
             return;
 
-        m_dicLoadingData[strName] = pDataInfo;
+        m_dicLoadingData[strName.ToLower()] = pDataInfo;
     }
 
     public void SetLoadDoneInfo(string strName, SHLoadEndInfo pLoadEndInfo)
@@ -197,7 +197,7 @@ public class SHLoadProgress
             if (false == m_dicLoadSucceedData.ContainsKey(strName.ToLower()))
                 m_dicLoadSucceedData.Add(strName.ToLower(), pDataInfo);
         }
-
+        
         if (true == m_dicLoadingData.ContainsKey(strName.ToLower()))
         {
             m_dicLoadingData.Remove(strName.ToLower());

@@ -86,9 +86,9 @@ public partial class SHBusinessGlobal : SHSingleton<SHBusinessGlobal>
             var isDone = false;
             var pAlertInfo = m_pAlertInfoPool[0];
             var pCopyCallback = pAlertInfo.m_pCallback;
-            pAlertInfo.m_pCallback = (eBtnAction) =>
+            pAlertInfo.m_pCallback = (eSelectBtnType) =>
             {
-                pCopyCallback(eBtnAction);
+                pCopyCallback(eSelectBtnType);
                 m_pAlertInfoPool.Remove(pAlertInfo);
                 isDone = true;
             };

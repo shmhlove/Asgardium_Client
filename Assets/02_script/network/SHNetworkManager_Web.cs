@@ -221,9 +221,37 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         request.method = pData.m_eMethodType.ToString();
         request.downloadHandler = new DownloadHandlerBuffer();
         request.certificateHandler = new SHCustomCertificateHandler();
+
+        // payload
+        var payload = new Dictionary<string, object>();
+        payload.Add("iss", "MangoNight.Client.com");
+        payload.Add("sub", "MangoNight");
+        payload.Add("aud", "Asgardium");
+        payload.Add("iat", ((int)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds).ToString());
         
-        var strJWT = JWTHeader.GetAuthorizationString();
-        Debug.Log(strJWT);
+        // access_token은... 일단 패스
+        // if (!string.IsNullOrEmpty(Session.Instance.Id))
+        // {
+        //     payload.Add("access_token", Session.Instance.Id);
+        // }
+        // if (this.AccessTokenType == AccessTokenType.Unknown)
+        // {
+        //     if (!string.IsNullOrEmpty(Session.Instance.Id))
+        //     {
+        //         this.AccessTokenType = AccessTokenType.Session;
+        //     }
+        //     else
+        //     {
+        //         this.AccessTokenType = AccessTokenType.App;
+        //     }
+        // }
+        // payload.Add("typ", this.AccessTokenType.ToString().ToLower());
+
+        JWT.JsonWebToken.JsonSerializer = new SHCustomJsonSerializer();
+        var strJWT = JWT.JsonWebToken.Encode(payload, SHCustomCertificateHandler.CERT_KEY, JWT.JwtHashAlgorithm.HS256);
+        Debug.LogFormat("JWT - {0}", strJWT);
+        // string value = JWT.JsonWebToken.Decode(token, SHCustomCertificateHandler.CERT_KEY, true);
+        // Debug.Log(value);
         
         request.SetRequestHeader("Content-Type", "application/json; charset=utf-8");
         request.SetRequestHeader("Accept", "application/json");

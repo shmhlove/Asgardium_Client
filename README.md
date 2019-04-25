@@ -376,6 +376,9 @@ alt+오른쪽|앞으로 이동|workbench.action.navigateForward
 	* UI 루트에서 객체를 Get할 수 있는 로직을 만들어 두는것..
 	* UI 루트를 통해 컨트롤 명령을 내리고, UI루트에서 각 UI에 명령을 전달하는것..
 	--
+	* 서버랑 클라의 에러코드를 동기화해야하나?? 분리하는게 좋은거 같다.
+	* 에러코드가 겹치는 문제는 영역을 분리해서 처리하는게 좋은거 같다.
+	--
 	* 미리 객체를 얻어두는거의 단점은 로드가 걸릴 수 있다는거..
 	* var pUIRoot = await Single.UI.GetRoot<SHUIRoot>();
 	* var pUIPanelXXX = pUIRoot.GetPanel<SHUIPanelXXX>();

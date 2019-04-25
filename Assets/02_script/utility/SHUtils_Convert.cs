@@ -5,11 +5,13 @@ using UnityEditor;
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.Serialization.Json;
 
 public static partial class SHUtils
 {
@@ -38,5 +40,30 @@ public static partial class SHUtils
     public static string Base64ForUrlEncode(byte[] data)
     {
         return Base64Encode(data).Replace("=", "").Replace("+", "-").Replace("/", "_");
+    }
+
+    public static string GetJsonStringFromObject<T>(T pObject)
+    {
+        var pSerializer = new DataContractJsonSerializer(typeof(T));
+        var pMemoryStream = new MemoryStream();
+        pSerializer.WriteObject(pMemoryStream, pObject);
+
+        var jsonString = Encoding.Default.GetString(pMemoryStream.ToArray());
+
+        pMemoryStream.Close();
+
+        return jsonString;
+        
+        //string jsonString = (new JavaScriptSerializer()).Serialize((object)dictss);
+    }
+
+    public static T GetObjectFromJsonString<T>(string json)
+    {
+        var ms = new MemoryStream(Encoding.UTF8.GetBytes(json));
+        DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(T));
+        T deserializedObject = (T)ser.ReadObject(ms);
+        ms.Close();
+        
+        return deserializedObject;
     }
 }

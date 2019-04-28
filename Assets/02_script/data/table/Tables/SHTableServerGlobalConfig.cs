@@ -46,14 +46,17 @@ public class SHTableServerGlobalConfig : SHBaseTable
     {
         if (null == pJson)
             return eErrorCode.Table_LoadFailed;
-        
-        m_iBasicMiningPowerCount = GetIntToJson(pJson, "basic_mining_power_count");
-        m_iBasicChargeTime = GetIntToJson(pJson, "basic_charge_time");
-        m_iBasicActiveMiningSupply = GetIntToJson(pJson, "basic_active_mining_supply");
-        m_iBasicRefreshTimeOUMining = GetIntToJson(pJson, "basic_refresh_time_ou_mining");
-        m_iCostUnitCompany1 = GetIntToJson(pJson, "cost_unit_company1");
-        m_iCostUnitCompany2 = GetIntToJson(pJson, "cost_unit_company2");
-        m_iCostUnitCompany3 = GetIntToJson(pJson, "cost_unit_company3");
+
+        for (int iLoop = 0; iLoop < pJson.Count; ++iLoop)
+        {
+            m_iBasicMiningPowerCount = GetIntToJson(pJson[iLoop], "basic_mining_power_count");
+            m_iBasicChargeTime = GetIntToJson(pJson[iLoop], "basic_charge_time");
+            m_iBasicActiveMiningSupply = GetIntToJson(pJson[iLoop], "basic_active_mining_supply");
+            m_iBasicRefreshTimeOUMining = GetIntToJson(pJson[iLoop], "basic_refresh_time_ou_mining");
+            m_iCostUnitCompany1 = GetIntToJson(pJson[iLoop], "cost_unit_company1");
+            m_iCostUnitCompany2 = GetIntToJson(pJson[iLoop], "cost_unit_company2");
+            m_iCostUnitCompany3 = GetIntToJson(pJson[iLoop], "cost_unit_company3");
+        }
 
         return eErrorCode.Succeed;
     }

@@ -34,12 +34,18 @@ public static partial class SHUtils
 
     public static string Base64ForUrlEncode(string plainText)
     {
-        return Base64Encode(plainText).Replace("=", "").Replace("+", "-").Replace("/", "_");
+        return Base64Encode(plainText)
+            .Replace("=", "")   // Remove any trailing '='s
+            .Replace("+", "-")  // 62nd char of encoding
+            .Replace("/", "_"); // 63rd char of encoding
     }
 
     public static string Base64ForUrlEncode(byte[] data)
     {
-        return Base64Encode(data).Replace("=", "").Replace("+", "-").Replace("/", "_");
+        return Base64Encode(data)
+            .Replace("=", "")   // Remove any trailing '='s
+            .Replace("+", "-")  // 62nd char of encoding
+            .Replace("/", "_"); // 63rd char of encoding
     }
 
     public static string GetJsonStringFromObject<T>(T pObject)
@@ -48,22 +54,21 @@ public static partial class SHUtils
         var pMemoryStream = new MemoryStream();
         pSerializer.WriteObject(pMemoryStream, pObject);
 
-        var jsonString = Encoding.Default.GetString(pMemoryStream.ToArray());
+        var pSerializeJsonString = Encoding.Default.GetString(pMemoryStream.ToArray());
 
         pMemoryStream.Close();
 
-        return jsonString;
-        
-        //string jsonString = (new JavaScriptSerializer()).Serialize((object)dictss);
+        return pSerializeJsonString;
     }
 
     public static T GetObjectFromJsonString<T>(string json)
     {
-        var ms = new MemoryStream(Encoding.UTF8.GetBytes(json));
+        var pMemoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
         DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(T));
-        T deserializedObject = (T)ser.ReadObject(ms);
-        ms.Close();
+        T pDeserializedObject = (T)ser.ReadObject(pMemoryStream);
+
+        pMemoryStream.Close();
         
-        return deserializedObject;
+        return pDeserializedObject;
     }
 }

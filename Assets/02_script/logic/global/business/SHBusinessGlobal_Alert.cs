@@ -38,6 +38,7 @@ public partial class SHBusinessGlobal : SHSingleton<SHBusinessGlobal>
                 case eErrorCode.Net_Common_InvalidResponseData:
                 case eErrorCode.Net_Common_JsonParse:
                 case eErrorCode.Net_Common_EmptyCollection:
+                case eErrorCode.Net_Common_InvalidHeader:
                     errorMessage = m_pStringTable.GetString("1002");
                     break;
                 case eErrorCode.Net_Auth_AlreadySignupUser:

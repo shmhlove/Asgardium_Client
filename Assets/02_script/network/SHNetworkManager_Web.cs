@@ -228,24 +228,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         payload.Add("sub", "MangoNight");
         payload.Add("aud", "Asgardium");
         payload.Add("iat", ((int)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds).ToString());
-        
-        // access_token은... 일단 패스
-        // if (!string.IsNullOrEmpty(Session.Instance.Id))
-        // {
-        //     payload.Add("access_token", Session.Instance.Id);
-        // }
-        // if (this.AccessTokenType == AccessTokenType.Unknown)
-        // {
-        //     if (!string.IsNullOrEmpty(Session.Instance.Id))
-        //     {
-        //         this.AccessTokenType = AccessTokenType.Session;
-        //     }
-        //     else
-        //     {
-        //         this.AccessTokenType = AccessTokenType.App;
-        //     }
-        // }
-        // payload.Add("typ", this.AccessTokenType.ToString().ToLower());
+        payload.Add("access_token", "abcdefg");
 
         JWT.JsonWebToken.JsonSerializer = new SHCustomJsonSerializer();
         var strJWT = JWT.JsonWebToken.Encode(payload, SHCustomCertificateHandler.CERT_KEY, JWT.JwtHashAlgorithm.HS256);

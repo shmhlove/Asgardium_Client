@@ -14,7 +14,8 @@ public enum eErrorCode
     Net_Common_InvalidResponseData = 1005,
     Net_Common_JsonParse = 1006,
     Net_Common_EmptyCollection = 1007,
-    
+    Net_Common_InvalidHeader = 1008,
+
     Net_Auth_AlreadySignupUser = 2001,
     Net_Auth_NoSignupUser = 2002,
     Net_Auth_NoMatchPassword = 2003,

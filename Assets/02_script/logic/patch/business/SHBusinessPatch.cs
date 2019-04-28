@@ -12,13 +12,18 @@ public class SHBusinessPatch : MonoBehaviour
         Single.AppInfo.CreateSingleton();
     }
     
-    async void Start()
+    void Start()
     {
-        await Single.Data.Load(eSceneType.Patch, async (pLoadInfo)=>
+        PatchProcess();
+    }
+
+    async void PatchProcess()
+    {
+        await Single.Data.Load(eSceneType.Patch, async (pLoadInfo) =>
         {
             if (pLoadInfo.IsSucceed())
             {
-                await Single.Scene.LoadScene(eSceneType.Login, pCallback: (pReply) => 
+                await Single.Scene.LoadScene(eSceneType.Login, pCallback: (pReply) =>
                 {
 
                 });
@@ -26,9 +31,26 @@ public class SHBusinessPatch : MonoBehaviour
             else
             {
                 // 업데이트 실패!! 재시도 유도 처리
+                var pAlertInfo = new SHUIAlertInfo();
+                pAlertInfo.m_strMessage = "업데이트 실패!!\n재시도하시겠습니까?";
+                pAlertInfo.m_strTwoLeftBtnLabel = "재시도";
+                pAlertInfo.m_strTwoRightBtnLabel = "종료";
+                pAlertInfo.m_eButtonType = eAlertButtonType.TwoButton;
+                pAlertInfo.m_pCallback = (eSelectBtnType) =>
+                {
+                    if (eAlertButtonAction.Left_Button == eSelectBtnType)
+                    {
+                        PatchProcess();
+                    }
+                    else
+                    {
+                        SHUtils.GameQuit();
+                    }
+                };
+                Single.BusinessGlobal.ShowAlertUI(pAlertInfo);
             }
-        }, 
-        (pProgressInfo)=>
+        },
+        (pProgressInfo) =>
         {
             // UI 표현 처리
 

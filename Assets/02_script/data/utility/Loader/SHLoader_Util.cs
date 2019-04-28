@@ -63,6 +63,12 @@ public partial class SHLoader
     void OnEventToLoadDone(string strFileName, SHLoadEndInfo pData)
     {
         m_pProgress.SetLoadDoneInfo(strFileName, pData);
+
+        if (false == m_pProgress.IsDone())
+        {
+            return;
+        }
+
         CallEventToProgress();
         CallEventToDone();
     }

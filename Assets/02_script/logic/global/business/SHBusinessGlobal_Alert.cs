@@ -16,6 +16,18 @@ public partial class SHBusinessGlobal : SHSingleton<SHBusinessGlobal>
         ShowAlertUI(new SHUIAlertInfo(strMessage, pCallback));
     }
 
+    public async void ShowAlertUI(SHUIAlertInfo pAlertInfo)
+    {
+        m_pAlertInfoPool.Add(pAlertInfo);
+
+        var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
+
+        if (false == m_bIsRunningCoroutineShowAlert)
+        {
+            StartCoroutine(CoroutineShowAlertUI(pUIRoot));
+        }
+    }
+
     public async void ShowAlertUI(SHReply pReply, Action<eAlertButtonAction> pCallback = null)
     {
         if (null == m_pStringTable)
@@ -63,18 +75,6 @@ public partial class SHBusinessGlobal : SHSingleton<SHBusinessGlobal>
         else
         {
             ShowAlertUI(new SHUIAlertInfo(string.Format("{0}({1})", errorMessage, pReply.error.code), pCallback));
-        }
-    }
-
-    public async void ShowAlertUI(SHUIAlertInfo pAlertInfo)
-    {
-        m_pAlertInfoPool.Add(pAlertInfo);
-
-        var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-
-        if (false == m_bIsRunningCoroutineShowAlert)
-        {
-            StartCoroutine(CoroutineShowAlertUI(pUIRoot));
         }
     }
 

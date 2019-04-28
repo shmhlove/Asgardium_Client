@@ -8,5 +8,8 @@ using System.Collections.Generic;
 
 public partial class SHBusinessGlobal : SHSingleton<SHBusinessGlobal>
 {
-    private SHTableClientString m_pStringTable;
+    public override void OnInitialize()
+    {
+        SetDontDestroy();
+    }
 }

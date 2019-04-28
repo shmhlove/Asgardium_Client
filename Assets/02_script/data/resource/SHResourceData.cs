@@ -226,25 +226,6 @@ public partial class SHResourceData : SHBaseData
         return await pPromise.Task;
     }
 
-    public T Instantiate<T>(T pPrefab) where T : UObject
-    {
-        if (null == pPrefab)
-        {
-            Debug.LogErrorFormat("[LSH] 오브젝트 복사중 null 프리팹이 전달되었습니다!!(Type : {0})", typeof(T));
-            return default;
-        }
-
-        DateTime pStartTime = DateTime.Now;
-
-        T pGameObject = UObject.Instantiate<T>(pPrefab);
-        var strName = pGameObject.name;
-        pGameObject.name = strName.Substring(0, strName.IndexOf("(Clone)"));
-
-        Single.AppInfo.SetLoadResource(string.Format("Instantiate : {0}({1}sec)", pPrefab.name, SHUtils.GetElapsedSecond(pStartTime)));
-
-        return pGameObject;
-    }
-
     public async Task<GameObject> GetGameObject(string strName)
     {
         var pPromise = new TaskCompletionSource<GameObject>();
@@ -321,5 +302,24 @@ public partial class SHResourceData : SHBaseData
             pPromise.TrySetResult(pObject.GetComponent<T>());
         
         return await pPromise.Task;
+    }
+
+    public T Instantiate<T>(T pPrefab) where T : UObject
+    {
+        if (null == pPrefab)
+        {
+            Debug.LogErrorFormat("[LSH] 오브젝트 복사중 null 프리팹이 전달되었습니다!!(Type : {0})", typeof(T));
+            return default;
+        }
+
+        DateTime pStartTime = DateTime.Now;
+
+        T pGameObject = UObject.Instantiate<T>(pPrefab);
+        var strName = pGameObject.name;
+        pGameObject.name = strName.Substring(0, strName.IndexOf("(Clone)"));
+
+        Single.AppInfo.SetLoadResource(string.Format("Instantiate : {0}({1}sec)", pPrefab.name, SHUtils.GetElapsedSecond(pStartTime)));
+
+        return pGameObject;
     }
 }

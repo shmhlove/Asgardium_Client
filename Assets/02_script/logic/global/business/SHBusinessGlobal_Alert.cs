@@ -30,18 +30,15 @@ public partial class SHBusinessGlobal : SHSingleton<SHBusinessGlobal>
 
     public async void ShowAlertUI(SHReply pReply, Action<eAlertButtonAction> pCallback = null)
     {
-        if (null == m_pStringTable)
-        {
-            m_pStringTable = await Single.Table.GetTable<SHTableClientString>();
-        }
-
         var errorMessage = string.Empty;
+        var pStringTable = await Single.Table.GetTable<SHTableClientString>();
+        
         if (false == pReply.isSucceed)
         {
             switch(pReply.error.code)
             {
                 case eErrorCode.Net_Common_HTTP:
-                    // Network Module에서 처리...
+                    // Network Module 에서 처리...
                     return;
                 case eErrorCode.Net_Common_InvalidParameter:
                 case eErrorCode.Net_Common_FailedGetCollection:
@@ -51,19 +48,19 @@ public partial class SHBusinessGlobal : SHSingleton<SHBusinessGlobal>
                 case eErrorCode.Net_Common_JsonParse:
                 case eErrorCode.Net_Common_EmptyCollection:
                 case eErrorCode.Net_Common_InvalidHeader:
-                    errorMessage = m_pStringTable.GetString("1002");
+                    errorMessage = pStringTable.GetString("1002");
                     break;
                 case eErrorCode.Net_Auth_AlreadySignupUser:
-                    errorMessage = m_pStringTable.GetString("1003");
+                    errorMessage = pStringTable.GetString("1003");
                     break;
                 case eErrorCode.Net_Auth_NoSignupUser:
-                    errorMessage = m_pStringTable.GetString("1004");
+                    errorMessage = pStringTable.GetString("1004");
                     break;
                 case eErrorCode.Net_Auth_NoMatchPassword:
-                    errorMessage = m_pStringTable.GetString("1005");
+                    errorMessage = pStringTable.GetString("1005");
                     break;
                 case eErrorCode.Auth_InvalidEmail:
-                    errorMessage = m_pStringTable.GetString("1001");
+                    errorMessage = pStringTable.GetString("1001");
                     break;
             }
         }

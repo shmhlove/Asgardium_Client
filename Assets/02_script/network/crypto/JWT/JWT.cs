@@ -1,4 +1,6 @@
-﻿using System;
+﻿using UnityEngine;
+
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
@@ -49,10 +51,10 @@ namespace JWT
             var segments = new List<string>();
             var header = new Dictionary<string, object>(extraHeaders)
             {
-                { "typ", "JWT" },
-                { "alg", algorithm.ToString() }
+                { "alg", algorithm.ToString()},
+                { "typ", "JWT" }
             };
-
+            
             byte[] headerBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(header));
             byte[] payloadBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(payload));
 

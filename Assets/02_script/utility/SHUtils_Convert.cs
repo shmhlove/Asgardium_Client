@@ -13,6 +13,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.Serialization.Json;
 
+using LitJson;
+
 public static partial class SHUtils
 {
     public static string Base64Encode(byte[] data)
@@ -50,25 +52,29 @@ public static partial class SHUtils
 
     public static string GetJsonStringFromObject<T>(T pObject)
     {
-        var pSerializer = new DataContractJsonSerializer(typeof(T));
-        var pMemoryStream = new MemoryStream();
-        pSerializer.WriteObject(pMemoryStream, pObject);
+        return JsonMapper.ToJson(pObject);
 
-        var pSerializeJsonString = Encoding.Default.GetString(pMemoryStream.ToArray());
+        //var pSerializer = new DataContractJsonSerializer(typeof(T));
+        //var pMemoryStream = new MemoryStream();
+        //pSerializer.WriteObject(pMemoryStream, pObject);
 
-        pMemoryStream.Close();
+        //var pSerializeJsonString = Encoding.Default.GetString(pMemoryStream.ToArray());
 
-        return pSerializeJsonString;
+        //pMemoryStream.Close();
+
+        //return pSerializeJsonString;
     }
 
     public static T GetObjectFromJsonString<T>(string json)
     {
-        var pMemoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
-        DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(T));
-        T pDeserializedObject = (T)ser.ReadObject(pMemoryStream);
+        return JsonMapper.ToObject<T>(json);
 
-        pMemoryStream.Close();
-        
-        return pDeserializedObject;
+        //var pMemoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+        //DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(T));
+        //T pDeserializedObject = (T)ser.ReadObject(pMemoryStream);
+
+        //pMemoryStream.Close();
+
+        //return pDeserializedObject;
     }
 }

@@ -26,6 +26,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         if (eType == eMiningStageType.Active)
         {
             requestSubscribeMiningActiveInfo();
+            StartCoroutine("CoroutineForMiningActiveInformation");
             StartCoroutine("CoroutineForMiningActiveScrollview");
         }
 
@@ -33,6 +34,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         if (eType != eMiningStageType.Active)
         {
             requestUnsubscribeMiningActiveInfo();
+            StopCoroutine("CoroutineForMiningActiveInformation");
             StopCoroutine("CoroutineForMiningActiveScrollview");
         }
     }

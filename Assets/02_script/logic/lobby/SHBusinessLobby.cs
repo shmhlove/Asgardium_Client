@@ -32,17 +32,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         m_pUIPanelMining = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
         m_pUIPanelMining.SetEventOfChangeStage(OnEventOfChangeMiningStage);
     }
-
-    private void OnEnable()
-    {
-        StartCoroutine("CoroutineForMiningActiveInformation");
-    }
-
-    private void OnDisable()
-    {
-        StopCoroutine("CoroutineForMiningActiveInformation");
-    }
-
+    
     public void OnEventOfChangeLobbyMenu(eLobbyMenuType eType)
     {
         // Mining
@@ -54,7 +44,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         {
             SetDisableMiningMenu();
         }
-        
+
         // Storage
         // Market
         // Upgrade

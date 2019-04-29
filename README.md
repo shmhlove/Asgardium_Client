@@ -219,7 +219,7 @@ alt+오른쪽|앞으로 이동|workbench.action.navigateForward
 ---
 2018-
 * ~~레파지토리 분리해야겠다.~~
-* 동적로드가 필요해지니 클라이언트 프레임워크 구성이 필요해졌다.
+* ~~동적로드가 필요해지니 클라이언트 프레임워크 구성이 필요해졌다.~~
 	* ~~유틸리티::AppInfo~~
 	* ~~유틸리티::코루틴~~
 	* ~~유틸리티::오브젝트풀~~
@@ -251,7 +251,7 @@ alt+오른쪽|앞으로 이동|workbench.action.navigateForward
 	* ~~개선::TAP(작업기반비동기)적용~~
 		* ~~리소스와 테이블 클래스에 TAP(작업기반비동기) 적용~~
 ---
-* 간단한 인증 프로세스를 만들자.
+* ~~간단한 인증 프로세스를 만들자.~~
 	* ~~서버 : 회원가입 및 로그인 처리~~
     * ~~클라 : NGUI로 로그인 클라이언트를 만들자~~
     * ~~클라 : body 데이터를 Json형태로 받아올 수 있도록 파라미터를 구성하자~~
@@ -264,7 +264,7 @@ alt+오른쪽|앞으로 이동|workbench.action.navigateForward
 	* ~~클라 : 로비씬 진입부 개발~~
 	* ~~클라 : PlayerPreb에 이메일과 비밀번호를 저장시켜서 반자동로그인을 시켜주자.~~
 ---
-* 로비씬
+* ~~로비씬~~
 	* ~~기획검토~~
 	* ~~클라 : 메인메뉴 개발~~
 ---
@@ -305,8 +305,18 @@ alt+오른쪽|앞으로 이동|workbench.action.navigateForward
 		* ~~클라 : 로그인 직후 서버를 끊으면 Request가 겁나게 쌓인다. 누가 SendRequest를 겁나 호출하는지 디버깅해봐야한다.~~
 			* ~~클라 : 아.... 코루틴.. 무조건 데이터를 받아온다고 가정하고 짜둿구나.. 어떡하꼬?? 일시정지가 답이다.~~
 			* ~~클라 : 에잇 일단 일시정지는 백로그에 넣어두고, 코루틴 돌때 callback 받고 다음 턴 돌도록 하자.~~
-		* 클라/서버 : 소켓통신 시작하자.
 		* ~~클라 : https 지원되도록 socket.io 수정~~
+		* 클라/서버 : 소켓통신 시작하자.
+		--
+	
+		* 클라/서버 : 마이닝 정보 Register, Unregister API 추가
+		
+	    public static string SH_API_SUBSCRIBE_MINING_ACTIVE_INFO = "/process/subscribe_mining_active_info";
+	    public static string SH_API_UNSUBSCRIBE_MINING_ACTIVE_INFO = "/process/unsubscribe_mining_active_info";
+
+		* 서버 : 마이닝 정보 Registe된 클라에게 인스턴스 마이닝 정보 인터벌 주기로 소켓전송
+		* 클라 : 소켓통신으로 전달받은 마이닝 정보로 UI 처리하기
+		--
 		* 클라 : Slot UI에서 구매버튼 이벤트로 채굴 API 호출하고, Response를 받아 UserInfo와 인스턴스 마이닝 액티브 테이블 업데이트 해주기
 			* 서버 : 채굴 정보를 요청받으면 특정 인터벌로 응답주도록 처리, 정지 요청받으면 리스트에서 제거
 			* 클라 : 채굴 정보 데이터 받기
@@ -316,7 +326,7 @@ alt+오른쪽|앞으로 이동|workbench.action.navigateForward
 		* 클라 : 스크롤뷰 갱신에 대한 문제가 있음 -> 갱신 프로세스를 변경하기로 함.(갯수변화 처리안함, 클라기준 정보업데이트만)
 ---
 * 인증
-	* 서버/클라 : JWT 적용
+	* ~~서버/클라 : JWT 적용~~
 ---
 * 기타
 	* ~~String 테이블을 만들어야 한다.~~

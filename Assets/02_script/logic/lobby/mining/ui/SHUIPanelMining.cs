@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 public enum eMiningStageType
 {
+    None,
     Active,
     Passive,
     Company,

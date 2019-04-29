@@ -10,19 +10,29 @@ using LitJson;
 
 public partial class SHBusinessLobby : MonoBehaviour
 {
+    private void SetEnableMiningMenu()
+    {
+
+    }
+
+    private void SetDisableMiningMenu()
+    {
+        SetChangeMiningStage(eMiningStageType.None);
+    }
+
     private void SetChangeMiningStage(eMiningStageType eType)
     {
         // 맞을 때
         if (eType == eMiningStageType.Active)
         {
-            // 서버에게 마이닝 회사 정보 업데이트 승인 요청
+            requestSubscribeMiningActiveInfo();
             StartCoroutine("CoroutineForMiningActiveScrollview");
         }
 
         // 아닐 때
         if (eType != eMiningStageType.Active)
         {
-            // 서버에게 마이닝 회사 정보 업데이트 취소 요청
+            requestUnsubscribeMiningActiveInfo();
             StopCoroutine("CoroutineForMiningActiveScrollview");
         }
     }
@@ -95,6 +105,48 @@ public partial class SHBusinessLobby : MonoBehaviour
 
             pCallback();
         //});
+    }
+
+    private async void requestSubscribeMiningActiveInfo()
+    {
+        var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
+
+        JsonData json = new JsonData
+        {
+            ["user_id"] = pUserInfo.UserId
+        };
+        Single.Network.POST(SHAPIs.SH_API_SUBSCRIBE_MINING_ACTIVE_INFO, json, (reply) => 
+        {
+            if (reply.isSucceed)
+            {
+                //pUserInfo.LoadJsonTable(reply.data);
+            }
+            else
+            {
+                Single.BusinessGlobal.ShowAlertUI(reply);
+            }
+        });
+    }
+
+    private async void requestUnsubscribeMiningActiveInfo()
+    {
+        var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
+
+        JsonData json = new JsonData
+        {
+            ["user_id"] = pUserInfo.UserId
+        };
+        Single.Network.POST(SHAPIs.SH_API_UNSUBSCRIBE_MINING_ACTIVE_INFO, json, (reply) => 
+        {
+            if (reply.isSucceed)
+            {
+                //pUserInfo.LoadJsonTable(reply.data);
+            }
+            else
+            {
+                Single.BusinessGlobal.ShowAlertUI(reply);
+            }
+        });
     }
 
     public void OnEventOfChangeMiningStage(eMiningStageType eType)

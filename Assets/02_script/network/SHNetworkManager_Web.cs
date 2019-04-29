@@ -246,8 +246,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 
         JWT.JsonWebToken.JsonSerializer = new SHCustomJsonSerializer();
         var strJWT = JWT.JsonWebToken.Encode(payload, SHCustomCertificateHandler.CERT_KEY, JWT.JwtHashAlgorithm.HS256);
-        Debug.LogFormat("JWT {0}", strJWT);
-
+        
         request.SetRequestHeader("Content-Type", "application/json; charset=utf-8");
         request.SetRequestHeader("Accept", "application/json");
         request.SetRequestHeader("Authorization", strJWT);
@@ -266,13 +265,14 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
     {
         if (null == pData.uploadHandler)
         {
-            Debug.LogFormat("[REQUEST] : {0} {1}\nbody = {2}", 
-                pData.method, pData.url, "{}");
+            Debug.LogFormat("[REQUEST] : {0} {1}\nheader = JWT {2}\nbody = {3}", 
+                pData.method, pData.url, pData.GetRequestHeader("Authorization"), "{}");
+                
         }
         else
         {
-            Debug.LogFormat("[REQUEST] : {0} {1}\nbody = {2}", 
-                pData.method, pData.url, Encoding.UTF8.GetString(pData.uploadHandler.data));
+            Debug.LogFormat("[REQUEST] : {0} {1}\nheader = JWT {2}\nbody = {3}", 
+                pData.method, pData.url, pData.GetRequestHeader("Authorization"), Encoding.UTF8.GetString(pData.uploadHandler.data));
         }
     }
 

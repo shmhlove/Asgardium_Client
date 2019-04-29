@@ -26,6 +26,7 @@ public static class SHUIConstant
 
     // Lobby Root
     public static string ROOT_LOBBY = "UI Root - Lobby";
+    public static string PANEL_MENUBAR = "Panel - MenuBar";
     public static string PANEL_MINING = "Panel - Mining";
     public static string PANEL_STORAGE = "Panel - Storage";
     public static string PANEL_MARKET = "Panel - Market";

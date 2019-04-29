@@ -21,13 +21,16 @@ public partial class SHBusinessLobby : MonoBehaviour
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
         pUserInfo.CheckUserInfoLoadedForDevelop();
 
-        // UI와 Contact 처리
+        // UI 초기화
         var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
+
+        // Lobby MainMenu Contact 처리
+        var pMenubar = await pUIRoot.GetPanel<SHUIPanelMenubar>(SHUIConstant.PANEL_MENUBAR);
+        pMenubar.SetEventOfChangeLobbyMenu(OnEventOfChangeLobbyMenu);
+        
+        // Mining UI와 Contact 처리        
         m_pUIPanelMining = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
         m_pUIPanelMining.SetEventOfChangeStage(OnEventOfChangeMiningStage);
-
-        // 초기화
-        SetChangeMiningStage(eMiningStageType.Active);
     }
 
     private void OnEnable()
@@ -38,6 +41,24 @@ public partial class SHBusinessLobby : MonoBehaviour
     private void OnDisable()
     {
         StopCoroutine("CoroutineForMiningActiveInformation");
+    }
+
+    public void OnEventOfChangeLobbyMenu(eLobbyMenuType eType)
+    {
+        // Mining
+        if (eLobbyMenuType.Mining == eType)
+        {
+            SetEnableMiningMenu();
+        }
+        if (eLobbyMenuType.Mining != eType)
+        {
+            SetDisableMiningMenu();
+        }
+        
+        // Storage
+        // Market
+        // Upgrade
+        // Menu
     }
 
     [FuncButton]

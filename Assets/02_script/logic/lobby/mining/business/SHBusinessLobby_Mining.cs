@@ -25,7 +25,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         // 맞을 때
         if (eType == eMiningStageType.Active)
         {
-            requestSubscribeMiningActiveInfo();
+            RequestSubscribeMiningActiveInfo();
             StartCoroutine("CoroutineForMiningActiveInformation");
             StartCoroutine("CoroutineForMiningActiveScrollview");
         }
@@ -33,7 +33,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         // 아닐 때
         if (eType != eMiningStageType.Active)
         {
-            requestUnsubscribeMiningActiveInfo();
+            RequestUnsubscribeMiningActiveInfo();
             StopCoroutine("CoroutineForMiningActiveInformation");
             StopCoroutine("CoroutineForMiningActiveScrollview");
         }
@@ -109,7 +109,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         //});
     }
 
-    private async void requestSubscribeMiningActiveInfo()
+    private async void RequestSubscribeMiningActiveInfo()
     {
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
 
@@ -130,7 +130,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         });
     }
 
-    private async void requestUnsubscribeMiningActiveInfo()
+    private async void RequestUnsubscribeMiningActiveInfo()
     {
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
 
@@ -240,5 +240,15 @@ public partial class SHBusinessLobby : MonoBehaviour
                 Single.BusinessGlobal.ShowAlertUI(reply);
             }
         });
+    }
+
+    public void OnClickDebugSubscribe()
+    {
+        RequestSubscribeMiningActiveInfo();
+    }
+
+    public void OnClickDebugUnubscribe()
+    {
+        RequestUnsubscribeMiningActiveInfo();
     }
 }

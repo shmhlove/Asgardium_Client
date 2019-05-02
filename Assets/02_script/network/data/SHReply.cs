@@ -45,6 +45,16 @@ public class SHReply
         this.requestMethod = string.Empty;
         this.requestUrl = string.Empty;
     }
+    
+    public SHReply(JsonData data)
+    {
+        this.isSucceed = true;
+        this.data = data;
+        this.error = null;
+        this.rawResponse = data;
+        this.requestMethod = string.Empty;
+        this.requestUrl = string.Empty;
+    }
 
     public SHReply(SHError error)
     {

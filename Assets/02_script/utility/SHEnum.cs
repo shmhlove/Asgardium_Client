@@ -21,6 +21,10 @@ public enum eErrorCode
     Net_Auth_NoMatchPassword = 2003,
     Auth_InvalidEmail = 2004,
     
+    // socket error
+    Net_Socket_Not_Connect = 5000,
+    Net_Socket_Aready_Connect = 5001,
+
     // data error
     Data_NotImplementation = 1000001,
     Resources_NotExsitInTable = 1001002,

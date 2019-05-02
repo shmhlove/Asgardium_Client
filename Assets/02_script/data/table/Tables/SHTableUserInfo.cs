@@ -45,6 +45,11 @@ public class SHTableUserInfo : SHBaseTable
         return eErrorCode.Succeed;
     }
     
+    public bool IsLogin()
+    {
+        return (false == string.IsNullOrEmpty(UserId));
+    }
+
     public void CheckUserInfoLoadedForDevelop()
     {
         if (true == m_bIsLoaded)

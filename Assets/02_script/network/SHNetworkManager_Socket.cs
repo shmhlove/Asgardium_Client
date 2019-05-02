@@ -13,20 +13,42 @@ using socket.io;
 
 public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 {
+    public Socket m_pSocket = null;
     public void ConnectWebSocket(Action<SHReply> callback)
     {
-        var test = Socket.Connect(m_strWebHost, new SHCustomCertificateHandler());
-        
-        test.On(SystemEvents.connect, () =>
+        if (m_pSocket)
         {
-            Debug.Log("[LSH] Socket Event : SystemEvents.connect");
-            test.Emit("test_message", "i connection now");
-            callback(new SHReply());
+            callback(new SHReply(new SHError(eErrorCode.Net_Socket_Aready_Connect, "already connect", null)));
+            return;
+        }
+
+        m_pSocket = Socket.Connect(m_strWebHost, new SHCustomCertificateHandler());
+        
+        m_pSocket.On(SystemEvents.connect, () =>
+        {
+            JsonData jsonData = new JsonData();
+            jsonData["message"] = "Succeed Websocket Connect!!";
+            callback(new SHReply(jsonData));
         });
         
-        test.On("test_message", (string data) =>
+        m_pSocket.On("test_message", (string data) =>
         {
             Debug.Log("[RECIVE] " + data);
+
+            JsonData jsonData = new JsonData();
+            jsonData["message"] = data;
+            Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
         });
+    }
+    
+    public void TestSendMessage(string strMessage, Action<SHReply> callback)
+    {
+        if (null == m_pSocket)
+        {
+            callback(new SHReply(new SHError(eErrorCode.Net_Socket_Not_Connect, "need connect", null)));
+            return;
+        }
+
+        m_pSocket.Emit("test_message", strMessage);
     }
 }

@@ -54,8 +54,16 @@ public partial class SHBusinessLobby : MonoBehaviour
     [FuncButton]
     public void OnClickDebugSocketConnect()
     {
-        // 소켓 통신 해보자
         Single.Network.ConnectWebSocket((reply) => 
+        {
+            Single.BusinessGlobal.ShowAlertUI(reply);
+        });
+    }
+
+    [FuncButton]
+    public void OnClickDebugSocketSendMessage()
+    {
+        Single.Network.TestSendMessage(Single.AppInfo.GetDeviceName(), (reply) => 
         {
             Single.BusinessGlobal.ShowAlertUI(reply);
         });

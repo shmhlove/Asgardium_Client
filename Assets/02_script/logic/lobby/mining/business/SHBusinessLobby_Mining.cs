@@ -112,6 +112,11 @@ public partial class SHBusinessLobby : MonoBehaviour
     private async void RequestSubscribeMiningActiveInfo()
     {
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
+        if (false == pUserInfo.IsLogin()) {
+            var pStringTable = await Single.Table.GetTable<SHTableClientString>();
+            Single.BusinessGlobal.ShowAlertUI(pStringTable.GetString("1000"));
+            return;
+        }
 
         JsonData json = new JsonData
         {
@@ -133,7 +138,12 @@ public partial class SHBusinessLobby : MonoBehaviour
     private async void RequestUnsubscribeMiningActiveInfo()
     {
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
-
+        if (false == pUserInfo.IsLogin()) {
+            var pStringTable = await Single.Table.GetTable<SHTableClientString>();
+            Single.BusinessGlobal.ShowAlertUI(pStringTable.GetString("1000"));
+            return;
+        }
+        
         JsonData json = new JsonData
         {
             ["user_id"] = pUserInfo.UserId

@@ -308,13 +308,13 @@ alt+오른쪽|앞으로 이동|workbench.action.navigateForward
 		* ~~클라 : https 지원되도록 socket.io 수정~~
 		* 클라/서버 : 소켓통신 시작하자.
 		--
-	
-		* 클라/서버 : 마이닝 정보 Register, Unregister API 추가
-		
-	    public static string SH_API_SUBSCRIBE_MINING_ACTIVE_INFO = "/process/subscribe_mining_active_info";
-	    public static string SH_API_UNSUBSCRIBE_MINING_ACTIVE_INFO = "/process/unsubscribe_mining_active_info";
-
+		* ~~클라/서버 : 마이닝 정보 Register, Unregister API 추가~~
+		* ~~서버 : Register, Unregister시 데이터 처리(컨테이너처리... 레디스가 필요한 시점이 왔다.)~~
 		* 서버 : 마이닝 정보 Registe된 클라에게 인스턴스 마이닝 정보 인터벌 주기로 소켓전송
+		* 클라 : 소켓통신 기본적인 예외처리해야될것 확인
+			* 클라 : 접속 종료 후 재접속이 안됨
+			* ~~클라 : 지속적으로 로그가 출력되고 있는거 확인하기, 왜 로그가 출력되고 있고, 필요한 로그인가?(핑퐁로그인데 없어도 될듯)~~
+
 		* 클라 : 소켓통신으로 전달받은 마이닝 정보로 UI 처리하기
 		--
 		* 클라 : Slot UI에서 구매버튼 이벤트로 채굴 API 호출하고, Response를 받아 UserInfo와 인스턴스 마이닝 액티브 테이블 업데이트 해주기

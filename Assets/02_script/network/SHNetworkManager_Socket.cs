@@ -20,10 +20,11 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         test.On(SystemEvents.connect, () =>
         {
             Debug.Log("[LSH] Socket Event : SystemEvents.connect");
-            test.Emit("message", "i connection now");
+            test.Emit("test_message", "i connection now");
+            callback(new SHReply());
         });
         
-        test.On("message", (string data) =>
+        test.On("test_message", (string data) =>
         {
             Debug.Log("[RECIVE] " + data);
         });

@@ -32,7 +32,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         m_pUIPanelMining = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
         m_pUIPanelMining.SetEventOfChangeStage(OnEventOfChangeMiningStage);
     }
-    
+
     public void OnEventOfChangeLobbyMenu(eLobbyMenuType eType)
     {
         // Mining
@@ -52,9 +52,12 @@ public partial class SHBusinessLobby : MonoBehaviour
     }
 
     [FuncButton]
-    public void OnClickConnectWebSocket()
+    public void OnClickDebugSocketConnect()
     {
         // 소켓 통신 해보자
-        Single.Network.ConnectWebSocket((reply) => {});
+        Single.Network.ConnectWebSocket((reply) => 
+        {
+            Single.BusinessGlobal.ShowAlertUI(reply);
+        });
     }
 }

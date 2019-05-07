@@ -61,6 +61,15 @@ public partial class SHBusinessLobby : MonoBehaviour
     }
 
     [FuncButton]
+    public void OnClickDebugSocketDisconnect()
+    {
+        Single.Network.DisconnectWebSocket((reply) =>
+        {
+            Single.BusinessGlobal.ShowAlertUI(reply);
+        });
+    }
+
+    [FuncButton]
     public void OnClickDebugSocketSendMessage()
     {
         Single.Network.TestSendMessage(Single.AppInfo.GetDeviceName(), (reply) => 

@@ -13,7 +13,72 @@ using socket.io;
 
 public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 {
-    public Socket m_pSocket = null;
+    private Socket m_pSocket = null;
+    private List<SHRequestData> m_pSocketRequestQueue = new List<SHRequestData>();
+
+    public void SendRequestSocket(string strEvent, JsonData body, Action<SHReply> callback)
+    {
+        SendRequestSocket(new SHRequestData(strEvent, HTTPMethodType.POST, body, callback));
+    }
+
+    public async void SendRequestSocket(SHRequestData pRequestData)
+    {
+        m_pSocketRequestQueue.Add(pRequestData);
+
+        if (true == m_bIsProcessingRetry)
+            return;
+
+        if (null == m_pStringTable)
+        {
+            m_pStringTable = await Single.Table.GetTable<SHTableClientString>();
+        }
+
+        ProcessSendRequestSocket();
+    }
+
+    public void ProcessSendRequestSocket()
+    {
+        m_pSocketRequestQueue.ForEach((pReq) => 
+        {
+            // 소켓메시지 처리
+        });
+
+        m_pSocketRequestQueue.Clear();
+    }
+
+    public void RetrySocketConnection()
+    {
+        if (IsConnected())
+        {
+            ProcessSendRequestSocket();
+            return;
+        }
+
+        if (true == m_bIsProcessingRetry)
+        {
+            return;
+        }
+
+        StartCoroutine("CoroutineRetrySocketConnectProcess");
+    }
+
+    private IEnumerator CoroutineRetrySocketConnectProcess()
+    {
+        m_bIsProcessingRetry = true;
+
+        // 컨넥션시도
+        // 연결이 되면 m_bIsProcessingRetry = false 해야하나?
+        // 웹소켓은 아직 retry 중일 수 있는데
+
+        // 이참에 설계 좀 해서 분리작업 좀 해야겠고만
+
+        yield return null;
+    }
+
+    private bool IsConnected()
+    {
+        return (m_pSocket && m_pSocket.IsConnected);
+    }
 
     public void ConnectWebSocket(Action<SHReply> callback)
     {
@@ -36,6 +101,8 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
             JsonData jsonData = new JsonData();
             jsonData["message"] = "Connect Websocket!!";
             Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
+
+            StopCoroutine("CoroutineRetrySocketConnectProcess");
         });
 
         m_pSocket.On(SystemEvents.connectTimeOut, () =>
@@ -67,6 +134,8 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
             JsonData jsonData = new JsonData();
             jsonData["message"] = "disconnect Websocket!!";
             Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
+
+            // 재시도처리
 
             m_pSocket = ClearSocket(m_pSocket);
         });

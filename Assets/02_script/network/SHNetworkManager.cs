@@ -20,10 +20,39 @@ public enum HTTPMethodType
     PUT,
 }
 
+public enum eRequestStatus
+{
+    Ready,
+    Requesting,
+    Done,
+}
+
+public class SHRequestData
+{
+    public string m_strPath;
+    public JsonData m_pBody;
+    public HTTPMethodType m_eMethodType;
+    public Action<SHReply> m_pCallback;
+    public eRequestStatus m_eRequestStatus;
+
+    public SHRequestData(string path, HTTPMethodType methoodType, JsonData body, Action<SHReply> callback)
+    {
+        this.m_strPath = path;
+        this.m_pBody = body;
+        this.m_eMethodType = methoodType;
+        this.m_pCallback = (null == callback) ? (reply) => { } : callback;
+        this.m_eRequestStatus = eRequestStatus.Ready;
+    }
+}
+
 public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 {
     private string m_strWebHost = "";
+    
+    private int m_iRetryCount = 0;
     private int m_iMaxRetryCount = 5;
+    private bool m_bIsProcessingRetry = false;
+
     private SHTableClientString m_pStringTable;
 
     public override void OnInitialize()

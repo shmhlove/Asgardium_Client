@@ -16,48 +16,21 @@ using System.Collections.Specialized;
 using LitJson;
 using socket.io;
 
-public enum eWebRequestStatus
-{
-    Ready,
-    Requesting,
-    Done,
-}
-
-public class SHWebRequestData
-{
-    public string m_strPath;
-    public JsonData m_pBody;
-    public HTTPMethodType m_eMethodType;
-    public Action<SHReply> m_pCallback;
-    public eWebRequestStatus m_eRequestStatus;
-
-    public SHWebRequestData(string path, HTTPMethodType methoodType, JsonData body, Action<SHReply> callback)
-    {
-        this.m_strPath = path;
-        this.m_pBody = body;
-        this.m_eMethodType = methoodType;
-        this.m_pCallback = (null == callback) ? (reply) => {} : callback;
-        this.m_eRequestStatus = eWebRequestStatus.Ready;
-    }
-}
-
 public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 {
-    private int m_iRetryCount = 0;
-    private bool m_bIsProcessingRetry = false;
-    private List<SHWebRequestData> m_pWebRequestQueue = new List<SHWebRequestData>();
+    private List<SHRequestData> m_pWebRequestQueue = new List<SHRequestData>();
 
     public void GET(string path, JsonData body, Action<SHReply> callback)
     {
-        SendRequest(new SHWebRequestData(path, HTTPMethodType.GET, body, callback));
+        SendRequestWeb(new SHRequestData(path, HTTPMethodType.GET, body, callback));
     }
 
     public void POST(string path, JsonData body, Action<SHReply> callback)
     {
-        SendRequest(new SHWebRequestData(path, HTTPMethodType.POST, body, callback));
+        SendRequestWeb(new SHRequestData(path, HTTPMethodType.POST, body, callback));
     }
 
-    public async void SendRequest(SHWebRequestData pRequestData)
+    public async void SendRequestWeb(SHRequestData pRequestData)
     {
         m_pWebRequestQueue.Add(pRequestData);
 
@@ -72,11 +45,11 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         StartCoroutine(CoroutineSendRequest(pRequestData));
     }
 
-    private IEnumerator CoroutineSendRequest(SHWebRequestData pRequestData)
+    private IEnumerator CoroutineSendRequest(SHRequestData pRequestData)
     {
         Single.BusinessGlobal.ShowIndicator();
 
-        pRequestData.m_eRequestStatus = eWebRequestStatus.Requesting;
+        pRequestData.m_eRequestStatus = eRequestStatus.Requesting;
 
         var pWebRequest = CreateUnityRequestData(pRequestData);
 
@@ -87,7 +60,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         while (false == pWebRequest.isDone)
             yield return null;
 
-        pRequestData.m_eRequestStatus = eWebRequestStatus.Done;
+        pRequestData.m_eRequestStatus = eRequestStatus.Done;
 
         var pReply = new SHReply(pWebRequest);
 
@@ -108,7 +81,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         }
     }
 
-    private IEnumerator CoroutineRetryProcess(SHWebRequestData pRequestData)
+    private IEnumerator CoroutineRetryProcess(SHRequestData pRequestData)
     {
         // 이미 Retry 진행 중이면 대기(Retry 요청은 예외)
         if ((SHAPIs.SH_API_RETRY_REQUEST != pRequestData.m_strPath)
@@ -122,7 +95,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         {
             var pRequestings = m_pWebRequestQueue.Find((pReq) => 
             {
-                return (pReq.m_eRequestStatus == eWebRequestStatus.Requesting);
+                return (pReq.m_eRequestStatus == eRequestStatus.Requesting);
             });
 
             if (null == pRequestings)
@@ -133,7 +106,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 
         Action pRetryAction = () => 
         {
-            StartCoroutine(CoroutineSendRequest(new SHWebRequestData(SHAPIs.SH_API_RETRY_REQUEST, HTTPMethodType.GET, null, (pReply) => 
+            StartCoroutine(CoroutineSendRequest(new SHRequestData(SHAPIs.SH_API_RETRY_REQUEST, HTTPMethodType.GET, null, (pReply) => 
             {
                 m_iRetryCount = 0;
                 m_bIsProcessingRetry = false;
@@ -145,6 +118,8 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
                 {
                     StartCoroutine(CoroutineSendRequest(pReq));
                 }
+
+                RetrySocketConnection();
             })));
         };
         
@@ -168,7 +143,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
             pRetryAction();
         }
         else
-        {            
+        {
             // 수동 재시도 처리
             var pAlertInfo = new SHUIAlertInfo();
             pAlertInfo.m_strMessage = string.Format("{0}\n{1}", strErrorMessage, m_pStringTable.GetString("1009"));
@@ -191,7 +166,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         }
     }
 
-    private UnityWebRequest CreateUnityRequestData(SHWebRequestData pData)
+    private UnityWebRequest CreateUnityRequestData(SHRequestData pData)
     {
         var uri = new Uri(m_strWebHost + pData.m_strPath);
 
@@ -255,7 +230,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         return request;
     }
 
-    private void CallbackAndRemovePool(SHWebRequestData pRequestData, SHReply pReply)
+    private void CallbackAndRemovePool(SHRequestData pRequestData, SHReply pReply)
     {
         pRequestData.m_pCallback(pReply);
         m_pWebRequestQueue.Remove(pRequestData);

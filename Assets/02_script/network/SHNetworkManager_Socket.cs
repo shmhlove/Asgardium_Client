@@ -23,14 +23,9 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
             return;
         }
 
-        // 재시도 시도, 재시도, 재시도중, 재시도실패, 재시도에러 핸들러에 대한 처리를 하는것보다는
-        // 재시도에 대한 코드는 직접 짜는게 좋겠다.
         SocketManager.Instance.Reconnection = false;
-
-        // 타임아웃은 3초로, 1초로 하니깐 컨넥션타임아웃발생함.
         //SocketManager.Instance.TimeOut = 30000;
 
-        // 연결, 연결타임아웃, 연결에러, 연결종료 이벤트만 처리
         m_pSocket = Socket.Connect(m_strWebHost, new SHCustomCertificateHandler());
         callback(new SHReply());
         
@@ -91,9 +86,9 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         {
             Debug.Log("[RECIVE] " + data);
 
-            JsonData jsonData = new JsonData();
-            jsonData["message"] = data;
-            Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
+            // JsonData jsonData = new JsonData();
+            // jsonData["message"] = data;
+            // Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
         });
     }
 

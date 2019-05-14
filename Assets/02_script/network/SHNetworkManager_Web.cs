@@ -14,6 +14,7 @@ using socket.io;
 public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 {
     private bool m_bIsConnectWebServer = true;
+    private bool m_bIsRunRetryCoroutine = false;
     private List<SHRequestData> m_pWebRequestQueue = new List<SHRequestData>();
 
     public void GET(string path, JsonData body, Action<SHReply> callback)
@@ -73,12 +74,20 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         }
     }
 
+    // 리트라이 상황이 발생하면 n초에 한번씩 무조건 호출된다.
     private IEnumerator CoroutineRetryWebServerProcess()
     {
         if (true == m_bIsConnectWebServer)
         {
             yield break;
         }
+
+        if (true == m_bIsRunRetryCoroutine)
+        {
+            yield break;
+        }
+
+        m_bIsRunRetryCoroutine = true;
 
         while (true)
         {
@@ -88,11 +97,15 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
             });
 
             if (null == pRequestings)
+            {
                 break;
+            }
             
             yield return null;
         }
 
+        // 여기서 꼬이네...
+        // 응답이 오면 다시 재시도 가야되는데 흠...
         StartCoroutine(CoroutineSendRequest(new SHRequestData(SHAPIs.SH_API_RETRY_REQUEST, HTTPMethodType.GET, null, (pReply) => 
         {
             // @@ 아래코드는 대기타다가 웹소켓도 성공 했을때 처리해야한다.
@@ -106,6 +119,8 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
                 StartCoroutine(CoroutineSendRequest(pReq));
             }
         })));
+
+        m_bIsRunRetryCoroutine = false;
     }
 
     private UnityWebRequest CreateUnityRequestData(SHRequestData pData)

@@ -66,15 +66,15 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
             strErrorMessage = m_pStringTable.GetString("1007");
         }
 
+        // 자동 재시도 처리 (m_iMaxRetryCount 만큼 반복)
         while (m_iRetryCount++ < m_iMaxRetryCount)
         {
-            // 자동 재시도 처리
             var strRetryInfo = string.Format(m_pStringTable.GetString("1008"), m_iRetryCount, m_iMaxRetryCount);
             Single.BusinessGlobal.UpdateIndicatorMessage(string.Format("{0}\n{1}", strRetryInfo, strErrorMessage));
 
             StartCoroutine(CoroutineRetryWebServerProcess());
             StartCoroutine(CoroutineRetryWebSocketProcess());
-
+            
             yield return new WaitForSeconds(m_fRetryDelay);
         }
         

@@ -18,4 +18,9 @@ public static class SHAPIs
     public static string SH_API_GET_MINING_ACTIVE_COMPANY_TABLE = "/table/instance_mining_active_company";
     public static string SH_API_GET_MINING_ACTIVE_QUANTITY_TABLE = "/table/mining_active_quantity";
     public static string SH_API_GET_MINING_ACTIVE_SUPPLY_TABLE = "/table/mining_active_supply";
+
+    public static string SH_SOCKET_CONNECT = "connect";
+    public static string SH_SOCKET_REQ_TEST = "test_message";
+    public static string SH_SOCKET_REQ_SUBSCRIBE_MINING_ACTIVE_INFO = "subscribe_mining_active_info";
+    public static string SH_SOCKET_REQ_UNSUBSCRIBE_MINING_ACTIVE_INFO = "unsubscribe_mining_active_info";
 }

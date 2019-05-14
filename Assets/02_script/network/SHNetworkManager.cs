@@ -48,10 +48,6 @@ public class SHRequestData
 public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 {
     private string m_strWebHost = "";
-    
-    private int m_iRetryCount = 0;
-    private int m_iMaxRetryCount = 5;
-    private bool m_bIsProcessingRetry = false;
 
     private SHTableClientString m_pStringTable;
 

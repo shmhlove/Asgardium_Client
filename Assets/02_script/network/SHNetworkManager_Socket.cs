@@ -14,6 +14,7 @@ using socket.io;
 public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 {
     private Socket m_pSocket = null;
+
     private List<SHRequestData> m_pSocketRequestQueue = new List<SHRequestData>();
 
     public void SendRequestSocket(string strEvent, JsonData body, Action<SHReply> callback)
@@ -21,17 +22,12 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         SendRequestSocket(new SHRequestData(strEvent, HTTPMethodType.POST, body, callback));
     }
 
-    public async void SendRequestSocket(SHRequestData pRequestData)
+    public void SendRequestSocket(SHRequestData pRequestData)
     {
         m_pSocketRequestQueue.Add(pRequestData);
 
         if (true == m_bIsProcessingRetry)
             return;
-
-        if (null == m_pStringTable)
-        {
-            m_pStringTable = await Single.Table.GetTable<SHTableClientString>();
-        }
 
         ProcessSendRequestSocket();
     }
@@ -40,49 +36,32 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
     {
         m_pSocketRequestQueue.ForEach((pReq) => 
         {
-            // º“ƒœ∏ﬁΩ√¡ˆ √≥∏Æ
+            // @@ ÏÜåÏºìÏöîÏ≤≠
         });
 
         m_pSocketRequestQueue.Clear();
     }
 
-    public void RetrySocketConnection()
+    private IEnumerator CoroutineRetryWebSocketProcess()
     {
-        if (IsConnected())
+        if (true == IsWebSocketConnected())
         {
-            ProcessSendRequestSocket();
-            return;
+            yield break;
         }
 
-        if (true == m_bIsProcessingRetry)
-        {
-            return;
-        }
-
-        StartCoroutine("CoroutineRetrySocketConnectProcess");
-    }
-
-    private IEnumerator CoroutineRetrySocketConnectProcess()
-    {
-        m_bIsProcessingRetry = true;
-
-        // ƒ¡≥ÿº«Ω√µµ
-        // ø¨∞·¿Ã µ«∏È m_bIsProcessingRetry = false «ÿæﬂ«œ≥™?
-        // ¿•º“ƒœ¿∫ æ∆¡˜ retry ¡ﬂ¿œ ºˆ ¿÷¥¬µ•
-
-        // ¿Ã¬¸ø° º≥∞Ë ¡ª «ÿº≠ ∫–∏Æ¿€æ˜ ¡ª «ÿæﬂ∞⁄∞Ì∏∏
+        // @@ Ïó∞Í≤∞ÏãúÎèÑ
 
         yield return null;
     }
 
-    private bool IsConnected()
+    private bool IsWebSocketConnected()
     {
         return (m_pSocket && m_pSocket.IsConnected);
     }
 
     public void ConnectWebSocket(Action<SHReply> callback)
     {
-        if (true == IsConnectSocket(m_pSocket))
+        if (true == IsWebSocketConnected())
         {
             callback(new SHReply(new SHError(eErrorCode.Net_Socket_Aready_Connect, "already connect", null)));
             return;
@@ -102,9 +81,8 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
             jsonData["message"] = "Connect Websocket!!";
             Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
 
-            StopCoroutine("CoroutineRetrySocketConnectProcess");
+            ProcessSendRequestSocket();
         });
-
         m_pSocket.On(SystemEvents.connectTimeOut, () =>
         {
             Debug.Log("[RECIVE] connectTimeOut");
@@ -114,6 +92,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
             Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
 
             m_pSocket = ClearSocket(m_pSocket);
+            StartRetryProcess();
         });
 
         m_pSocket.On(SystemEvents.connectError, (Exception exception) =>
@@ -125,6 +104,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
             Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
 
             m_pSocket = ClearSocket(m_pSocket);
+            StartRetryProcess();
         });
 
         m_pSocket.On(SystemEvents.disconnect, () =>
@@ -135,9 +115,8 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
             jsonData["message"] = "disconnect Websocket!!";
             Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
 
-            // ¿ÁΩ√µµ√≥∏Æ
-
             m_pSocket = ClearSocket(m_pSocket);
+            StartRetryProcess();
         });
 
         m_pSocket.On("forceDisconnect", (string data) =>
@@ -163,7 +142,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 
     public void DisconnectWebSocket(Action<SHReply> callback)
     {
-        if (false == IsConnectSocket(m_pSocket))
+        if (false == IsWebSocketConnected())
         {
             callback(new SHReply(new SHError(eErrorCode.Net_Socket_Not_Connect, "need connect", null)));
             return;
@@ -175,7 +154,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 
     public void TestSendMessage(string strMessage, Action<SHReply> callback)
     {
-        if (false == IsConnectSocket(m_pSocket))
+        if (false == IsWebSocketConnected())
         {
             callback(new SHReply(new SHError(eErrorCode.Net_Socket_Not_Connect, "need connect", null)));
             return;
@@ -185,18 +164,12 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         callback(new SHReply());
     }
 
-    private bool IsConnectSocket(Socket pSocket)
-    {
-        return ((null != pSocket) && (true == pSocket.IsConnected));
-    }
-
     private Socket ClearSocket(Socket pSocket)
     {
-        if (null == pSocket)
-        {
+        if (null == pSocket) {
             return null;
         }
-            
+        
         GameObject.DestroyImmediate(pSocket.gameObject);
         return null;
     }

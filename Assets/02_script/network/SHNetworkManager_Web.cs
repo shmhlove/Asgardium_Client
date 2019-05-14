@@ -1,8 +1,3 @@
-/*
-    @@ 에러팝업출력 / 로그 / 인디케이터UI컨트롤 / 리트라이 하는 부분은 비지니스로 빼면 좋을꺼같다.
-    @@ 여기는 진짜 요청받은대로 보내고, 받는것만 하고
-*/
-
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -18,6 +13,7 @@ using socket.io;
 
 public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 {
+    private bool m_bIsConnectWebServer = true;
     private List<SHRequestData> m_pWebRequestQueue = new List<SHRequestData>();
 
     public void GET(string path, JsonData body, Action<SHReply> callback)
@@ -30,17 +26,12 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         SendRequestWeb(new SHRequestData(path, HTTPMethodType.POST, body, callback));
     }
 
-    public async void SendRequestWeb(SHRequestData pRequestData)
+    public void SendRequestWeb(SHRequestData pRequestData)
     {
         m_pWebRequestQueue.Add(pRequestData);
 
         if (true == m_bIsProcessingRetry)
             return;
-
-        if (null == m_pStringTable)
-        {
-            m_pStringTable = await Single.Table.GetTable<SHTableClientString>();
-        }
         
         StartCoroutine(CoroutineSendRequest(pRequestData));
     }
@@ -56,7 +47,6 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         DebugLogOfRequest(pWebRequest);
 
         yield return pWebRequest.SendWebRequest();
-        
         while (false == pWebRequest.isDone)
             yield return null;
 
@@ -66,11 +56,9 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 
         DebugLogOfResponse(pReply);
 
-        if (eErrorCode.Net_Common_HTTP == pReply.errorCode)
-        {
-            StartCoroutine(CoroutineRetryProcess(pRequestData));
-        }
-        else
+        m_bIsConnectWebServer = (eErrorCode.Net_Common_HTTP != pReply.errorCode);
+
+        if (true == m_bIsConnectWebServer)
         {
             CallbackAndRemovePool(pRequestData, pReply);
 
@@ -79,18 +67,19 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
                 Single.BusinessGlobal.CloseIndicator();
             }
         }
+        else
+        {
+            StartRetryProcess();
+        }
     }
 
-    private IEnumerator CoroutineRetryProcess(SHRequestData pRequestData)
+    private IEnumerator CoroutineRetryWebServerProcess()
     {
-        // 이미 Retry 진행 중이면 대기(Retry 요청은 예외)
-        if ((SHAPIs.SH_API_RETRY_REQUEST != pRequestData.m_strPath)
-            && (true == m_bIsProcessingRetry) )
+        if (true == m_bIsConnectWebServer)
+        {
             yield break;
+        }
 
-        m_bIsProcessingRetry = true;
-
-        // 모든 요청이 돌아올때까지 대기
         while (true)
         {
             var pRequestings = m_pWebRequestQueue.Find((pReq) => 
@@ -104,66 +93,19 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
             yield return null;
         }
 
-        Action pRetryAction = () => 
+        StartCoroutine(CoroutineSendRequest(new SHRequestData(SHAPIs.SH_API_RETRY_REQUEST, HTTPMethodType.GET, null, (pReply) => 
         {
-            StartCoroutine(CoroutineSendRequest(new SHRequestData(SHAPIs.SH_API_RETRY_REQUEST, HTTPMethodType.GET, null, (pReply) => 
+            // @@ 아래코드는 대기타다가 웹소켓도 성공 했을때 처리해야한다.
+
+            StopRetryProcess();
+            
+            Debug.LogFormat("[LSH] WebRequestQueue Count : {0}", m_pWebRequestQueue.Count);
+
+            foreach (var pReq in m_pWebRequestQueue)
             {
-                m_iRetryCount = 0;
-                m_bIsProcessingRetry = false;
-                Single.BusinessGlobal.UpdateIndicatorMessage(string.Empty);
-
-                Debug.LogFormat("[LSH] WebRequestQueue Count : {0}", m_pWebRequestQueue.Count);
-
-                foreach (var pReq in m_pWebRequestQueue)
-                {
-                    StartCoroutine(CoroutineSendRequest(pReq));
-                }
-
-                RetrySocketConnection();
-            })));
-        };
-        
-        var strErrorMessage = string.Empty;
-        if (Application.internetReachability == NetworkReachability.NotReachable)
-        {
-            strErrorMessage = m_pStringTable.GetString("1006");
-        }
-        else
-        {
-            strErrorMessage = m_pStringTable.GetString("1007");
-        }
-
-        if (m_iRetryCount++ < m_iMaxRetryCount)
-        {
-            // 자동 재시도 처리
-            var strRetryInfo = string.Format(m_pStringTable.GetString("1008"), m_iRetryCount, m_iMaxRetryCount);
-            Single.BusinessGlobal.UpdateIndicatorMessage(string.Format("{0}\n{1}", strRetryInfo, strErrorMessage));
-
-            yield return new WaitForSeconds(1.5f);
-            pRetryAction();
-        }
-        else
-        {
-            // 수동 재시도 처리
-            var pAlertInfo = new SHUIAlertInfo();
-            pAlertInfo.m_strMessage = string.Format("{0}\n{1}", strErrorMessage, m_pStringTable.GetString("1009"));
-            pAlertInfo.m_strTwoLeftBtnLabel = m_pStringTable.GetString("10012");
-            pAlertInfo.m_strTwoRightBtnLabel = m_pStringTable.GetString("10013");
-            pAlertInfo.m_eButtonType = eAlertButtonType.TwoButton;
-            pAlertInfo.m_pCallback = (eSelectBtnType) => 
-            {
-                if (eAlertButtonAction.Left_Button == eSelectBtnType)
-                {
-                    m_iRetryCount = 0;
-                    pRetryAction();
-                }
-                else
-                {
-                    SHUtils.GameQuit();
-                }
-            };
-            Single.BusinessGlobal.ShowAlertUI(pAlertInfo);
-        }
+                StartCoroutine(CoroutineSendRequest(pReq));
+            }
+        })));
     }
 
     private UnityWebRequest CreateUnityRequestData(SHRequestData pData)
@@ -234,6 +176,11 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
     {
         pRequestData.m_pCallback(pReply);
         m_pWebRequestQueue.Remove(pRequestData);
+    }
+    
+    private bool IsWebServerConnected()
+    {
+        return m_bIsConnectWebServer;
     }
 
     private void DebugLogOfRequest(UnityWebRequest pData)

@@ -1,19 +1,9 @@
-[
+﻿[
   {
     "0": "Form",
     "1": "Form",
-    
     "1000": "Login is required.",
     "1001": "This is not a valid email format.",
-    "1002": "A system error has occurred.",
-    "1003": "Email already registered.",
-    "1004": "Unregistered email.",
-    "1005": "This password does not match",
-    "1006": "The network status is unstable.",
-    "1007": "Transient system error.",
-    "1008": "Retrying({0}/{1})",
-    "1009": "Would you like to retry?",
-
     "10000": "Email",
     "10001": "Password",
     "10002": "Nickname",
@@ -24,11 +14,6 @@
     "10007": "Please enter your Password.",
     "10008": "Save login information",
     "10009": "Please enter your nickname.",
-    "10010": "OK",
-    "10011": "Cancel",
-    "10012": "Retry",
-    "10013": "Exit",
-
     "1010000": "ASGARDIUM",
     "1010001": "ASGARDIUM",
     "1010002": "ASGARDIUM",
@@ -58,9 +43,11 @@
     "1110000": "Oracle Union",
     "1110001": "마미쿠",
     "1110002": "코아쿠",
-    "1120000": "Lv.",
-    "1120001": "Available GOLD: ",
-    "1120002": "Upgrade",
+    "1120000": "OK",
+    "1120001": "Upgrade",
+    "1120002": "Lv.",
+    "1120003": "Available GOLD: ",
+    "1120004": "Available: ",
     "1130000": "Mining",
     "1130001": "Storage",
     "1130002": "Market",
@@ -88,6 +75,17 @@
     "1210012": "Mining Power",
     "1210013": "Max MP ",
     "1210014": "Recharge",
-    "1210015": "Delay Time "
+    "1210015": "Delay Time ",
+    "1210016": "Edit Company",
+    "1210017": "COMPANY NAME",
+    "1210018": "EMBLEM",
+    "1210019": "Resource",
+    "1210020": "Mining Type",
+    "1210021": "ACTIVE MINING",
+    "1210022": "PASSIVE MINING",
+    "1210023": "Establish",
+    "1210024": "EMBLEM & COMPANY NAME",
+    "1210025": "RESOURCE",
+    "1210026": "MINING TYPE"
   }
 ]

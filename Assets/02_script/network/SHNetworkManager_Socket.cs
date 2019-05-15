@@ -40,10 +40,13 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         }
         else
         {
-            m_pSocketRequestQueue.ForEach((pReq) => 
+            foreach (var pReq in m_pSocketRequestQueue)
             {
-                m_pSocket.Emit(pReq.m_strPath, pReq.m_pBody.ToJson());
-
+                if (false == pReq.m_strPath.Equals(SHAPIs.SH_SOCKET_CONNECT))
+                {
+                    m_pSocket.Emit(pReq.m_strPath, (null != pReq.m_pBody) ? pReq.m_pBody.ToJson() : string.Empty);
+                }
+                
                 pReq.m_pCallback(new SHReply()
                 {
                     isSucceed = true,
@@ -51,7 +54,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
                     requestMethod = "socket",
                     requestUrl = pReq.m_strPath
                 });
-            });
+            }
             m_pSocketRequestQueue.Clear();
         }
     }

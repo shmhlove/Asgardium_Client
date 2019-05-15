@@ -49,12 +49,9 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 {
     private string m_strWebHost = "";
     
-    private SHTableClientString m_pStringTable;
-
     public override void OnInitialize()
     {
         SetServerInfo(() => {});
-        SetStringTable();
         SetDontDestroy();
     }
     
@@ -66,11 +63,6 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         pCallback();
     }
     
-    private async void SetStringTable()
-    {
-        m_pStringTable = await Single.Table.GetTable<SHTableClientString>();
-    }
-
     private string GetBodyMessage(JsonData body)
     {
         return (null == body) ? "{}" : JsonMapper.ToJson(body);

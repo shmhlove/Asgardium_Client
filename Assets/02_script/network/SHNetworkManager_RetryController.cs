@@ -19,6 +19,8 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
     private bool m_bIsProcessingRetry = false;
     private bool m_bIsProcessingStopRetry = false;
 
+    private SHTableClientString m_pStringTable;
+
     private async void StartRetryProcess()
     {
         if (true == m_bIsProcessingRetry)
@@ -43,6 +45,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         StartCoroutine(CoroutineCheckStopRetry(() => 
         {
             ClearRetryInfo();
+            Single.BusinessGlobal.CloseIndicator();
             StopCoroutine("CoroutineRetryProcess");
         }));
     }

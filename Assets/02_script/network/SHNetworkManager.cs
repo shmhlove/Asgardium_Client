@@ -48,7 +48,7 @@ public class SHRequestData
 public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 {
     private string m_strWebHost = "";
-
+    
     private SHTableClientString m_pStringTable;
 
     public override void OnInitialize()

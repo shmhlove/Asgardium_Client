@@ -13,8 +13,8 @@ using socket.io;
 
 public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 {
-    private bool m_bIsConnectWebServer = true;
-    private bool m_bIsRunRetryCoroutine = false;
+    private bool m_bIsConnectWebServer = false;
+    private bool m_bIsRunWebserverRetryCoroutine = false;
     private List<SHRequestData> m_pWebRequestQueue = new List<SHRequestData>();
 
     public void GET(string path, JsonData body, Action<SHReply> callback)
@@ -57,9 +57,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 
         DebugLogOfResponse(pReply);
 
-        m_bIsConnectWebServer = (eErrorCode.Net_Common_HTTP != pReply.errorCode);
-
-        if (true == m_bIsConnectWebServer)
+        if (true == (m_bIsConnectWebServer = (eErrorCode.Net_Common_HTTP != pReply.errorCode)))
         {
             CallbackAndRemovePool(pRequestData, pReply);
 
@@ -74,21 +72,24 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         }
     }
 
-    // 리트라이 상황이 발생하면 n초에 한번씩 무조건 호출된다.
     private IEnumerator CoroutineRetryWebServerProcess()
     {
+        // 예외처리 : 연결이 되어있으면 무시
         if (true == m_bIsConnectWebServer)
         {
             yield break;
         }
 
-        if (true == m_bIsRunRetryCoroutine)
+        // 예외처리 : 재시도 시도중이면 무시
+        if (true == m_bIsRunWebserverRetryCoroutine)
         {
             yield break;
         }
 
-        m_bIsRunRetryCoroutine = true;
-
+        // 재시도 준비
+        m_bIsRunWebserverRetryCoroutine = true;
+        
+        // 응답이 오지않은 요청들 기다려주기
         while (true)
         {
             var pRequestings = m_pWebRequestQueue.Find((pReq) => 
@@ -104,23 +105,35 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
             yield return null;
         }
 
-        // 여기서 꼬이네...
-        // 응답이 오면 다시 재시도 가야되는데 흠...
-        StartCoroutine(CoroutineSendRequest(new SHRequestData(SHAPIs.SH_API_RETRY_REQUEST, HTTPMethodType.GET, null, (pReply) => 
-        {
-            // @@ 아래코드는 대기타다가 웹소켓도 성공 했을때 처리해야한다.
+        // 연결체크 Request Send
+        var pWebRequest = CreateUnityRequestData(
+            new SHRequestData(SHAPIs.SH_API_RETRY_REQUEST, HTTPMethodType.GET, null, null));
 
+        DebugLogOfRequest(pWebRequest);
+
+        yield return pWebRequest.SendWebRequest();
+        while (false == pWebRequest.isDone)
+            yield return null;
+
+        var pReply = new SHReply(pWebRequest);
+
+        DebugLogOfResponse(pReply);
+
+        if (true == (m_bIsConnectWebServer = (eErrorCode.Net_Common_HTTP != pReply.errorCode)))
+        {
             StopRetryProcess();
-            
-            Debug.LogFormat("[LSH] WebRequestQueue Count : {0}", m_pWebRequestQueue.Count);
 
             foreach (var pReq in m_pWebRequestQueue)
             {
                 StartCoroutine(CoroutineSendRequest(pReq));
             }
-        })));
+        }
+        else
+        {
+            StartRetryProcess();
+        }
 
-        m_bIsRunRetryCoroutine = false;
+        m_bIsRunWebserverRetryCoroutine = false;
     }
 
     private UnityWebRequest CreateUnityRequestData(SHRequestData pData)

@@ -14,7 +14,7 @@ using socket.io;
 public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 {
     private Socket m_pSocket = null;
-
+    private bool m_bIsRunWebsocketRetryCoroutine = false;
     private List<SHRequestData> m_pSocketRequestQueue = new List<SHRequestData>();
 
     public void SendRequestSocket(string strEvent, JsonData body, Action<SHReply> callback)
@@ -34,12 +34,48 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 
     public void ProcessSendRequestSocket()
     {
-        m_pSocketRequestQueue.ForEach((pReq) => 
+        if (false == IsWebSocketConnected())
         {
-            // @@ 소켓요청
-        });
+            StartRetryProcess();
+        }
+        else
+        {
+            m_pSocketRequestQueue.ForEach((pReq) => 
+            {
+                m_pSocket.Emit(pReq.m_strPath, pReq.m_pBody.ToJson());
 
-        m_pSocketRequestQueue.Clear();
+                pReq.m_pCallback(new SHReply()
+                {
+                    isSucceed = true,
+                    data = pReq.m_pBody,
+                    requestMethod = "socket",
+                    requestUrl = pReq.m_strPath
+                });
+            });
+            m_pSocketRequestQueue.Clear();
+        }
+    }
+
+    public Socket ConnectWebSocket()
+    {
+        // 소켓 셋팅
+        SocketManager.Instance.Reconnection = false;
+        //SocketManager.Instance.TimeOut = 30000;
+
+        // 연결
+        m_pSocket = Socket.Connect(m_strWebHost, new SHCustomCertificateHandler());
+        
+        // 시스템 이벤트 함수 등록
+        m_pSocket.On(SystemEvents.connect, OnSocketEventForConnect);
+        m_pSocket.On(SystemEvents.connectTimeOut, OnSocketEventForConnectTimeOut);
+        m_pSocket.On(SystemEvents.connectError, OnSocketEventForConnectError);
+        m_pSocket.On(SystemEvents.disconnect, OnSocketEventForDisconnect);
+
+        // 커스텀 이벤트 함수 등록
+        m_pSocket.On("force_disconnect", OnSocketEventForForceDisconnect);
+        m_pSocket.On("test_message", OnSocketEventForTestMessage);
+
+        return m_pSocket;
     }
 
     private IEnumerator CoroutineRetryWebSocketProcess()
@@ -49,119 +85,31 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
             yield break;
         }
 
-        // @@ 연결시도
-
-        yield return null;
-    }
-
-    private bool IsWebSocketConnected()
-    {
-        return (m_pSocket && m_pSocket.IsConnected);
-    }
-
-    public void ConnectWebSocket(Action<SHReply> callback)
-    {
-        if (true == IsWebSocketConnected())
+        if (true == m_bIsRunWebsocketRetryCoroutine)
         {
-            callback(new SHReply(new SHError(eErrorCode.Net_Socket_Aready_Connect, "already connect", null)));
-            return;
+            yield break;
         }
-
-        SocketManager.Instance.Reconnection = false;
-        //SocketManager.Instance.TimeOut = 30000;
-
-        m_pSocket = Socket.Connect(m_strWebHost, new SHCustomCertificateHandler());
-        callback(new SHReply());
+        m_bIsRunWebsocketRetryCoroutine = true;
         
-        m_pSocket.On(SystemEvents.connect, () =>
+        var pSocket = ConnectWebSocket();
+        pSocket.On(SystemEvents.connect, () => 
         {
-            Debug.Log("[RECIVE] connect");
+            m_bIsRunWebsocketRetryCoroutine = false;
+            OnSocketEventForConnect();
 
-            JsonData jsonData = new JsonData();
-            jsonData["message"] = "Connect Websocket!!";
-            Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
-
+            StopRetryProcess();
             ProcessSendRequestSocket();
         });
-        m_pSocket.On(SystemEvents.connectTimeOut, () =>
+        pSocket.On(SystemEvents.connectTimeOut, () => 
         {
-            Debug.Log("[RECIVE] connectTimeOut");
-
-            JsonData jsonData = new JsonData();
-            jsonData["message"] = "connectTimeOut Websocket!!";
-            Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
-
-            m_pSocket = ClearSocket(m_pSocket);
-            StartRetryProcess();
+            m_bIsRunWebsocketRetryCoroutine = false;
+            OnSocketEventForConnectTimeOut();
         });
-
-        m_pSocket.On(SystemEvents.connectError, (Exception exception) =>
+        pSocket.On(SystemEvents.connectError, (pException) => 
         {
-            Debug.Log("[RECIVE] connectError");
-
-            JsonData jsonData = new JsonData();
-            jsonData["message"] = "connectError Websocket!!";
-            Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
-
-            m_pSocket = ClearSocket(m_pSocket);
-            StartRetryProcess();
+            m_bIsRunWebsocketRetryCoroutine = false;
+            OnSocketEventForConnectError(pException);
         });
-
-        m_pSocket.On(SystemEvents.disconnect, () =>
-        {
-            Debug.Log("[RECIVE] disconnect");
-
-            JsonData jsonData = new JsonData();
-            jsonData["message"] = "disconnect Websocket!!";
-            Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
-
-            m_pSocket = ClearSocket(m_pSocket);
-            StartRetryProcess();
-        });
-
-        m_pSocket.On("forceDisconnect", (string data) =>
-        {
-            Debug.Log("[RECIVE] forceDisconnect");
-
-            JsonData jsonData = new JsonData();
-            jsonData["message"] = "forceDisconnect Websocket!!";
-            Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
-
-            m_pSocket = ClearSocket(m_pSocket);
-        });
-
-        m_pSocket.On("test_message", (string data) =>
-        {
-            Debug.Log("[RECIVE] " + data);
-
-            // JsonData jsonData = new JsonData();
-            // jsonData["message"] = data;
-            // Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
-        });
-    }
-
-    public void DisconnectWebSocket(Action<SHReply> callback)
-    {
-        if (false == IsWebSocketConnected())
-        {
-            callback(new SHReply(new SHError(eErrorCode.Net_Socket_Not_Connect, "need connect", null)));
-            return;
-        }
-
-        m_pSocket.Emit("forceDisconnect", "");
-        callback(new SHReply());
-    }
-
-    public void TestSendMessage(string strMessage, Action<SHReply> callback)
-    {
-        if (false == IsWebSocketConnected())
-        {
-            callback(new SHReply(new SHError(eErrorCode.Net_Socket_Not_Connect, "need connect", null)));
-            return;
-        }
-
-        m_pSocket.Emit("test_message", strMessage);
-        callback(new SHReply());
     }
 
     private Socket ClearSocket(Socket pSocket)
@@ -172,5 +120,73 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         
         GameObject.DestroyImmediate(pSocket.gameObject);
         return null;
+    }
+
+    private bool IsWebSocketConnected()
+    {
+        return (m_pSocket && m_pSocket.IsConnected);
+    }
+
+    // 소켓 시스템 이벤트 함수
+    private void OnSocketEventForConnect()
+    {
+        Debug.Log("[RECIVE] connect");
+
+        // JsonData jsonData = new JsonData();
+        // jsonData["message"] = "Connect Websocket!!";
+        // Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
+    }
+    private void OnSocketEventForConnectTimeOut()
+    {
+        Debug.Log("[RECIVE] connectTimeOut");
+
+        // JsonData jsonData = new JsonData();
+        // jsonData["message"] = "connectTimeOut Websocket!!";
+        // Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
+
+        m_pSocket = ClearSocket(m_pSocket);
+        StartRetryProcess();
+    }
+    private void OnSocketEventForConnectError(Exception pException)
+    {
+        Debug.Log("[RECIVE] connectError");
+
+        // JsonData jsonData = new JsonData();
+        // jsonData["message"] = "connectError Websocket!!";
+        // Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
+
+        m_pSocket = ClearSocket(m_pSocket);
+        StartRetryProcess();
+    }
+    private void OnSocketEventForDisconnect()
+    {
+        Debug.Log("[RECIVE] disconnect");
+
+        // JsonData jsonData = new JsonData();
+        // jsonData["message"] = "disconnect Websocket!!";
+        // Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
+
+        m_pSocket = ClearSocket(m_pSocket);
+        StartRetryProcess();
+    }
+
+    // 소켓 커스텀 이벤트 함수
+    private void OnSocketEventForForceDisconnect(string strMessage)
+    {
+        Debug.Log("[RECIVE] forceDisconnect : " + strMessage);
+
+        // JsonData jsonData = new JsonData();
+        // jsonData["message"] = "forceDisconnect Websocket!!";
+        // Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
+
+        m_pSocket = ClearSocket(m_pSocket);
+    }
+    private void OnSocketEventForTestMessage(string strMessage)
+    {
+        Debug.Log("[RECIVE] testMessage : " + strMessage);
+
+        // JsonData jsonData = new JsonData();
+        // jsonData["message"] = data;
+        // Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
     }
 }

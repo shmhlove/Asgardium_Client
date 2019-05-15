@@ -17,6 +17,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
     private int m_iMaxRetryCount = 5;
     private float m_fRetryDelay = 1.5f;
     private bool m_bIsProcessingRetry = false;
+    private bool m_bIsProcessingStopRetry = false;
 
     private async void StartRetryProcess()
     {
@@ -30,26 +31,40 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         {
             m_pStringTable = await Single.Table.GetTable<SHTableClientString>();
         }
-
+        
         StartCoroutine("CoroutineRetryProcess");
     }
 
-    private bool StopRetryProcess()
+    private void StopRetryProcess()
     {
-        // 웹서버와 웹소켓 모두 연결중일때
-        if ((false == IsWebServerConnected()) || (false == IsWebSocketConnected())) {
-                // 대기타야 함
-            }
-
-        ClearRetryInfo();
-        StopCoroutine("CoroutineRetryProcess");
-        return true;
+        if (true == m_bIsProcessingStopRetry)
+            return;
+        
+        StartCoroutine(CoroutineCheckStopRetry(() => 
+        {
+            ClearRetryInfo();
+            StopCoroutine("CoroutineRetryProcess");
+        }));
     }
 
     private void ClearRetryInfo()
     {
         m_iRetryCount = 0;
         m_bIsProcessingRetry = false;
+    }
+
+    private IEnumerator CoroutineCheckStopRetry(Action pCallback)
+    {
+        m_bIsProcessingStopRetry = true;
+
+        while ((false == IsWebServerConnected()) || (false == IsWebSocketConnected()))
+        {
+            yield return null;
+        }
+
+        m_bIsProcessingStopRetry = false;
+
+        pCallback();
     }
 
     private IEnumerator CoroutineRetryProcess()

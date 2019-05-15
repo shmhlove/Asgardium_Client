@@ -5,6 +5,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+using LitJson;
+
 public partial class SHBusinessLobby : MonoBehaviour
 {
     [Header("UI Objects")]
@@ -54,7 +56,7 @@ public partial class SHBusinessLobby : MonoBehaviour
     [FuncButton]
     public void OnClickDebugSocketConnect()
     {
-        Single.Network.ConnectWebSocket((reply) => 
+        Single.Network.SendRequestSocket(SHAPIs.SH_SOCKET_CONNECT, null, (reply) => 
         {
             Single.BusinessGlobal.ShowAlertUI(reply);
         });
@@ -63,7 +65,7 @@ public partial class SHBusinessLobby : MonoBehaviour
     [FuncButton]
     public void OnClickDebugSocketDisconnect()
     {
-        Single.Network.DisconnectWebSocket((reply) =>
+        Single.Network.SendRequestSocket(SHAPIs.SH_SOCKET_REQ_FORCE_DISCONNECT, null, (reply) => 
         {
             Single.BusinessGlobal.ShowAlertUI(reply);
         });
@@ -72,7 +74,11 @@ public partial class SHBusinessLobby : MonoBehaviour
     [FuncButton]
     public void OnClickDebugSocketSendMessage()
     {
-        Single.Network.TestSendMessage(Single.AppInfo.GetDeviceName(), (reply) => 
+        JsonData json = new JsonData
+        {
+            ["device_name"] = Single.AppInfo.GetDeviceName()
+        };
+        Single.Network.SendRequestSocket(SHAPIs.SH_SOCKET_REQ_TEST, json, (reply) => 
         {
             Single.BusinessGlobal.ShowAlertUI(reply);
         });

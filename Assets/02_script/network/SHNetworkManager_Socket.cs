@@ -46,7 +46,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
                 {
                     m_pSocket.Emit(pReq.m_strPath, (null != pReq.m_pBody) ? pReq.m_pBody.ToJson() : string.Empty);
                 }
-                
+
                 pReq.m_pCallback(new SHReply()
                 {
                     isSucceed = true,
@@ -59,7 +59,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         }
     }
 
-    public Socket ConnectWebSocket()
+    private Socket ConnectWebSocket()
     {
         // 소켓 셋팅
         SocketManager.Instance.Reconnection = false;
@@ -187,7 +187,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
     private void OnSocketEventForTestMessage(string strMessage)
     {
         Debug.Log("[RECIVE] testMessage : " + strMessage);
-
+        
         // JsonData jsonData = new JsonData();
         // jsonData["message"] = data;
         // Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));

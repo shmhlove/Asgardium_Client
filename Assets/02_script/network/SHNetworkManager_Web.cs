@@ -215,19 +215,19 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
     {
         if (null == pData.uploadHandler)
         {
-            Debug.LogFormat("<color=#666600>[REQUEST]</color> : {0} {1}\nheader = JWT {2}\nbody = {3}", 
+            Debug.LogFormat("<color=#666600>[WEB_REQUEST]</color> : {0} {1}\nheader = JWT {2}\nbody = {3}", 
                 pData.method, pData.url, pData.GetRequestHeader("Authorization"), "{}");
         }
         else
         {
-            Debug.LogFormat("<color=#666600>[REQUEST]</color> : {0} {1}\nheader = JWT {2}\nbody = {3}", 
+            Debug.LogFormat("<color=#666600>[WEB_REQUEST]</color> : {0} {1}\nheader = JWT {2}\nbody = {3}", 
                 pData.method, pData.url, pData.GetRequestHeader("Authorization"), Encoding.UTF8.GetString(pData.uploadHandler.data));
         }
     }
 
     private void DebugLogOfResponse(SHReply pReply)
     {
-        var strLog = string.Format("<color=#0033ff>[RESPONSE]</color> : {0} {1}\n{2}",
+        var strLog = string.Format("<color=#0033ff>[WEB_RESPONSE]</color> : {0} {1}\n{2}",
                 pReply.requestMethod,
                 pReply.requestUrl,
                 pReply.ToString());

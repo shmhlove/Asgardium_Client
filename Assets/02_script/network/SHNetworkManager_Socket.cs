@@ -44,7 +44,11 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
             {
                 if (false == pReq.m_strPath.Equals(SHAPIs.SH_SOCKET_CONNECT))
                 {
-                    m_pSocket.Emit(pReq.m_strPath, (null != pReq.m_pBody) ? pReq.m_pBody.ToJson() : string.Empty);
+                    var strMessage = (null != pReq.m_pBody) ? pReq.m_pBody.ToJson() : string.Empty;
+                    m_pSocket.Emit(pReq.m_strPath, strMessage);
+
+                    Debug.LogFormat("<color=#666600>[SOCKET_REQUEST]</color> : {0}\n{1}",
+                        pReq.m_strPath, strMessage);
                 }
 
                 pReq.m_pCallback(new SHReply()
@@ -75,9 +79,9 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         m_pSocket.On(SystemEvents.disconnect, OnSocketEventForDisconnect);
 
         // 커스텀 이벤트 함수 등록
-        m_pSocket.On("force_disconnect", OnSocketEventForForceDisconnect);
-        m_pSocket.On("test_message", OnSocketEventForTestMessage);
-
+        m_pSocket.On(SHAPIs.SH_SOCKET_REQ_TEST, OnSocketEventForTestMessage);
+        m_pSocket.On(SHAPIs.SH_SOCKET_REQ_FORCE_DISCONNECT, OnSocketEventForForceDisconnect);
+        
         return m_pSocket;
     }
 
@@ -133,7 +137,8 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
     // 소켓 시스템 이벤트 함수
     private void OnSocketEventForConnect()
     {
-        Debug.Log("[RECIVE] connect");
+        Debug.LogFormat("<color=#0033ff>[SOCKET_RESPONSE]</color> : {0}",
+                "Connect");
 
         // JsonData jsonData = new JsonData();
         // jsonData["message"] = "Connect Websocket!!";
@@ -141,7 +146,8 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
     }
     private void OnSocketEventForConnectTimeOut()
     {
-        Debug.Log("[RECIVE] connectTimeOut");
+        Debug.LogFormat("<color=#0033ff>[SOCKET_RESPONSE]</color> : {0}",
+                "ConnectTimeOut");
 
         // JsonData jsonData = new JsonData();
         // jsonData["message"] = "connectTimeOut Websocket!!";
@@ -152,7 +158,8 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
     }
     private void OnSocketEventForConnectError(Exception pException)
     {
-        Debug.Log("[RECIVE] connectError");
+        Debug.LogFormat("<color=#0033ff>[SOCKET_RESPONSE]</color> : {0}",
+                "ConnectError");
 
         // JsonData jsonData = new JsonData();
         // jsonData["message"] = "connectError Websocket!!";
@@ -163,7 +170,8 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
     }
     private void OnSocketEventForDisconnect()
     {
-        Debug.Log("[RECIVE] disconnect");
+        Debug.LogFormat("<color=#0033ff>[SOCKET_RESPONSE]</color> : {0}",
+                "Disconnect");
 
         // JsonData jsonData = new JsonData();
         // jsonData["message"] = "disconnect Websocket!!";
@@ -176,7 +184,8 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
     // 소켓 커스텀 이벤트 함수
     private void OnSocketEventForForceDisconnect(string strMessage)
     {
-        Debug.Log("[RECIVE] forceDisconnect : " + strMessage);
+        Debug.LogFormat("<color=#0033ff>[SOCKET_RESPONSE]</color> : {0}",
+                SHAPIs.SH_SOCKET_REQ_FORCE_DISCONNECT);
 
         // JsonData jsonData = new JsonData();
         // jsonData["message"] = "forceDisconnect Websocket!!";
@@ -186,7 +195,9 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
     }
     private void OnSocketEventForTestMessage(string strMessage)
     {
-        Debug.Log("[RECIVE] testMessage : " + strMessage);
+        Debug.LogFormat("<color=#0033ff>[SOCKET_RESPONSE]</color> : {0}",
+                SHAPIs.SH_SOCKET_REQ_TEST);
+
         
         // JsonData jsonData = new JsonData();
         // jsonData["message"] = data;

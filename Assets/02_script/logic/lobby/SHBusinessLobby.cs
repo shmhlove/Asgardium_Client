@@ -68,7 +68,7 @@ public partial class SHBusinessLobby : MonoBehaviour
     {
         Single.Network.SendRequestSocket(SHAPIs.SH_SOCKET_REQ_FORCE_DISCONNECT, null, (reply) => 
         {
-            Single.BusinessGlobal.ShowAlertUI(reply);
+            //Single.BusinessGlobal.ShowAlertUI(reply);
         });
     }
 
@@ -81,7 +81,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         };
         Single.Network.SendRequestSocket(SHAPIs.SH_SOCKET_REQ_TEST, json, (reply) => 
         {
-            Single.BusinessGlobal.ShowAlertUI(reply);
+            //Single.BusinessGlobal.ShowAlertUI(reply);
         });
     }
 }

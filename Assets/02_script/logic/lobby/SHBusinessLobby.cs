@@ -20,6 +20,7 @@ public partial class SHBusinessLobby : MonoBehaviour
     async void Start()
     {
         // 로그인 체크 후 테스트 계정으로 로그인 시켜주기
+        var pConfigTable = await Single.Table.GetTable<SHTableClientConfig>();
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
         pUserInfo.CheckUserInfoLoadedForDevelop();
 

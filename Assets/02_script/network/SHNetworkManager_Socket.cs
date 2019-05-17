@@ -44,7 +44,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
             {
                 if (false == pReq.m_strPath.Equals(SHAPIs.SH_SOCKET_CONNECT))
                 {
-                    var strMessage = (null != pReq.m_pBody) ? pReq.m_pBody.ToJson() : string.Empty;
+                    var strMessage = GetBodyMessage(pReq.m_pBody).Replace("\"", "\'");
                     m_pSocket.Emit(pReq.m_strPath, strMessage);
 
                     Debug.LogFormat("<color=#666600>[SOCKET_REQUEST]</color> : {0}\n{1}",
@@ -81,7 +81,9 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         // 커스텀 이벤트 함수 등록
         m_pSocket.On(SHAPIs.SH_SOCKET_REQ_TEST, OnSocketEventForTestMessage);
         m_pSocket.On(SHAPIs.SH_SOCKET_REQ_FORCE_DISCONNECT, OnSocketEventForForceDisconnect);
-        
+        m_pSocket.On(SHAPIs.SH_SOCKET_REQ_SUBSCRIBE_MINING_ACTIVE_INFO, OnSocketEventForMiningSubscribe);
+        m_pSocket.On(SHAPIs.SH_SOCKET_REQ_UNSUBSCRIBE_MINING_ACTIVE_INFO, OnSocketEventForMiningUnubscribe);
+            
         return m_pSocket;
     }
 
@@ -198,7 +200,24 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         Debug.LogFormat("<color=#0033ff>[SOCKET_RESPONSE]</color> : {0}",
                 SHAPIs.SH_SOCKET_REQ_TEST);
 
-        
+        // JsonData jsonData = new JsonData();
+        // jsonData["message"] = data;
+        // Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
+    }
+    private void OnSocketEventForMiningSubscribe(string strMessage)
+    {
+        Debug.LogFormat("<color=#0033ff>[SOCKET_RESPONSE]</color> : {0}",
+                SHAPIs.SH_SOCKET_REQ_SUBSCRIBE_MINING_ACTIVE_INFO);
+
+        // JsonData jsonData = new JsonData();
+        // jsonData["message"] = data;
+        // Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
+    }
+    private void OnSocketEventForMiningUnubscribe(string strMessage)
+    {
+        Debug.LogFormat("<color=#0033ff>[SOCKET_RESPONSE]</color> : {0}",
+                SHAPIs.SH_SOCKET_REQ_UNSUBSCRIBE_MINING_ACTIVE_INFO);
+
         // JsonData jsonData = new JsonData();
         // jsonData["message"] = data;
         // Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));

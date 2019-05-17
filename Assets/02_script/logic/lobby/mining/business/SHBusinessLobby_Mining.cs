@@ -122,7 +122,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         {
             ["user_id"] = pUserInfo.UserId
         };
-        Single.Network.POST(SHAPIs.SH_API_SUBSCRIBE_MINING_ACTIVE_INFO, json, (reply) => 
+        Single.Network.SendRequestSocket(SHAPIs.SH_SOCKET_REQ_SUBSCRIBE_MINING_ACTIVE_INFO, json, (reply) =>
         {
             if (reply.isSucceed)
             {
@@ -148,7 +148,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         {
             ["user_id"] = pUserInfo.UserId
         };
-        Single.Network.POST(SHAPIs.SH_API_UNSUBSCRIBE_MINING_ACTIVE_INFO, json, (reply) => 
+        Single.Network.SendRequestSocket(SHAPIs.SH_SOCKET_REQ_UNSUBSCRIBE_MINING_ACTIVE_INFO, json, (reply) =>
         {
             if (reply.isSucceed)
             {
@@ -250,15 +250,5 @@ public partial class SHBusinessLobby : MonoBehaviour
                 Single.BusinessGlobal.ShowAlertUI(reply);
             }
         });
-    }
-
-    public void OnClickDebugSubscribe()
-    {
-        RequestSubscribeMiningActiveInfo();
-    }
-
-    public void OnClickDebugUnubscribe()
-    {
-        RequestUnsubscribeMiningActiveInfo();
     }
 }

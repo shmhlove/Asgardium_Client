@@ -84,4 +84,16 @@ public partial class SHBusinessLobby : MonoBehaviour
             //Single.BusinessGlobal.ShowAlertUI(reply);
         });
     }
+
+    [FuncButton]
+    public void OnClickDebugSocketMiningSubscribe()
+    {
+        RequestSubscribeMiningActiveInfo();
+    }
+
+    [FuncButton]
+    public void OnClickDebugSocketMiningUnubscribe()
+    {
+        RequestUnsubscribeMiningActiveInfo();
+    }
 }

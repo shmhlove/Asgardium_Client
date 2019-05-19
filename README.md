@@ -306,7 +306,7 @@ alt+오른쪽|앞으로 이동|workbench.action.navigateForward
 			* ~~클라 : 아.... 코루틴.. 무조건 데이터를 받아온다고 가정하고 짜둿구나.. 어떡하꼬?? 일시정지가 답이다.~~
 			* ~~클라 : 에잇 일단 일시정지는 백로그에 넣어두고, 코루틴 돌때 callback 받고 다음 턴 돌도록 하자.~~
 		* ~~클라 : https 지원되도록 socket.io 수정~~
-		* 클라/서버 : 소켓통신 시작하자.
+		* ~~클라/서버 : 소켓통신 시작하자.~~
 		--
 		* ~~클라/서버 : 마이닝 정보 Register, Unregister API 추가~~
 		* ~~서버 : Register, Unregister시 데이터 처리(컨테이너처리... 레디스가 필요한 시점이 왔다.)~~
@@ -318,14 +318,41 @@ alt+오른쪽|앞으로 이동|workbench.action.navigateForward
 	    	* ~~ 주기적으로 데이터를 보내주는 로직 구성해서 확인해보자. -> 그래도 disconnect된다.~~
 	    	* ~~ 어떻게 해야되나???.. 아... 유니티 에디터가 액티브되어 있지 않으면 핑/퐁 응답을 하지 않는다..~~
 		* 클라 : 소켓이 끊켰을때 재접속 처리 해줘야한다.
-			* 웹서버, 소켓 모두 끊켰을때
-			* 웹서버만 끊켰을때
-			* 소켓만 끊켰을때
-            * 웹소켓과 웹서버를 한통속으로 묶어주고싶다.
-            * 웹소켓에서 끊킴이 발생했을때, 웹서버에서 끊킴이 발생했을때, 이것만 호출하면 재시도카운팅해주고, 콜백으로 각자 재시도를 한다.
-            * 재시도 카운터는 ... 
+            * ~~웹소켓과 웹서버를 한통속으로 묶어주고싶다.~~
+            * ~~웹소켓에서 끊킴이 발생했을때, 웹서버에서 끊킴이 발생했을때, 이것만 호출하면 재시도카운팅해주고, 콜백으로 각자 재시도를 한다.~~
+            * ~~재시도 카운터는 ... ~~
             
-		* 클라/서버 : 구독, 구독해제 처리를 소켓으로 해야한다.
+            * ~~유효성검증을 위해 jwt 헤더 포함~~
+            * ~~구독/구독해제 WebServer 코드 제거 소켓으로 이동~~
+
+            * 소켓종료 후 Disconnect 메시지가 오기까지 딜레이가 있다.
+            * 소켓 찌꺼기 문제
+
+            * 서버를 끄고 / 다시 켜고 / 연결하면
+                MissingReferenceException: The object of type 'Socket' has been destroyed but you are still trying to access it.
+                Your script should either check if it is null or you should not destroy the object.
+                UniRx.InternalUtil.ThrowObserver`1[T].OnError (System.Exception error) (at Assets/Plugins/UniRx/Scripts/InternalUtil/ListObserver.cs:102)
+                UniRx.Operators.DoOnCompletedObservable`1+DoOnCompleted[T].OnError (System.Exception error) (at Assets/Plugins/UniRx/Scripts/Operators/Do.cs:272)
+                UniRx.Operators.DoOnErrorObservable`1+DoOnError[T].OnError (System.Exception error) (at Assets/Plugins/UniRx/Scripts/Operators/Do.cs:216)
+                UniRx.Operators.TimeoutObservable`1+Timeout+<>c__DisplayClass8_0[T].<RunTimer>b__0 () (at Assets/Plugins/UniRx/Scripts/Operators/Timeout.cs:77)
+                UniRx.MainThreadDispatcher.UnsafeSend (System.Action action) (at Assets/Plugins/UniRx/Scripts/UnityEngineBridge/MainThreadDispatcher.cs:257)
+                UnityEngine.Debug:LogException(Exception)
+                UniRx.<>c:<.ctor>b__53_0(Exception) (at Assets/Plugins/UniRx/Scripts/UnityEngineBridge/MainThreadDispatcher.cs:389)
+                UniRx.MainThreadDispatcher:UnsafeSend(Action) (at Assets/Plugins/UniRx/Scripts/UnityEngineBridge/MainThreadDispatcher.cs:264)
+                UniRx.<DelayAction>d__2:MoveNext() (at Assets/Plugins/UniRx/Scripts/UnityEngineBridge/MainThreadScheduler.cs:102)
+                UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr)
+
+            * 서버On 중 연결하면 에디터 크래시
+                InvalidOperationException: Instance of JsonData is not a list
+                UniRx.InternalUtil.ThrowObserver`1[T].OnError (System.Exception error) (at Assets/Plugins/UniRx/Scripts/InternalUtil/ListObserver.cs:102)
+                UniRx.Operators.DoOnCompletedObservable`1+DoOnCompleted[T].OnCompleted () (at Assets/Plugins/UniRx/Scripts/Operators/Do.cs:284)
+                UniRx.Operators.DoOnErrorObservable`1+DoOnError[T].OnCompleted () (at Assets/Plugins/UniRx/Scripts/Operators/Do.cs:228)
+                UniRx.Operators.TimeoutObservable`1+Timeout[T].OnCompleted () (at Assets/Plugins/UniRx/Scripts/Operators/Timeout.cs:124)
+                UniRx.Operators.FromCoroutineObservable`1+FromCoroutine[T].OnCompleted () (at Assets/Plugins/UniRx/Scripts/UnityEngineBridge/Operators/FromCoroutine.cs:61)
+                socket.io.SocketInitializer+<InitCore>d__21.MoveNext () (at Assets/Plugins/socket.io/SocketInitializer.cs:210)
+                UnityEngine.SetupCoroutine.InvokeMoveNext (System.Collections.IEnumerator enumerator, System.IntPtr returnValueAddress) (at C:/buildslave/unity/build/Runtime/Export/Coroutines.cs:17)
+
+		* ~~클라/서버 : 구독, 구독해제 처리를 소켓으로 해야한다.~~
 		* 서버 : 마이닝 정보 Registe된 클라에게 인스턴스 마이닝 정보 인터벌 주기로 소켓전송
 			* UserId와 소켓정보를 어떻게 연결시켜줘야하나??
 			* 매핑테이블을 만들어야하나??
@@ -372,10 +399,10 @@ alt+오른쪽|앞으로 이동|workbench.action.navigateForward
 * 소켓연결을 시도해보자.
 	* ~~웹소켓 모듈을 찾자.~~
 	* ~~컨넥션 및 단순 데이터 PingPong~~
-	* 서버 웹 소켓 이벤트에 대해 조사
+	* ~~서버 웹 소켓 이벤트에 대해 조사~~
 	* 접속 후 초기화 메시지를 추가해서 유져 authntoken과 socket.id를 매칭시켜줘야겠다.,, 이건 DB에 저장되는 값이 아님, 서버 메모리에 올라감.
-	* 클라 웹 소켓 플러그인에서 출력하는 로그에 대해 조사 및 Disable
-	* 예외처리방식 구상해보기
+	* ~~클라 웹 소켓 플러그인에서 출력하는 로그에 대해 조사 및 Disable~~
+	* ~~예외처리방식 구상해보기~~
 	* 전체 유저를 대상으로 데이터 Send
 	* 특정 유저를 대상으로 데이터 Send
 	* 특정 그룹을 대상으로 데이터 Send
@@ -383,7 +410,7 @@ alt+오른쪽|앞으로 이동|workbench.action.navigateForward
 ---
 * 피들러 필요하다.
 ---
-* 외부인증 추가(google, facebook, twitter, naver, kakao, etc...)
+* 외부인증 추가(google, facebook, twitter, naver, kakao, line, etc...)
 ---
 # 고민
 * ~~비지니스와 UI 구조를 어떻게 가져가면 좋을까?~~

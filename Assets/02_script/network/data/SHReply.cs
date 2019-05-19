@@ -66,6 +66,43 @@ public class SHReply
         this.requestUrl = string.Empty;
     }
 
+    public SHReply(string strEvent, string strMessage)
+    {
+        this.rawResponse = JsonMapper.ToObject(strMessage);
+        if (0 == this.rawResponse.Keys.Count)
+        {
+            this.isSucceed = false;
+            this.error = new SHError(eErrorCode.Net_Common_InvalidResponseData, strMessage);
+        }
+        else
+        {
+            if (true == this.rawResponse.Keys.Contains("result"))
+            {
+                this.isSucceed = (bool)this.rawResponse["result"];
+            }
+
+            if ((true == this.rawResponse.Keys.Contains("data"))
+                && (null != this.rawResponse["data"]))
+            {
+                this.data = this.rawResponse["data"];
+            }
+
+            if ((true == this.rawResponse.Keys.Contains("error"))
+                && (null != this.rawResponse["error"]))
+            {
+                var pError = this.rawResponse["error"];
+                if (pError.Keys.Contains("extras"))
+                    this.error = new SHError((eErrorCode)(int)pError["code"], (string)pError["message"], pError["extras"]);
+                else
+                    this.error = new SHError((eErrorCode)(int)pError["code"], (string)pError["message"]);
+            }
+            this.isSucceed = true;
+        }
+
+        this.requestMethod = "socket";
+        this.requestUrl = strEvent;
+    }
+
     public SHReply(UnityWebRequest request)
     {
         this.data = null;

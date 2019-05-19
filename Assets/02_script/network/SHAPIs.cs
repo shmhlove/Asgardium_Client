@@ -2,6 +2,7 @@
 
 public static class SHAPIs
 {
+    // WebServer 이벤트
     public static string SH_API_RETRY_REQUEST = "/process/test";
     public static string SH_API_TEST_USE_POWER = "/process/test_use_mining_power";
     public static string SH_API_TEST_RESET_POWER = "/process/test_reset_mining_power";
@@ -19,7 +20,7 @@ public static class SHAPIs
     public static string SH_API_GET_MINING_ACTIVE_QUANTITY_TABLE = "/table/mining_active_quantity";
     public static string SH_API_GET_MINING_ACTIVE_SUPPLY_TABLE = "/table/mining_active_supply";
 
-    public static string SH_SOCKET_CONNECT = "connect";
+    // WebSocket 이벤트
     public static string SH_SOCKET_REQ_TEST = "test_message";
     public static string SH_SOCKET_REQ_FORCE_DISCONNECT = "force_disconnect";
     public static string SH_SOCKET_REQ_SUBSCRIBE_MINING_ACTIVE_INFO = "subscribe_mining_active_info";

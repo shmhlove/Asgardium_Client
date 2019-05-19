@@ -55,15 +55,6 @@ public partial class SHBusinessLobby : MonoBehaviour
     }
 
     [FuncButton]
-    public void OnClickDebugSocketConnect()
-    {
-        Single.Network.SendRequestSocket(SHAPIs.SH_SOCKET_CONNECT, null, (reply) => 
-        {
-            Single.BusinessGlobal.ShowAlertUI(reply);
-        });
-    }
-
-    [FuncButton]
     public void OnClickDebugSocketDisconnect()
     {
         Single.Network.SendRequestSocket(SHAPIs.SH_SOCKET_REQ_FORCE_DISCONNECT, null, (reply) => 

@@ -37,30 +37,35 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         if (false == IsWebSocketConnected())
         {
             StartRetryProcess();
+            return;
         }
-        else
+
+        foreach (var pReq in m_pSocketRequestQueue)
         {
-            foreach (var pReq in m_pSocketRequestQueue)
+            JsonData jsonBody = new JsonData
             {
-                if (false == pReq.m_strPath.Equals(SHAPIs.SH_SOCKET_CONNECT))
-                {
-                    var strMessage = GetBodyMessage(pReq.m_pBody).Replace("\"", "\'");
-                    m_pSocket.Emit(pReq.m_strPath, strMessage);
+                ["jwt_header"] = GetJWT(),
+                ["body"] = pReq.m_pBody
+            };
 
-                    Debug.LogFormat("<color=#666600>[SOCKET_REQUEST]</color> : {0}\n{1}",
-                        pReq.m_strPath, strMessage);
-                }
+            // "는 전송이 안된다. "를 '으로 모두 바꾸고 보낸다.
+            var strMessage = GetBodyMessage(jsonBody).Replace("\"", "\'");
+            DebugLogOfSocketRequest(pReq.m_strPath, strMessage);
+            m_pSocket.Emit(pReq.m_strPath, strMessage);
 
-                pReq.m_pCallback(new SHReply()
-                {
-                    isSucceed = true,
-                    data = pReq.m_pBody,
-                    requestMethod = "socket",
-                    requestUrl = pReq.m_strPath
-                });
-            }
-            m_pSocketRequestQueue.Clear();
+            var strEvent = pReq.m_strPath;
+            var pCallback = pReq.m_pCallback;
+            m_pSocket.On(strEvent, (string strResponse) =>
+            {
+                // "{\"key\": "\value\"}" 를 {"key": "value"}로 바꿔야한다.
+                // \"를 \'으로 바꾸고, "를 모두제거한다. \'를 "으로 다시 바꾼다.
+                SHReply pReply = new SHReply(strEvent, strResponse.Replace("\\\"", "\\\'").Replace("\"", "").Replace("\\\'", "\""));
+                DebugLogOfSocketResponse(pReply);
+                pCallback(pReply);
+            });
         }
+
+        m_pSocketRequestQueue.Clear();
     }
 
     private Socket ConnectWebSocket()
@@ -79,11 +84,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         m_pSocket.On(SystemEvents.disconnect, OnSocketEventForDisconnect);
 
         // 커스텀 이벤트 함수 등록
-        m_pSocket.On(SHAPIs.SH_SOCKET_REQ_TEST, OnSocketEventForTestMessage);
-        m_pSocket.On(SHAPIs.SH_SOCKET_REQ_FORCE_DISCONNECT, OnSocketEventForForceDisconnect);
-        m_pSocket.On(SHAPIs.SH_SOCKET_REQ_SUBSCRIBE_MINING_ACTIVE_INFO, OnSocketEventForMiningSubscribe);
-        m_pSocket.On(SHAPIs.SH_SOCKET_REQ_UNSUBSCRIBE_MINING_ACTIVE_INFO, OnSocketEventForMiningUnubscribe);
-            
+
         return m_pSocket;
     }
 
@@ -121,14 +122,14 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         });
     }
 
-    private Socket ClearSocket(Socket pSocket)
+    private void ClearSocket()
     {
-        if (null == pSocket) {
-            return null;
+        if (null == m_pSocket) {
+            return;
         }
         
-        GameObject.DestroyImmediate(pSocket.gameObject);
-        return null;
+        GameObject.DestroyImmediate(m_pSocket.gameObject);
+        m_pSocket = null;
     }
 
     private bool IsWebSocketConnected()
@@ -155,7 +156,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         // jsonData["message"] = "connectTimeOut Websocket!!";
         // Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
 
-        m_pSocket = ClearSocket(m_pSocket);
+        ClearSocket();
         StartRetryProcess();
     }
     private void OnSocketEventForConnectError(Exception pException)
@@ -167,7 +168,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         // jsonData["message"] = "connectError Websocket!!";
         // Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
 
-        m_pSocket = ClearSocket(m_pSocket);
+        ClearSocket();
         StartRetryProcess();
     }
     private void OnSocketEventForDisconnect()
@@ -179,47 +180,29 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         // jsonData["message"] = "disconnect Websocket!!";
         // Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
 
-        m_pSocket = ClearSocket(m_pSocket);
+        ClearSocket();
         StartRetryProcess();
     }
 
-    // 소켓 커스텀 이벤트 함수
-    private void OnSocketEventForForceDisconnect(string strMessage)
+    private void DebugLogOfSocketRequest(string strEvent, string strMessage)
     {
-        Debug.LogFormat("<color=#0033ff>[SOCKET_RESPONSE]</color> : {0}",
-                SHAPIs.SH_SOCKET_REQ_FORCE_DISCONNECT);
-
-        // JsonData jsonData = new JsonData();
-        // jsonData["message"] = "forceDisconnect Websocket!!";
-        // Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
-
-        m_pSocket = ClearSocket(m_pSocket);
+        Debug.LogFormat("<color=#666600>[SOCKET_REQUEST]</color> : {0}\n{1}",
+            strEvent, strMessage);
     }
-    private void OnSocketEventForTestMessage(string strMessage)
-    {
-        Debug.LogFormat("<color=#0033ff>[SOCKET_RESPONSE]</color> : {0}",
-                SHAPIs.SH_SOCKET_REQ_TEST);
 
-        // JsonData jsonData = new JsonData();
-        // jsonData["message"] = data;
-        // Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
-    }
-    private void OnSocketEventForMiningSubscribe(string strMessage)
+    private void DebugLogOfSocketResponse(SHReply pReply)
     {
-        Debug.LogFormat("<color=#0033ff>[SOCKET_RESPONSE]</color> : {0}",
-                SHAPIs.SH_SOCKET_REQ_SUBSCRIBE_MINING_ACTIVE_INFO);
+        var strLog = string.Format("<color=#0033ff>[SOCKET_RESPONSE]</color> : {0}\n{1}",
+                pReply.requestUrl,
+                pReply.ToString());
 
-        // JsonData jsonData = new JsonData();
-        // jsonData["message"] = data;
-        // Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
-    }
-    private void OnSocketEventForMiningUnubscribe(string strMessage)
-    {
-        Debug.LogFormat("<color=#0033ff>[SOCKET_RESPONSE]</color> : {0}",
-                SHAPIs.SH_SOCKET_REQ_UNSUBSCRIBE_MINING_ACTIVE_INFO);
-
-        // JsonData jsonData = new JsonData();
-        // jsonData["message"] = data;
-        // Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
+        if (pReply.isSucceed)
+        {
+            Debug.Log(strLog);
+        }
+        else
+        {
+            Debug.LogError(strLog);
+        }
     }
 }

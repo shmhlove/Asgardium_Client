@@ -62,6 +62,12 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
                 SHReply pReply = new SHReply(strEvent, strResponse.Replace("\\\"", "\\\'").Replace("\"", "").Replace("\\\'", "\""));
                 DebugLogOfSocketResponse(pReply);
                 pCallback(pReply);
+
+                // force_disconnect는 disconnect처리를 해준다.
+                if (true == strEvent.Equals(SHAPIs.SH_SOCKET_REQ_FORCE_DISCONNECT))
+                {
+                    ClearSocket();
+                }
             });
         }
 

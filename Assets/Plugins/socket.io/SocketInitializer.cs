@@ -122,6 +122,11 @@ namespace socket.io {
         /// <param name="cancelToken"> The cancel token object which signals to stop the currnet coroutine </param>
         /// <returns></returns>
         IEnumerator InitCore(UniRx.IObserver<Socket> observer, UniRx.CancellationToken cancelToken) {
+            if (null == Socket) {
+                observer.OnError(new Exception("Invalid Socket"));
+                yield break;
+            }
+
             // Declare to connect in socket.io v1.0
             _urlQueries.Add("EIO", "3");
             _urlQueries.Add("transport", "polling");
@@ -152,6 +157,11 @@ namespace socket.io {
                     yield break;
                 }
                 
+                if (null == Socket) {
+                    observer.OnError(new Exception("Invalid Socket"));
+                    yield break;
+                }
+
                 var textLength = www.downloadHandler.text.Length;
                 var textStartIndex = www.downloadHandler.text.IndexOf('{');
                 var textEndIndex = www.downloadHandler.text.LastIndexOf('}');

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 public enum eLobbyMenuType
 {
+    None,
     Mining,
     Storage,
     Market,

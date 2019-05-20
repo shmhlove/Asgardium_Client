@@ -16,10 +16,24 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
     private Socket m_pSocket = null;
     private bool m_bIsRunWebsocketRetryCoroutine = false;
     private List<SHRequestData> m_pSocketRequestQueue = new List<SHRequestData>();
+    private Dictionary<SystemEvents, List<Action>> m_pSystemEventObserver = new Dictionary<SystemEvents, List<Action>>();
 
     public void ConnectWebSocket()
     {
         StartCoroutine("CoroutineRetryWebSocketProcess");
+    }
+
+    public void AddSystemEventObserver(SystemEvents eEvent, Action pCallback)
+    {
+        if (false == m_pSystemEventObserver.ContainsKey(eEvent))
+        {
+            m_pSystemEventObserver.Add(eEvent, new List<Action>());
+        }
+
+        if (false == m_pSystemEventObserver[eEvent].Contains(pCallback))
+        {
+            m_pSystemEventObserver[eEvent].Add(pCallback);
+        }
     }
 
     public void SendRequestSocket(string strEvent, JsonData body, Action<SHReply> callback)
@@ -158,45 +172,61 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         Debug.LogFormat("<color=#0033ff>[SOCKET_RESPONSE]</color> : {0}",
                 "Connect");
 
-        // JsonData jsonData = new JsonData();
-        // jsonData["message"] = "Connect Websocket!!";
-        // Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
+        if (true == m_pSystemEventObserver.ContainsKey(SystemEvents.connect))
+        {
+            foreach (var pCallback in m_pSystemEventObserver[SystemEvents.connect])
+            {
+                pCallback();
+            }
+        }
     }
     private void OnSocketEventForConnectTimeOut()
     {
         Debug.LogFormat("<color=#0033ff>[SOCKET_RESPONSE]</color> : {0}",
                 "ConnectTimeOut");
 
-        // JsonData jsonData = new JsonData();
-        // jsonData["message"] = "connectTimeOut Websocket!!";
-        // Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
-
         ClearSocket();
         StartRetryProcess();
+
+        if (true == m_pSystemEventObserver.ContainsKey(SystemEvents.connectTimeOut))
+        {
+            foreach (var pCallback in m_pSystemEventObserver[SystemEvents.connectTimeOut])
+            {
+                pCallback();
+            }
+        }
     }
     private void OnSocketEventForConnectError(Exception pException)
     {
         Debug.LogFormat("<color=#0033ff>[SOCKET_RESPONSE]</color> : {0}",
                 "ConnectError");
 
-        // JsonData jsonData = new JsonData();
-        // jsonData["message"] = "connectError Websocket!!";
-        // Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
-
         ClearSocket();
         StartRetryProcess();
+
+        if (true == m_pSystemEventObserver.ContainsKey(SystemEvents.connectError))
+        {
+            foreach (var pCallback in m_pSystemEventObserver[SystemEvents.connectError])
+            {
+                pCallback();
+            }
+        }
     }
     private void OnSocketEventForDisconnect()
     {
         Debug.LogFormat("<color=#0033ff>[SOCKET_RESPONSE]</color> : {0}",
                 "Disconnect");
 
-        // JsonData jsonData = new JsonData();
-        // jsonData["message"] = "disconnect Websocket!!";
-        // Single.BusinessGlobal.ShowAlertUI(new SHReply(jsonData));
-
         ClearSocket();
         StartRetryProcess();
+
+        if (true == m_pSystemEventObserver.ContainsKey(SystemEvents.disconnect))
+        {
+            foreach (var pCallback in m_pSystemEventObserver[SystemEvents.disconnect])
+            {
+                pCallback();
+            }
+        }
     }
 
     private void OnSocketEventForMiningActiveInfo(string strResponse)

@@ -22,11 +22,13 @@ public partial class SHBusinessLobby : MonoBehaviour
 
     private void SetChangeMiningStage(eMiningStageType eType)
     {
+        m_eCurrentMiningStageType = eType;
+        
         // 맞을 때
         if (eType == eMiningStageType.Active)
         {
             RequestSubscribeMiningActiveInfo();
-            StartCoroutine("CoroutineForMiningActiveInformation");
+            
             StartCoroutine("CoroutineForMiningActiveScrollview");
         }
 
@@ -34,7 +36,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         if (eType != eMiningStageType.Active)
         {
             RequestUnsubscribeMiningActiveInfo();
-            StopCoroutine("CoroutineForMiningActiveInformation");
+
             StopCoroutine("CoroutineForMiningActiveScrollview");
         }
     }

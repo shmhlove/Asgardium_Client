@@ -17,6 +17,11 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
     private bool m_bIsRunWebsocketRetryCoroutine = false;
     private List<SHRequestData> m_pSocketRequestQueue = new List<SHRequestData>();
 
+    public void ConnectWebSocket()
+    {
+        StartCoroutine("CoroutineRetryWebSocketProcess");
+    }
+
     public void SendRequestSocket(string strEvent, JsonData body, Action<SHReply> callback)
     {
         SendRequestSocket(new SHRequestData(strEvent, HTTPMethodType.POST, body, callback));
@@ -27,6 +32,9 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         m_pSocketRequestQueue.Add(pRequestData);
 
         if (true == m_bIsProcessingRetry)
+            return;
+
+        if (true == m_bIsRunWebsocketRetryCoroutine)
             return;
 
         ProcessSendRequestSocket();
@@ -74,7 +82,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         m_pSocketRequestQueue.Clear();
     }
 
-    private Socket ConnectWebSocket()
+    private Socket Connect()
     {
         // 소켓 셋팅
         SocketManager.Instance.Reconnection = false;
@@ -107,7 +115,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         }
         m_bIsRunWebsocketRetryCoroutine = true;
         
-        var pSocket = ConnectWebSocket();
+        var pSocket = Connect();
         pSocket.On(SystemEvents.connect, () => 
         {
             m_bIsRunWebsocketRetryCoroutine = false;

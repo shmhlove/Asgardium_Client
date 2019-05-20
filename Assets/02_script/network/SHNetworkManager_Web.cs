@@ -34,6 +34,9 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         if (true == m_bIsProcessingRetry)
             return;
         
+        if (true == m_bIsRunWebserverRetryCoroutine)
+            return;
+
         StartCoroutine(CoroutineSendRequest(pRequestData));
     }
 

@@ -24,6 +24,9 @@ public partial class SHBusinessLobby : MonoBehaviour
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
         pUserInfo.CheckUserInfoLoadedForDevelop();
 
+        // 소켓 연결
+        Single.Network.ConnectWebSocket();
+
         // UI 초기화
         var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
 

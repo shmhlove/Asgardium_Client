@@ -317,40 +317,14 @@ alt+오른쪽|앞으로 이동|workbench.action.navigateForward
 	    * ~~서버/클라 : Ping Timeout으로 서버에서 연결을 끊어버린다.~~
 	    	* ~~ 주기적으로 데이터를 보내주는 로직 구성해서 확인해보자. -> 그래도 disconnect된다.~~
 	    	* ~~ 어떻게 해야되나???.. 아... 유니티 에디터가 액티브되어 있지 않으면 핑/퐁 응답을 하지 않는다..~~
-		* 클라 : 소켓이 끊켰을때 재접속 처리 해줘야한다.
+		* ~~클라 : 소켓이 끊켰을때 재접속 처리 해줘야한다.~~
             * ~~웹소켓과 웹서버를 한통속으로 묶어주고싶다.~~
             * ~~웹소켓에서 끊킴이 발생했을때, 웹서버에서 끊킴이 발생했을때, 이것만 호출하면 재시도카운팅해주고, 콜백으로 각자 재시도를 한다.~~
             * ~~재시도 카운터는 ... ~~
-            
             * ~~유효성검증을 위해 jwt 헤더 포함~~
             * ~~구독/구독해제 WebServer 코드 제거 소켓으로 이동~~
-
-            * 소켓종료 후 Disconnect 메시지가 오기까지 딜레이가 있다.
-            * 소켓 찌꺼기 문제
-
-            * 서버를 끄고 / 다시 켜고 / 연결하면
-                MissingReferenceException: The object of type 'Socket' has been destroyed but you are still trying to access it.
-                Your script should either check if it is null or you should not destroy the object.
-                UniRx.InternalUtil.ThrowObserver`1[T].OnError (System.Exception error) (at Assets/Plugins/UniRx/Scripts/InternalUtil/ListObserver.cs:102)
-                UniRx.Operators.DoOnCompletedObservable`1+DoOnCompleted[T].OnError (System.Exception error) (at Assets/Plugins/UniRx/Scripts/Operators/Do.cs:272)
-                UniRx.Operators.DoOnErrorObservable`1+DoOnError[T].OnError (System.Exception error) (at Assets/Plugins/UniRx/Scripts/Operators/Do.cs:216)
-                UniRx.Operators.TimeoutObservable`1+Timeout+<>c__DisplayClass8_0[T].<RunTimer>b__0 () (at Assets/Plugins/UniRx/Scripts/Operators/Timeout.cs:77)
-                UniRx.MainThreadDispatcher.UnsafeSend (System.Action action) (at Assets/Plugins/UniRx/Scripts/UnityEngineBridge/MainThreadDispatcher.cs:257)
-                UnityEngine.Debug:LogException(Exception)
-                UniRx.<>c:<.ctor>b__53_0(Exception) (at Assets/Plugins/UniRx/Scripts/UnityEngineBridge/MainThreadDispatcher.cs:389)
-                UniRx.MainThreadDispatcher:UnsafeSend(Action) (at Assets/Plugins/UniRx/Scripts/UnityEngineBridge/MainThreadDispatcher.cs:264)
-                UniRx.<DelayAction>d__2:MoveNext() (at Assets/Plugins/UniRx/Scripts/UnityEngineBridge/MainThreadScheduler.cs:102)
-                UnityEngine.SetupCoroutine:InvokeMoveNext(IEnumerator, IntPtr)
-
-            * 서버On 중 연결하면 에디터 크래시
-                InvalidOperationException: Instance of JsonData is not a list
-                UniRx.InternalUtil.ThrowObserver`1[T].OnError (System.Exception error) (at Assets/Plugins/UniRx/Scripts/InternalUtil/ListObserver.cs:102)
-                UniRx.Operators.DoOnCompletedObservable`1+DoOnCompleted[T].OnCompleted () (at Assets/Plugins/UniRx/Scripts/Operators/Do.cs:284)
-                UniRx.Operators.DoOnErrorObservable`1+DoOnError[T].OnCompleted () (at Assets/Plugins/UniRx/Scripts/Operators/Do.cs:228)
-                UniRx.Operators.TimeoutObservable`1+Timeout[T].OnCompleted () (at Assets/Plugins/UniRx/Scripts/Operators/Timeout.cs:124)
-                UniRx.Operators.FromCoroutineObservable`1+FromCoroutine[T].OnCompleted () (at Assets/Plugins/UniRx/Scripts/UnityEngineBridge/Operators/FromCoroutine.cs:61)
-                socket.io.SocketInitializer+<InitCore>d__21.MoveNext () (at Assets/Plugins/socket.io/SocketInitializer.cs:210)
-                UnityEngine.SetupCoroutine.InvokeMoveNext (System.Collections.IEnumerator enumerator, System.IntPtr returnValueAddress) (at C:/buildslave/unity/build/Runtime/Export/Coroutines.cs:17)
+            * ~~소켓종료 후 Disconnect 메시지가 오기까지 딜레이가 있다.~~
+            * ~~소켓 찌꺼기 문제~~
 
 		* ~~클라/서버 : 구독, 구독해제 처리를 소켓으로 해야한다.~~
 		* 서버 : 마이닝 정보 Registe된 클라에게 인스턴스 마이닝 정보 인터벌 주기로 소켓전송

@@ -10,9 +10,6 @@ public static class SHAPIs
     public static string SH_API_SIGNUP = "/process/signup";
     public static string SH_API_SIGNIN = "/process/signin";
 
-    public static string SH_API_SUBSCRIBE_MINING_ACTIVE_INFO = "/process/subscribe_mining_active_info";
-    public static string SH_API_UNSUBSCRIBE_MINING_ACTIVE_INFO = "/process/unsubscribe_mining_active_info";
-
     public static string SH_API_GET_CONFIG_TABLE = "/table/global_config";
     public static string SH_API_GET_UNIT_DATA_TABLE = "/table/global_unit_data";
     public static string SH_API_GET_MINING_ACTIVE_COMPANY_NPC_TABLE = "/table/mining_active_company_npc";

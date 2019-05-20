@@ -22,4 +22,6 @@ public static class SHAPIs
     public static string SH_SOCKET_REQ_FORCE_DISCONNECT = "force_disconnect";
     public static string SH_SOCKET_REQ_SUBSCRIBE_MINING_ACTIVE_INFO = "subscribe_mining_active_info";
     public static string SH_SOCKET_REQ_UNSUBSCRIBE_MINING_ACTIVE_INFO = "unsubscribe_mining_active_info";
+
+    public static string SH_SOCKET_POLLING_MINING_ACTIVE_INFO = "polling_mining_active_info";
 }

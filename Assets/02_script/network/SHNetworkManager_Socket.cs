@@ -98,7 +98,8 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         m_pSocket.On(SystemEvents.disconnect, OnSocketEventForDisconnect);
 
         // 커스텀 이벤트 함수 등록
-
+        m_pSocket.On(SHAPIs.SH_SOCKET_POLLING_MINING_ACTIVE_INFO, OnSocketEventForMiningActiveInfo);
+        
         return m_pSocket;
     }
 
@@ -198,6 +199,14 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         StartRetryProcess();
     }
 
+    private void OnSocketEventForMiningActiveInfo(string strResponse)
+    {
+        // "{\"key\": "\value\"}" 를 {"key": "value"}로 바꿔야한다.
+        // \"를 \'으로 바꾸고, "를 모두제거한다. \'를 "으로 다시 바꾼다.
+        SHReply pReply = new SHReply(SHAPIs.SH_SOCKET_POLLING_MINING_ACTIVE_INFO, strResponse.Replace("\\\"", "\\\'").Replace("\"", "").Replace("\\\'", "\""));
+        DebugLogOfSocketResponse(pReply);
+    }
+    
     private void DebugLogOfSocketRequest(string strEvent, string strMessage)
     {
         Debug.LogFormat("<color=#666600>[SOCKET_REQUEST]</color> : {0}\n{1}",

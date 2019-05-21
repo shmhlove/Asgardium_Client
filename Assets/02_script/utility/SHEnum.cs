@@ -22,9 +22,11 @@ public enum eErrorCode
     Auth_InvalidEmail = 2004,
     
     // socket error
-    Net_Socket_Not_Connect = 5000,
-    Net_Socket_Aready_Connect = 5001,
-
+    Net_Socket_Disconnect = 5000,
+    Net_Socket_Connect_Error = 5001,
+    Net_Socket_Connect_Timeout = 5002,
+    Net_Socket_Aready_Connect = 5003,
+    
     // data error
     Data_NotImplementation = 1000001,
     Resources_NotExsitInTable = 1001002,

@@ -17,27 +17,23 @@ public partial class SHBusinessLobby : MonoBehaviour
 
     private void SetDisableMiningMenu()
     {
-        SetChangeMiningStage(eMiningStageType.None);
+        SetChangeMiningStage(eMiningTabType.None);
     }
 
-    private void SetChangeMiningStage(eMiningStageType eType)
+    private void SetChangeMiningStage(eMiningTabType eType)
     {
-        m_eCurrentMiningStageType = eType;
-        
+        m_eCurrentMiningTabType = eType;
+
         // 맞을 때
-        if (eType == eMiningStageType.Active)
+        if (eType == eMiningTabType.Active)
         {
             RequestSubscribeMiningActiveInfo();
-            
-            StartCoroutine("CoroutineForMiningActiveScrollview");
         }
 
         // 아닐 때
-        if (eType != eMiningStageType.Active)
+        if (eType != eMiningTabType.Active)
         {
             RequestUnsubscribeMiningActiveInfo();
-
-            StopCoroutine("CoroutineForMiningActiveScrollview");
         }
     }
 
@@ -71,8 +67,11 @@ public partial class SHBusinessLobby : MonoBehaviour
         pCallback();
     }
 
-    private async void UpdateActiveScrollview(Action pCallback)
+    private async void UpdateActiveScrollview()
     {
+        // 아직 처리가 되지 않은 상태에서 다시 호출될 수 있다.
+        // 막아줘야될지 판단하자.
+
         var pCompanyTable = await Single.Table.GetTable<SHTableServerInstanceMiningActiveCompany>();
         //pCompanyTable.LoadServerTable(async (errorCode) => 
         //{
@@ -95,7 +94,7 @@ public partial class SHBusinessLobby : MonoBehaviour
                 pData.m_iResourceLevel = kvp.Value.m_iEfficiencyLV;
                 pData.m_iSupplyQuantity = kvp.Value.m_iSupplyCount;
                 pData.m_iPurchaseCost = pServerGlobalUnitData.GetData(kvp.Value.m_iUnitId).m_iWeight;
-                pData.m_pEventPurchaseButton = OnEventOfPurchaseMining;
+                pData.m_pEventPurchaseButton = OnEventForPurchaseMining;
                 pSlotDatas.Add(pData);
             }
 
@@ -106,8 +105,6 @@ public partial class SHBusinessLobby : MonoBehaviour
             });
 
             m_pUIPanelMining.SetActiveScrollview(pSlotDatas);
-
-            pCallback();
         //});
     }
 
@@ -163,14 +160,23 @@ public partial class SHBusinessLobby : MonoBehaviour
         });
     }
 
-    public void OnEventOfChangeMiningStage(eMiningStageType eType)
+    public void OnEventForChangeMiningTab(eMiningTabType eType)
     {
         SetChangeMiningStage(eType);
     }
 
-    public void OnEventOfPurchaseMining(string strInstanceId)
+    public void OnEventForPurchaseMining(string strInstanceId)
     {
         Single.BusinessGlobal.ShowAlertUI(string.Format("채굴 요청 : {0}", strInstanceId));
+    }
+
+    private void OnEventForSocketPollingMiningActiveInfo(SHReply pReply)
+    {
+        if (null == m_pUIPanelMining) {
+            return;
+        }
+
+        UpdateActiveScrollview();
     }
 
     private IEnumerator CoroutineForMiningActiveInformation()
@@ -187,24 +193,6 @@ public partial class SHBusinessLobby : MonoBehaviour
             }
             
             yield return null;
-        }
-    }
-    
-    [Obsolete("This Coroutine is Deprecated When run socket.io")]
-    private IEnumerator CoroutineForMiningActiveScrollview()
-    {
-        while (true)
-        {
-            if (m_pUIPanelMining)
-            {
-                bool isDone = false;
-                UpdateActiveScrollview(() => isDone = true);
-
-                while (false == isDone)
-                    yield return null;
-            }
-
-            yield return new WaitForSeconds(1.0f);
         }
     }
 

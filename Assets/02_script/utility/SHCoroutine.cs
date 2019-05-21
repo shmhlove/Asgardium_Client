@@ -10,16 +10,16 @@ public class SHCoroutine : SHSingleton<SHCoroutine>
     public override void OnInitialize()
     {
         SetDontDestroy();
-        Single.Scene.AddEventForBeforeLoadScene(OnEventOfLoadedScene);
+        Single.Scene.AddEventForBeforeLoadScene(OnEventForLoadedScene);
     }
 
     public override void OnFinalize()
     {
         StopAllCoroutines();
-        Single.Scene.DelEventForBeforeLoadScene(OnEventOfLoadedScene);
+        Single.Scene.DelEventForBeforeLoadScene(OnEventForLoadedScene);
     }
 
-    public void OnEventOfLoadedScene(eSceneType eType)
+    public void OnEventForLoadedScene(eSceneType eType)
     {
         StopAllCoroutines();
     }

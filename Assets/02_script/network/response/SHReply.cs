@@ -68,6 +68,10 @@ public class SHReply
 
     public SHReply(string strEvent, string strMessage)
     {
+        // "{\"key\": "\value\"}" 를 {"key": "value"}로 바꿔야한다.
+        // \"를 \'으로 바꾸고, "를 모두제거한다. \'를 "으로 다시 바꾼다.
+        strMessage = strMessage.Replace("\\\"", "\\\'").Replace("\"", "").Replace("\\\'", "\"");
+
         this.rawResponse = JsonMapper.ToObject(strMessage);
         if (0 == this.rawResponse.Keys.Count)
         {

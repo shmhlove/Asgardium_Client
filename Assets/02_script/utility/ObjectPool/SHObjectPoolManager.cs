@@ -27,7 +27,7 @@ public class SHObjectPoolManager : SHSingleton<SHObjectPoolManager>
         SetDontDestroy();
 
         ClearAll();
-        Single.Scene.AddEventForBeforeLoadScene(OnEventOfLoadedScene);
+        Single.Scene.AddEventForBeforeLoadScene(OnEventForLoadedScene);
 
         StartCoroutine(CoroutineCheckAutoRecovery());
     }
@@ -35,7 +35,7 @@ public class SHObjectPoolManager : SHSingleton<SHObjectPoolManager>
     public override void OnFinalize()
     {
         StopAllCoroutines();
-        Single.Scene.DelEventForBeforeLoadScene(OnEventOfLoadedScene);
+        Single.Scene.DelEventForBeforeLoadScene(OnEventForLoadedScene);
     }
 
     public async Task Get<T>(string  strName, 
@@ -327,7 +327,7 @@ public class SHObjectPoolManager : SHSingleton<SHObjectPoolManager>
         }
     }
     
-    public void OnEventOfLoadedScene(eSceneType eType)
+    public void OnEventForLoadedScene(eSceneType eType)
     {
         CheckAutoReturnObject(true);
         CheckAutoDestroyObject(true);

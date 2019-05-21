@@ -11,10 +11,26 @@ using System.Collections.Specialized;
 using LitJson;
 using socket.io;
 
+public enum HTTPMethodType
+{
+    GET,
+    POST,
+    DELETE,
+    UPDATE,
+    PUT,
+}
+
+public enum eRequestStatus
+{
+    Ready,
+    Requesting,
+    Done,
+}
+
 public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 {
     private bool m_bIsConnectWebServer = false;
-    private bool m_bIsRunWebserverRetryCoroutine = false;
+    private bool m_bIsRetryingWebServerConnect = false;
     private List<SHRequestData> m_pWebRequestQueue = new List<SHRequestData>();
 
     public void GET(string path, JsonData body, Action<SHReply> callback)
@@ -34,7 +50,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         if (true == m_bIsProcessingRetry)
             return;
         
-        if (true == m_bIsRunWebserverRetryCoroutine)
+        if (true == m_bIsRetryingWebServerConnect)
             return;
 
         StartCoroutine(CoroutineSendRequest(pRequestData));
@@ -62,7 +78,8 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 
         if (true == (m_bIsConnectWebServer = (eErrorCode.Net_Common_HTTP != pReply.errorCode)))
         {
-            CallbackAndRemovePool(pRequestData, pReply);
+            pRequestData.m_pCallback(pReply);
+            m_pWebRequestQueue.Remove(pRequestData);
 
             if (0 == m_pWebRequestQueue.Count)
             {
@@ -84,13 +101,13 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         }
 
         // 예외처리 : 재시도 시도중이면 무시
-        if (true == m_bIsRunWebserverRetryCoroutine)
+        if (true == m_bIsRetryingWebServerConnect)
         {
             yield break;
         }
 
         // 재시도 준비
-        m_bIsRunWebserverRetryCoroutine = true;
+        m_bIsRetryingWebServerConnect = true;
         
         // 응답이 오지않은 요청들 기다려주기
         while (true)
@@ -136,7 +153,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
             StartRetryProcess();
         }
 
-        m_bIsRunWebserverRetryCoroutine = false;
+        m_bIsRetryingWebServerConnect = false;
     }
 
     private UnityWebRequest CreateUnityRequestData(SHRequestData pData)
@@ -146,7 +163,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         if (HTTPMethodType.GET == pData.m_eMethodType)
         {
             var keyValueParamList = new List<string>();
-
+            
             if (null != pData.m_pBody)
             {
                 foreach (var key in pData.m_pBody.Keys)
@@ -178,12 +195,6 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         return request;
     }
 
-    private void CallbackAndRemovePool(SHRequestData pRequestData, SHReply pReply)
-    {
-        pRequestData.m_pCallback(pReply);
-        m_pWebRequestQueue.Remove(pRequestData);
-    }
-    
     private bool IsWebServerConnected()
     {
         return m_bIsConnectWebServer;

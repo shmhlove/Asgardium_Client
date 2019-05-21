@@ -50,7 +50,7 @@ public class SHTableUserInfo : SHBaseTable
         return (false == string.IsNullOrEmpty(UserId));
     }
 
-    public void CheckUserInfoLoadedForDevelop()
+    public void SetUserInfoForDevelop()
     {
         if (true == m_bIsLoaded)
             return;

@@ -91,7 +91,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
             Single.BusinessGlobal.UpdateIndicatorMessage(string.Format("{0}\n{1}", strRetryInfo, strErrorMessage));
 
             StartCoroutine(CoroutineRetryWebServerProcess());
-            StartCoroutine(CoroutineRetryWebSocketProcess());
+            ProcessRetryWebSocketConnect();
             
             yield return new WaitForSeconds(m_fRetryDelay);
         }

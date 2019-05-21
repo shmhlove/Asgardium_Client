@@ -11,40 +11,6 @@ using System.Collections.Specialized;
 using LitJson;
 using socket.io;
 
-public enum HTTPMethodType
-{
-    GET,
-    POST,
-    DELETE,
-    UPDATE,
-    PUT,
-}
-
-public enum eRequestStatus
-{
-    Ready,
-    Requesting,
-    Done,
-}
-
-public class SHRequestData
-{
-    public string m_strPath;
-    public JsonData m_pBody;
-    public HTTPMethodType m_eMethodType;
-    public Action<SHReply> m_pCallback;
-    public eRequestStatus m_eRequestStatus;
-
-    public SHRequestData(string path, HTTPMethodType methoodType, JsonData body, Action<SHReply> callback)
-    {
-        this.m_strPath = path;
-        this.m_pBody = body;
-        this.m_eMethodType = methoodType;
-        this.m_pCallback = (null == callback) ? (reply) => { } : callback;
-        this.m_eRequestStatus = eRequestStatus.Ready;
-    }
-}
-
 public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 {
     private string m_strWebHost = "";

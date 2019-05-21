@@ -18,7 +18,7 @@ public class SHUIPanelMenubar : SHUIPanel
 {
     private Action<eLobbyMenuType> m_pEventOfChangeLobbyMenu;
 
-    public void SetEventOfChangeLobbyMenu(Action<eLobbyMenuType> pCallback)
+    public void SetEventForChangeLobbyMenu(Action<eLobbyMenuType> pCallback)
     {
         m_pEventOfChangeLobbyMenu = pCallback;
     }

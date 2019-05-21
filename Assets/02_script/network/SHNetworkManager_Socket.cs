@@ -14,47 +14,24 @@ using socket.io;
 public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 {
     private Socket m_pSocket = null;
-    private bool m_bIsRunWebsocketRetryCoroutine = false;
+    private bool m_bIsRetryingWebSocketConnect = false;
     private List<SHRequestData> m_pSocketRequestQueue = new List<SHRequestData>();
-    private Dictionary<SystemEvents, List<Action>> m_pSystemEventObserver = new Dictionary<SystemEvents, List<Action>>();
-
-    public void ConnectWebSocket()
+    private Dictionary<string, List<Action<SHReply>>> m_pSocketEventObserver = new Dictionary<string, List<Action<SHReply>>>();
+    
+    public void SendRequestSocket(string strEvent, JsonData pBody, Action<SHReply> pCallback)
     {
-        StartCoroutine("CoroutineRetryWebSocketProcess");
-    }
-
-    public void AddSystemEventObserver(SystemEvents eEvent, Action pCallback)
-    {
-        if (false == m_pSystemEventObserver.ContainsKey(eEvent))
-        {
-            m_pSystemEventObserver.Add(eEvent, new List<Action>());
-        }
-
-        if (false == m_pSystemEventObserver[eEvent].Contains(pCallback))
-        {
-            m_pSystemEventObserver[eEvent].Add(pCallback);
-        }
-    }
-
-    public void SendRequestSocket(string strEvent, JsonData body, Action<SHReply> callback)
-    {
-        SendRequestSocket(new SHRequestData(strEvent, HTTPMethodType.POST, body, callback));
-    }
-
-    public void SendRequestSocket(SHRequestData pRequestData)
-    {
-        m_pSocketRequestQueue.Add(pRequestData);
+        m_pSocketRequestQueue.Add(new SHRequestData(strEvent, HTTPMethodType.POST, pBody, pCallback));
 
         if (true == m_bIsProcessingRetry)
             return;
 
-        if (true == m_bIsRunWebsocketRetryCoroutine)
+        if (true == m_bIsRetryingWebSocketConnect)
             return;
 
         ProcessSendRequestSocket();
     }
 
-    public void ProcessSendRequestSocket()
+    private void ProcessSendRequestSocket()
     {
         if (false == IsWebSocketConnected())
         {
@@ -64,28 +41,36 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 
         foreach (var pReq in m_pSocketRequestQueue)
         {
+            // 전송 중 연결종료가 발생하면 요청이 유실되므로 즉시 콜백을 주도록 하자.
+            if (false == IsWebSocketConnected()) {
+                SHReply pReply = new SHReply(new SHError(eErrorCode.Net_Socket_Disconnect, "Disconnected Socket"));
+                pReply.requestMethod = "socket";
+                pReply.requestUrl = pReq.m_strPath;
+                pReq.m_pCallback(pReply);
+                continue;
+            }
+
             JsonData jsonBody = new JsonData
             {
                 ["jwt_header"] = GetJWT(),
                 ["body"] = pReq.m_pBody
             };
 
-            // "는 전송이 안된다. "를 '으로 모두 바꾸고 보낸다.
+            // 와... 뭐이런게 다있노ㅋ -> "는 전송이 안된다. "를 '으로 모두 바꾸고 보낸다.
             var strMessage = GetBodyMessage(jsonBody).Replace("\"", "\'");
             DebugLogOfSocketRequest(pReq.m_strPath, strMessage);
             m_pSocket.Emit(pReq.m_strPath, strMessage);
 
             var strEvent = pReq.m_strPath;
             var pCallback = pReq.m_pCallback;
+            
             m_pSocket.On(strEvent, (string strResponse) =>
             {
-                // "{\"key\": "\value\"}" 를 {"key": "value"}로 바꿔야한다.
-                // \"를 \'으로 바꾸고, "를 모두제거한다. \'를 "으로 다시 바꾼다.
-                SHReply pReply = new SHReply(strEvent, strResponse.Replace("\\\"", "\\\'").Replace("\"", "").Replace("\\\'", "\""));
+                SHReply pReply = new SHReply(strEvent, strResponse);
                 DebugLogOfSocketResponse(pReply);
                 pCallback(pReply);
 
-                // force_disconnect는 disconnect처리를 해준다.
+                // force_disconnect는 예외로 여기서 바로 disconnect 처리를 해준다.
                 if (true == strEvent.Equals(SHAPIs.SH_SOCKET_REQ_FORCE_DISCONNECT))
                 {
                     ClearSocket();
@@ -96,8 +81,23 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         m_pSocketRequestQueue.Clear();
     }
 
-    private Socket Connect()
+    public void ConnectWebSocket()
     {
+        ProcessRetryWebSocketConnect();
+    }
+
+    private void ProcessRetryWebSocketConnect()
+    {
+        if (true == IsWebSocketConnected()) {
+            return;
+        }
+
+        if (true == m_bIsRetryingWebSocketConnect) {
+            return;
+        }
+
+        m_bIsRetryingWebSocketConnect = true;
+        
         // 소켓 셋팅
         SocketManager.Instance.Reconnection = false;
         //SocketManager.Instance.TimeOut = 30000;
@@ -112,43 +112,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         m_pSocket.On(SystemEvents.disconnect, OnSocketEventForDisconnect);
 
         // 커스텀 이벤트 함수 등록
-        m_pSocket.On(SHAPIs.SH_SOCKET_POLLING_MINING_ACTIVE_INFO, OnSocketEventForMiningActiveInfo);
-        
-        return m_pSocket;
-    }
-
-    private IEnumerator CoroutineRetryWebSocketProcess()
-    {
-        if (true == IsWebSocketConnected())
-        {
-            yield break;
-        }
-
-        if (true == m_bIsRunWebsocketRetryCoroutine)
-        {
-            yield break;
-        }
-        m_bIsRunWebsocketRetryCoroutine = true;
-        
-        var pSocket = Connect();
-        pSocket.On(SystemEvents.connect, () => 
-        {
-            m_bIsRunWebsocketRetryCoroutine = false;
-            OnSocketEventForConnect();
-
-            StopRetryProcess();
-            ProcessSendRequestSocket();
-        });
-        pSocket.On(SystemEvents.connectTimeOut, () => 
-        {
-            m_bIsRunWebsocketRetryCoroutine = false;
-            OnSocketEventForConnectTimeOut();
-        });
-        pSocket.On(SystemEvents.connectError, (pException) => 
-        {
-            m_bIsRunWebsocketRetryCoroutine = false;
-            OnSocketEventForConnectError(pException);
-        });
+        m_pSocket.On(SHAPIs.SH_SOCKET_POLLING_MINING_ACTIVE_INFO, OnSocketPollingEventForMiningActiveInfo);
     }
 
     private void ClearSocket()
@@ -166,75 +130,84 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         return (m_pSocket && m_pSocket.IsConnected);
     }
 
+    public void AddEventObserver(string strEvent, Action<SHReply> pCallback)
+    {
+        if (false == m_pSocketEventObserver.ContainsKey(strEvent))
+        {
+            m_pSocketEventObserver.Add(strEvent, new List<Action<SHReply>>());
+        }
+
+        if (false == m_pSocketEventObserver[strEvent].Contains(pCallback))
+        {
+            m_pSocketEventObserver[strEvent].Add(pCallback);
+        }
+    }
+    
+    private void SendEventForObserver(string strEvent, SHReply pReply)
+    {
+        if (false == m_pSocketEventObserver.ContainsKey(strEvent))
+            return;
+
+        foreach (var pCallback in m_pSocketEventObserver[strEvent])
+        {
+            pCallback(pReply);
+        }
+    }
+
     // 소켓 시스템 이벤트 함수
     private void OnSocketEventForConnect()
     {
-        Debug.LogFormat("<color=#0033ff>[SOCKET_RESPONSE]</color> : {0}",
-                "Connect");
+        m_bIsRetryingWebSocketConnect = false;
 
-        if (true == m_pSystemEventObserver.ContainsKey(SystemEvents.connect))
+        StopRetryProcess();
+        ProcessSendRequestSocket();
+
+        var pReply = new SHReply(new JsonData
         {
-            foreach (var pCallback in m_pSystemEventObserver[SystemEvents.connect])
-            {
-                pCallback();
-            }
-        }
+            ["message"] = "socket connect",
+            ["url"] = m_pSocket.Namespace
+        });
+        SendEventForObserver(SystemEvents.connect.ToString(), pReply);
+        DebugLogOfSocketResponse(pReply);
     }
     private void OnSocketEventForConnectTimeOut()
     {
-        Debug.LogFormat("<color=#0033ff>[SOCKET_RESPONSE]</color> : {0}",
-                "ConnectTimeOut");
+        m_bIsRetryingWebSocketConnect = false;
 
         ClearSocket();
         StartRetryProcess();
 
-        if (true == m_pSystemEventObserver.ContainsKey(SystemEvents.connectTimeOut))
-        {
-            foreach (var pCallback in m_pSystemEventObserver[SystemEvents.connectTimeOut])
-            {
-                pCallback();
-            }
-        }
+        var pReply = new SHReply(new SHError(eErrorCode.Net_Socket_Connect_Timeout, "Timeout Socket Connect"));
+        SendEventForObserver(SystemEvents.connectTimeOut.ToString(), pReply);
+        DebugLogOfSocketResponse(pReply);
     }
     private void OnSocketEventForConnectError(Exception pException)
     {
-        Debug.LogFormat("<color=#0033ff>[SOCKET_RESPONSE]</color> : {0}",
-                "ConnectError");
+        m_bIsRetryingWebSocketConnect = false;
 
         ClearSocket();
         StartRetryProcess();
 
-        if (true == m_pSystemEventObserver.ContainsKey(SystemEvents.connectError))
-        {
-            foreach (var pCallback in m_pSystemEventObserver[SystemEvents.connectError])
-            {
-                pCallback();
-            }
-        }
+        var pReply = new SHReply(new SHError(eErrorCode.Net_Socket_Connect_Error, pException.ToString()));
+        SendEventForObserver(SystemEvents.connectError.ToString(), pReply);
+        DebugLogOfSocketResponse(pReply);
     }
     private void OnSocketEventForDisconnect()
     {
-        Debug.LogFormat("<color=#0033ff>[SOCKET_RESPONSE]</color> : {0}",
-                "Disconnect");
-
         ClearSocket();
         StartRetryProcess();
-
-        if (true == m_pSystemEventObserver.ContainsKey(SystemEvents.disconnect))
-        {
-            foreach (var pCallback in m_pSystemEventObserver[SystemEvents.disconnect])
-            {
-                pCallback();
-            }
-        }
+        
+        var pReply = new SHReply(new SHError(eErrorCode.Net_Socket_Disconnect, "Disconnected Socket"));
+        SendEventForObserver(SystemEvents.connectTimeOut.ToString(), pReply);
+        DebugLogOfSocketResponse(pReply);
     }
 
-    private void OnSocketEventForMiningActiveInfo(string strResponse)
+    // 소켓 커스텀 이벤트 함수
+    private void OnSocketPollingEventForMiningActiveInfo(string strResponse)
     {
-        // "{\"key\": "\value\"}" 를 {"key": "value"}로 바꿔야한다.
-        // \"를 \'으로 바꾸고, "를 모두제거한다. \'를 "으로 다시 바꾼다.
-        SHReply pReply = new SHReply(SHAPIs.SH_SOCKET_POLLING_MINING_ACTIVE_INFO, strResponse.Replace("\\\"", "\\\'").Replace("\"", "").Replace("\\\'", "\""));
-        DebugLogOfSocketResponse(pReply);
+        SHReply pReply = new SHReply(SHAPIs.SH_SOCKET_POLLING_MINING_ACTIVE_INFO, strResponse);
+        SendEventForObserver(SHAPIs.SH_SOCKET_POLLING_MINING_ACTIVE_INFO, pReply);
+        //DebugLogOfSocketResponse(pReply);
     }
     
     private void DebugLogOfSocketRequest(string strEvent, string strMessage)

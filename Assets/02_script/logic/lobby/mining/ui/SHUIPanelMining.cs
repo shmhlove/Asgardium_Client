@@ -4,7 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public enum eMiningStageType
+public enum eMiningTabType
 {
     None,
     Active,
@@ -20,9 +20,9 @@ public class SHUIPanelMining : SHUIPanel
     [Header("ScrollView")]
     public SHUIScrollViewForActive m_pActiveScrollView;
 
-    private Action<eMiningStageType> m_pEventOfChangeStage;
+    private Action<eMiningTabType> m_pEventOfChangeStage;
 
-    public void SetEventOfChangeStage(Action<eMiningStageType> pCallback)
+    public void SetEventForChangeStage(Action<eMiningTabType> pCallback)
     {
         m_pEventOfChangeStage = pCallback;
     }
@@ -40,16 +40,16 @@ public class SHUIPanelMining : SHUIPanel
 
     public void OnClickActive()
     {
-        m_pEventOfChangeStage?.Invoke(eMiningStageType.Active);
+        m_pEventOfChangeStage?.Invoke(eMiningTabType.Active);
     }
 
     public void OnClickPassive()
     {
-        m_pEventOfChangeStage?.Invoke(eMiningStageType.Passive);
+        m_pEventOfChangeStage?.Invoke(eMiningTabType.Passive);
     }
 
     public void OnClickCompany()
     {
-        m_pEventOfChangeStage?.Invoke(eMiningStageType.Company);
+        m_pEventOfChangeStage?.Invoke(eMiningTabType.Company);
     }
 }

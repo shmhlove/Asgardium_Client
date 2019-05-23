@@ -10,31 +10,23 @@ using LitJson;
 
 public partial class SHBusinessLobby : MonoBehaviour
 {
-    private void SetEnableMiningMenu()
+    private void SetChangeMiningTab(eMiningTabType eType)
     {
-
-    }
-
-    private void SetDisableMiningMenu()
-    {
-        SetChangeMiningStage(eMiningTabType.None);
-    }
-
-    private void SetChangeMiningStage(eMiningTabType eType)
-    {
-        m_eCurrentMiningTabType = eType;
-
-        // 맞을 때
-        if (eType == eMiningTabType.Active)
+        // On
+        if ((eMiningTabType.Active == eType)
+            && (eMiningTabType.Active != m_eCurrentMiningTabType))
         {
             RequestSubscribeMiningActiveInfo();
         }
-
-        // 아닐 때
-        if (eType != eMiningTabType.Active)
+        
+        // Off
+        if ((eMiningTabType.Active != eType)
+            && (eMiningTabType.Active == m_eCurrentMiningTabType))
         {
             RequestUnsubscribeMiningActiveInfo();
         }
+
+        m_eCurrentMiningTabType = eType;
     }
 
     private async void UpdateActiveInformation(Action pCallback)
@@ -162,7 +154,7 @@ public partial class SHBusinessLobby : MonoBehaviour
 
     public void OnEventForChangeMiningTab(eMiningTabType eType)
     {
-        SetChangeMiningStage(eType);
+        SetChangeMiningTab(eType);
     }
 
     public void OnEventForPurchaseMining(string strInstanceId)
@@ -177,23 +169,6 @@ public partial class SHBusinessLobby : MonoBehaviour
         }
 
         UpdateActiveScrollview();
-    }
-
-    private IEnumerator CoroutineForMiningActiveInformation()
-    {
-        while (true)
-        {
-            if (m_pUIPanelMining)
-            {
-                bool isDone = false;
-                UpdateActiveInformation(() => isDone = true);
-
-                while (false == isDone)
-                    yield return null;
-            }
-            
-            yield return null;
-        }
     }
 
     //////////////////////////////////////////////////////////////////////

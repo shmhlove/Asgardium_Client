@@ -20,11 +20,11 @@ public class SHUIPanelMining : SHUIPanel
     [Header("ScrollView")]
     public SHUIScrollViewForActive m_pActiveScrollView;
 
-    private Action<eMiningTabType> m_pEventOfChangeStage;
+    private Action<eMiningTabType> m_pEventOfChangeTab;
 
-    public void SetEventForChangeStage(Action<eMiningTabType> pCallback)
+    public void SetEventForChangeTab(Action<eMiningTabType> pCallback)
     {
-        m_pEventOfChangeStage = pCallback;
+        m_pEventOfChangeTab = pCallback;
     }
 
     public void SetActiveInformation(string strPower, string strTimer)
@@ -40,16 +40,16 @@ public class SHUIPanelMining : SHUIPanel
 
     public void OnClickActive()
     {
-        m_pEventOfChangeStage?.Invoke(eMiningTabType.Active);
+        m_pEventOfChangeTab?.Invoke(eMiningTabType.Active);
     }
 
     public void OnClickPassive()
     {
-        m_pEventOfChangeStage?.Invoke(eMiningTabType.Passive);
+        m_pEventOfChangeTab?.Invoke(eMiningTabType.Passive);
     }
 
     public void OnClickCompany()
     {
-        m_pEventOfChangeStage?.Invoke(eMiningTabType.Company);
+        m_pEventOfChangeTab?.Invoke(eMiningTabType.Company);
     }
 }

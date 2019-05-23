@@ -42,53 +42,32 @@ public partial class SHBusinessLobby : MonoBehaviour
         
         // Mining Tab UI 이벤트 바인딩
         m_pUIPanelMining = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
-        m_pUIPanelMining.SetEventForChangeStage(OnEventForChangeMiningTab);
+        m_pUIPanelMining.SetEventForChangeTab(OnEventForChangeMiningTab);
 
         // 초기화면 : Mining Tab 초기화
-        SetChangeMiningStage(eMiningTabType.Active);
-        // 소켓 폴링 연결되면 이코드 지워야한다.
-        StartCoroutine("CoroutineForMiningActiveInformation");
+        SetChangeMiningTab(eMiningTabType.Active);
     }
 
     private void OnEventForChangeLobbyMenu(eLobbyMenuType eType)
     {
+        // On
+        if ((eLobbyMenuType.Mining == eType) 
+            && (eLobbyMenuType.Mining != m_eCurrentLobbyMenuType)) {
+            SetChangeMiningTab(m_eCurrentMiningTabType);
+        }
+
+        // Off
+        if ((eLobbyMenuType.Mining != eType) 
+            && (eLobbyMenuType.Mining == m_eCurrentLobbyMenuType)) {
+            SetChangeMiningTab(eMiningTabType.None);
+        }
+        
         m_eCurrentLobbyMenuType = eType;
-
-        // Mining
-        if (eLobbyMenuType.Mining == eType)
-        {
-            SetEnableMiningMenu();
-        }
-        if (eLobbyMenuType.Mining != eType)
-        {
-            SetDisableMiningMenu();
-        }
-
-        // Storage
-        // Market
-        // Upgrade
-        // Menu
     }
 
     private void OnEventForSocketReconnect(SHReply pReply)
     {
-        switch(m_eCurrentLobbyMenuType)
-        {
-            case eLobbyMenuType.Mining:
-                SetChangeMiningStage(m_eCurrentMiningTabType);
-                break;
-            case eLobbyMenuType.Storage:
-                break;
-            case eLobbyMenuType.Market:
-                break;
-            case eLobbyMenuType.Upgrade:
-                break;
-            case eLobbyMenuType.Menu:
-                break;
-            default:
-                SetChangeMiningStage(m_eCurrentMiningTabType);
-                break;
-        }
+        SetChangeMiningTab(m_eCurrentMiningTabType);
     }
 
     [FuncButton]

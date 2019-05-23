@@ -18,7 +18,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         {
             RequestSubscribeMiningActiveInfo();
         }
-        
+
         // Off
         if ((eMiningTabType.Active != eType)
             && (eMiningTabType.Active == m_eCurrentMiningTabType))
@@ -169,6 +169,23 @@ public partial class SHBusinessLobby : MonoBehaviour
         }
 
         UpdateActiveScrollview();
+    }
+
+    private IEnumerator CoroutineForMiningActiveInformation()
+    {
+        while (true)
+        {
+            if (m_pUIPanelMining)
+            {
+                bool isDone = false;
+                UpdateActiveInformation(() => isDone = true);
+
+                while (false == isDone)
+                    yield return null;
+            }
+            
+            yield return null;
+        }
     }
 
     //////////////////////////////////////////////////////////////////////

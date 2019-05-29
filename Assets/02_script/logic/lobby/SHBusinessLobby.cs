@@ -46,6 +46,7 @@ public partial class SHBusinessLobby : MonoBehaviour
 
         // 초기화면 : Mining Tab 초기화
         SetChangeMiningTab(eMiningTabType.Active);
+        StartCoroutine("CoroutineForMiningActiveInformation");
     }
 
     private void OnEventForChangeLobbyMenu(eLobbyMenuType eType)
@@ -69,7 +70,7 @@ public partial class SHBusinessLobby : MonoBehaviour
     {
         SetChangeMiningTab(m_eCurrentMiningTabType);
     }
-
+    
     [FuncButton]
     public void OnClickDebugSocketDisconnect()
     {

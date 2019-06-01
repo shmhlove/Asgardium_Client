@@ -108,9 +108,9 @@ public class SHUIScrollSlotForActive : MonoBehaviour
             }
         }
 
-        if (m_pSubItems) {
-            m_pSubItems.SetActive(pData.m_bIsSubItems);
-        }
+        //if (m_pSubItems) {
+        //    m_pSubItems.SetActive(pData.m_bIsSubItems);
+        //}
 
         m_pData = pData;
     }

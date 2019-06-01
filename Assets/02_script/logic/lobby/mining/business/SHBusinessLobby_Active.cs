@@ -20,6 +20,9 @@ public partial class SHBusinessLobby : MonoBehaviour
         {
             RequestSubscribeMiningActiveInfo();
 
+            m_dicActiveCompanyData.Clear();
+            UpdateDataForActiveCompany();
+
             StopCoroutine("CoroutineForUpdateUIForActiveCompany");
             StartCoroutine("CoroutineForUpdateUIForActiveCompany");
         }
@@ -78,7 +81,10 @@ public partial class SHBusinessLobby : MonoBehaviour
         // 없는 유닛에 대해서는 Supply를 0으로 처리해야한다.
         // Supply 0인 유닛에 대해서는 UI에서 딤드처리를 해서 인터렉션을 받지 않도록 해야한다.
 
-        m_dicActiveCompanyData.Clear();
+        // 업데이트
+        // 삽입
+        // 삭제
+
         foreach (var kvp in pCompanyTable.m_dicDatas)
         {
             var pData = new SHActiveSlotData
@@ -101,9 +107,20 @@ public partial class SHBusinessLobby : MonoBehaviour
             };
 
             if (false == m_dicActiveCompanyData.ContainsKey(pData.m_strSlotId))
+            {
                 m_dicActiveCompanyData[pData.m_strSlotId] = new List<SHActiveSlotData>();
+            }
 
-            m_dicActiveCompanyData[pData.m_strSlotId].Add(pData);
+            var pValue = m_dicActiveCompanyData[pData.m_strSlotId].Find((p) => 
+            {
+                return p.m_strInstanceId.Equals(pData.m_strInstanceId);
+            });
+            if (null != pValue) {
+                pValue.CopyFrom(pData);
+            }
+            else {
+                m_dicActiveCompanyData[pData.m_strSlotId].Add(pData);
+            }
         }
     }
 
@@ -119,7 +136,15 @@ public partial class SHBusinessLobby : MonoBehaviour
         List<SHActiveSlotData> pSlotDatas = new List<SHActiveSlotData>();
         foreach (var kvp in m_dicActiveCompanyData)
         {
-            pSlotDatas.Add(kvp.Value[0]);
+            var pData = kvp.Value.Find((p) => { return 0 != p.m_iSupplyQuantity; });
+            if (null != pData)
+            {
+                pSlotDatas.Add(pData);
+            }
+            else
+            {
+                pSlotDatas.Add(kvp.Value[0]);
+            }
         }
 
         // 출력순서 정렬
@@ -142,7 +167,6 @@ public partial class SHBusinessLobby : MonoBehaviour
             return 1;
         });
 
-        // UI 업데이트
         m_pUIPanelMining.SetActiveScrollview(pSlotDatas);
         
         pCallback();
@@ -214,7 +238,7 @@ public partial class SHBusinessLobby : MonoBehaviour
     {
         if (true == m_dicActiveCompanyData.ContainsKey(strSlotId))
         {
-            m_pUIPanelMiningSubActiveCompany.Show(new List<SHActiveSlotData>(m_dicActiveCompanyData[strSlotId]));
+            m_pUIPanelMiningSubActiveCompany.Show(m_dicActiveCompanyData[strSlotId]);
         }
         else
         {

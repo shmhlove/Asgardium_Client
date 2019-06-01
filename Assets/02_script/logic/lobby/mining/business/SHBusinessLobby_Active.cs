@@ -73,6 +73,11 @@ public partial class SHBusinessLobby : MonoBehaviour
         var pServerGlobalUnitDataTable = await Single.Table.GetTable<SHTableServerGlobalUnitData>();
         var pActiveMiningQuantityTable = await Single.Table.GetTable<SHTableServerMiningActiveQuantity>();
 
+        // m_dicActiveCompanyData이 데이터는 탭이 전환될때만 초기화되어야한다.
+        // 탭이 전환되기 전에는 업데이트만 쳐야하고,
+        // 없는 유닛에 대해서는 Supply를 0으로 처리해야한다.
+        // Supply 0인 유닛에 대해서는 UI에서 딤드처리를 해서 인터렉션을 받지 않도록 해야한다.
+
         m_dicActiveCompanyData.Clear();
         foreach (var kvp in pCompanyTable.m_dicDatas)
         {

@@ -4,56 +4,48 @@
         "s_Name" : "UI Root - Global",
         "s_FileName" : "UI Root - Global.prefab",
         "s_Extension" : ".prefab",
-        "s_Size"      : "60216",
-        "s_Hash"      : "CE4DEEDA65B4FCFCDC08B233C21906DB",
+        "s_Size"      : "63128",
+        "s_Hash"      : "B917C09E2F4A5614BBAB0536654ED2EA",
         "s_Path"      : "Prefab/UI/UI Root - Global"
-    },
-    {
-        "s_Name" : "",
-        "s_FileName" : ".DS_Store",
-        "s_Extension" : ".DS_Store",
-        "s_Size"      : "6148",
-        "s_Hash"      : "4E0C1C7AF309811790EE39CF0B49DF2E",
-        "s_Path"      : "Table/"
     },
     {
         "s_Name" : "JsonClientConfig",
         "s_FileName" : "JsonClientConfig.json",
         "s_Extension" : ".json",
-        "s_Size"      : "434",
-        "s_Hash"      : "B24A4F38901315C75F6A408CCD266FE4",
+        "s_Size"      : "788",
+        "s_Hash"      : "00376746F8E8077390323B824571091E",
         "s_Path"      : "Table/Json/JsonClientConfig"
     },
     {
         "s_Name" : "JsonClientString_en",
         "s_FileName" : "JsonClientString_en.json",
         "s_Extension" : ".json",
-        "s_Size"      : "447",
-        "s_Hash"      : "A6A5BF4F2074ECBA303FA6800214612C",
+        "s_Size"      : "2975",
+        "s_Hash"      : "CA805A805A1DD3378A7360ED2F7992FC",
         "s_Path"      : "Table/Json/JsonClientString_en"
     },
     {
         "s_Name" : "JsonClientString_kr",
         "s_FileName" : "JsonClientString_kr.json",
         "s_Extension" : ".json",
-        "s_Size"      : "499",
-        "s_Hash"      : "834AF6A23B54CAD4D28A663C2A7BD0BB",
+        "s_Size"      : "3230",
+        "s_Hash"      : "E5A14DF81DB4C364908EF40DA72F1CAA",
         "s_Path"      : "Table/Json/JsonClientString_kr"
     },
     {
         "s_Name" : "JsonPreLoadResources",
         "s_FileName" : "JsonPreLoadResources.json",
         "s_Extension" : ".json",
-        "s_Size"      : "64",
-        "s_Hash"      : "A14E877370F80D51F961BF313B3920C2",
+        "s_Size"      : "77",
+        "s_Hash"      : "B14A79A7D47FF8479DFCE705FBC17C1E",
         "s_Path"      : "Table/Json/JsonPreLoadResources"
     },
     {
         "s_Name" : "JsonResourcesInfo",
         "s_FileName" : "JsonResourcesInfo.json",
         "s_Extension" : ".json",
-        "s_Size"      : "1657",
-        "s_Hash"      : "0C3BF4B8471781EAA132E41D34CA415E",
+        "s_Size"      : "2003",
+        "s_Hash"      : "EDC1C5867DCDB52ED21675C16590340A",
         "s_Path"      : "Table/Json/JsonResourcesInfo"
     }
 ]

@@ -10,7 +10,7 @@ using LitJson;
 public class SHTableServerGlobalUnitDataData
 {
     public int m_iUnitId;
-    public int m_iNameStrid;
+    public int m_iNameStrId;
     public string m_strIconImage;
     public int m_iWeight;
     public int m_iFuelUnitId_1;
@@ -57,7 +57,7 @@ public class SHTableServerGlobalUnitData : SHBaseTable
         {
             var pData = new SHTableServerGlobalUnitDataData();
             pData.m_iUnitId = GetIntToJson(pJson[iLoop], "unit_id");
-            pData.m_iNameStrid = GetIntToJson(pJson[iLoop], "name_str_id");
+            pData.m_iNameStrId = GetIntToJson(pJson[iLoop], "name_str_id");
             pData.m_strIconImage = GetStrToJson(pJson[iLoop], "icon_image");
             pData.m_iWeight = GetIntToJson(pJson[iLoop], "weight");
             pData.m_iFuelUnitId_1 = GetIntToJson(pJson[iLoop], "fuel_unit_id_1");

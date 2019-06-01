@@ -12,6 +12,7 @@ public partial class SHBusinessLobby : MonoBehaviour
 {
     [Header("UI Objects")]
     private SHUIPanelMining m_pUIPanelMining = null;
+    private SHUIPanelMiningSubActiveCompany m_pUIPanelMiningSubActiveCompany = null;
 
     private eLobbyMenuType m_eCurrentLobbyMenuType = eLobbyMenuType.None;
     private eMiningTabType m_eCurrentMiningTabType = eMiningTabType.None;
@@ -40,13 +41,14 @@ public partial class SHBusinessLobby : MonoBehaviour
         var pMenubar = await pUIRoot.GetPanel<SHUIPanelMenubar>(SHUIConstant.PANEL_MENUBAR);
         pMenubar.SetEventForChangeLobbyMenu(OnEventForChangeLobbyMenu);
         
-        // Mining Tab UI 이벤트 바인딩
+        // MiningTab UIs 로드 및 이벤트 바인딩
         m_pUIPanelMining = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
         m_pUIPanelMining.SetEventForChangeTab(OnEventForChangeMiningTab);
+        m_pUIPanelMiningSubActiveCompany = await pUIRoot.GetPanel<SHUIPanelMiningSubActiveCompany>(SHUIConstant.PANEL_MINING_SUB_ACTIVE_COMPANY);
 
         // 초기화면 : Mining Tab 초기화
         SetChangeMiningTab(eMiningTabType.Active);
-        StartCoroutine("CoroutineForMiningActiveInformation");
+        StartCoroutine("CoroutineForUpdateUIForActiveInformation");
     }
 
     private void OnEventForChangeLobbyMenu(eLobbyMenuType eType)

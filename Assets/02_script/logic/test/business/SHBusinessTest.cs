@@ -122,4 +122,89 @@ public class SHBusinessTest : MonoBehaviour
 
         return -1;
     }
+
+    public class SHSortData
+    {
+        public int iLevel;
+        public int iUnitID;
+        public int iSupply;
+
+        public override string ToString()
+        {
+            return string.Format("{0} : {1}, {2}", iUnitID, iLevel, iSupply);
+        }
+    }
+
+    private bool? SortConditionForUnitID(SHSortData pValue1, SHSortData pValue2)
+    {
+        if (pValue1.iUnitID == pValue2.iUnitID)
+            return null;
+
+        return pValue1.iUnitID > pValue2.iUnitID;
+    }
+
+    private bool? SortConditionForLevel(SHSortData pValue1, SHSortData pValue2)
+    {
+        if (pValue1.iLevel == pValue2.iLevel)
+            return null;
+
+        return pValue1.iLevel < pValue2.iLevel;
+    }
+
+    private bool? SortConditionForSupply(SHSortData pValue1, SHSortData pValue2)
+    {
+        if (pValue1.iSupply == pValue2.iSupply)
+            return null;
+
+        return pValue1.iSupply < pValue2.iSupply;
+    }
+
+    private List<SHSortData> m_pSortTestData = new List<SHSortData>();
+    private void CreateSortData()
+    {
+        m_pSortTestData.Clear();
+        for (int iLoop = 0; iLoop < 10; ++iLoop)
+        {
+            var pData = new SHSortData
+            {
+                iLevel = UnityEngine.Random.Range(1, 4),
+                iUnitID = UnityEngine.Random.Range(1, 4),
+                iSupply = UnityEngine.Random.Range(100, 10001)
+            };
+            m_pSortTestData.Add(pData);
+        }
+    }
+
+    [FuncButton]
+    void OnClickSort()
+    {
+        CreateSortData();
+
+        var m_pFilters = new List<Func<SHSortData, SHSortData, bool?>>
+        {
+            SortConditionForLevel,
+            SortConditionForUnitID
+        };
+
+        m_pSortTestData.Sort((x, y) =>
+        {
+            foreach (var pFilter in m_pFilters)
+            {
+                bool? result = pFilter(x, y);
+                if (null != result)
+                {
+                    return result.Value ? 1 : -1;
+                }
+            }
+
+            return 1;
+        });
+
+        string logBuff = "";
+        foreach (var pData in m_pSortTestData)
+        {
+            logBuff += pData.ToString() + "\n";
+        }
+        Debug.Log(logBuff);
+    }
 }

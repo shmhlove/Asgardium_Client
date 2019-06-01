@@ -32,4 +32,7 @@ public static class SHUIConstant
     public static string PANEL_MARKET = "Panel - Market";
     public static string PANEL_UPGRADE = "Panel - Upgrade";
     public static string PANEL_MENU = "Panel - Menu";
+
+    // Lobby Mining
+    public static string PANEL_MINING_SUB_ACTIVE_COMPANY = "Panel - MiningSubActiveCompany";
 }

@@ -10,17 +10,18 @@ using LitJson;
 
 public partial class SHBusinessLobby : MonoBehaviour
 {
+    private Dictionary<string, List<SHActiveSlotData>> m_dicActiveCompanyData = new Dictionary<string, List<SHActiveSlotData>>();
+
     private void SetChangeMiningTab(eMiningTabType eType)
     {
-        // Initialize
-        StopCoroutine("CoroutineForMiningActiveCompany");
-
         // On
         if ((eMiningTabType.Active == eType)
             && (eMiningTabType.Active != m_eCurrentMiningTabType))
         {
             RequestSubscribeMiningActiveInfo();
-            StartCoroutine("CoroutineForMiningActiveCompany");
+
+            StopCoroutine("CoroutineForUpdateUIForActiveCompany");
+            StartCoroutine("CoroutineForUpdateUIForActiveCompany");
         }
 
         // Off
@@ -28,12 +29,14 @@ public partial class SHBusinessLobby : MonoBehaviour
             && (eMiningTabType.Active == m_eCurrentMiningTabType))
         {
             RequestUnsubscribeMiningActiveInfo();
+
+            StopCoroutine("CoroutineForUpdateUIForActiveCompany");
         }
 
         m_eCurrentMiningTabType = eType;
     }
 
-    private async void UpdateActiveInformation(Action pCallback)
+    private async void UpdateUIForActiveInformation(Action pCallback)
     {
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
         var pServerGlobalConfig = await Single.Table.GetTable<SHTableServerGlobalConfig>();
@@ -63,37 +66,80 @@ public partial class SHBusinessLobby : MonoBehaviour
         pCallback();
     }
 
-    private async void UpdateActiveCompany(Action pCallback)
+    private async void UpdateDataForActiveCompany()
     {
         var pCompanyTable = await Single.Table.GetTable<SHTableServerInstanceMiningActiveCompany>();
         var pStringTable = await Single.Table.GetTable<SHTableClientString>();
-        var pServerGlobalUnitData = await Single.Table.GetTable<SHTableServerGlobalUnitData>();
+        var pServerGlobalUnitDataTable = await Single.Table.GetTable<SHTableServerGlobalUnitData>();
         var pActiveMiningQuantityTable = await Single.Table.GetTable<SHTableServerMiningActiveQuantity>();
 
-        var pSlotDatas = new List<SHActiveSlotData>();
+        m_dicActiveCompanyData.Clear();
         foreach (var kvp in pCompanyTable.m_dicDatas)
         {
-            var pData = new SHActiveSlotData();
-            pData.m_strInstanceId = kvp.Value.m_strInstanceId;
-            pData.m_strCompanyName = pStringTable.GetString(kvp.Value.m_iNameStrid.ToString());
-            pData.m_strCompanyIcon = kvp.Value.m_strEmblemImage;
-            pData.m_strResourceIcon = pServerGlobalUnitData.GetData(kvp.Value.m_iUnitId).m_strIconImage;
-            pData.m_iResourceQuantity = pActiveMiningQuantityTable.GetData(kvp.Value.m_iEfficiencyLV).m_iQuantity;
-            pData.m_iResourceLevel = kvp.Value.m_iEfficiencyLV;
-            pData.m_iSupplyQuantity = kvp.Value.m_iSupplyCount;
-            pData.m_iPurchaseCost = pServerGlobalUnitData.GetData(kvp.Value.m_iUnitId).m_iWeight;
-            pData.m_pEventPurchaseButton = OnEventForPurchaseMining;
-            pSlotDatas.Add(pData);
+            var pData = new SHActiveSlotData
+            {
+                m_strSlotId = string.Format("{0}_{1}", kvp.Value.m_iEfficiencyLV, kvp.Value.m_iUnitId),
+                m_strInstanceId = kvp.Value.m_strInstanceId,
+                
+                m_strCompanyName = pStringTable.GetString(kvp.Value.m_iNameStrid.ToString()),
+                m_strCompanyIcon = kvp.Value.m_strEmblemImage,
+                m_strResourceIcon = pServerGlobalUnitDataTable.GetData(kvp.Value.m_iUnitId).m_strIconImage,
+                m_iResourceQuantity = pActiveMiningQuantityTable.GetData(kvp.Value.m_iEfficiencyLV).m_iQuantity,
+                m_iPurchaseCost = pServerGlobalUnitDataTable.GetData(kvp.Value.m_iUnitId).m_iWeight,
+                
+                m_iUnitId = kvp.Value.m_iUnitId,
+                m_iEfficiencyLevel = kvp.Value.m_iEfficiencyLV,
+                m_iSupplyQuantity = kvp.Value.m_iSupplyCount,
+                
+                m_pEventPurchaseButton = OnEventForPurchaseMining,
+                m_pEventShowSubItemsButton = OnEventForShowSubItems,
+            };
+
+            if (false == m_dicActiveCompanyData.ContainsKey(pData.m_strSlotId))
+                m_dicActiveCompanyData[pData.m_strSlotId] = new List<SHActiveSlotData>();
+
+            m_dicActiveCompanyData[pData.m_strSlotId].Add(pData);
+        }
+    }
+
+    private void UpdateUIForActiveCompany(Action pCallback)
+    {
+        if (0 == m_dicActiveCompanyData.Count)
+        {
+            pCallback();
+            return;
         }
 
+        // 출력할 데이터 선별
+        List<SHActiveSlotData> pSlotDatas = new List<SHActiveSlotData>();
+        foreach (var kvp in m_dicActiveCompanyData)
+        {
+            pSlotDatas.Add(kvp.Value[0]);
+        }
+
+        // 출력순서 정렬
+        var m_pFilters = new List<Func<SHActiveSlotData, SHActiveSlotData, bool?>>
+        {
+            SortConditionForEfficiencyLevel,
+            SortConditionForUnitID
+        };
         pSlotDatas.Sort((x, y) =>
         {
-            return (x.m_iResourceLevel == y.m_iResourceLevel) ? 
-                ((x.m_iSupplyQuantity < y.m_iSupplyQuantity) ? 1 : -1) : ((x.m_iResourceLevel < y.m_iResourceLevel) ? 1 : -1);
+            foreach (var pFilter in m_pFilters)
+            {
+                bool? result = pFilter(x, y);
+                if (null != result)
+                {
+                    return result.Value ? 1 : -1;
+                }
+            }
+
+            return 1;
         });
 
         // UI 업데이트
         m_pUIPanelMining.SetActiveScrollview(pSlotDatas);
+        
         pCallback();
     }
 
@@ -159,20 +205,33 @@ public partial class SHBusinessLobby : MonoBehaviour
         Single.BusinessGlobal.ShowAlertUI(string.Format("채굴 요청 : {0}", strInstanceId));
     }
 
+    public void OnEventForShowSubItems(string strSlotId)
+    {
+        if (true == m_dicActiveCompanyData.ContainsKey(strSlotId))
+        {
+            m_pUIPanelMiningSubActiveCompany.Show(new List<SHActiveSlotData>(m_dicActiveCompanyData[strSlotId]));
+        }
+        else
+        {
+            m_pUIPanelMiningSubActiveCompany.Show(new List<SHActiveSlotData>());
+        }
+    }
+
     private async void OnEventForSocketPollingMiningActiveInfo(SHReply pReply)
     {
         var pCompanyTable = await Single.Table.GetTable<SHTableServerInstanceMiningActiveCompany>();
         pCompanyTable.LoadJsonTable(pReply.data);
+        UpdateDataForActiveCompany();
     }
     
-    private IEnumerator CoroutineForMiningActiveInformation()
+    private IEnumerator CoroutineForUpdateUIForActiveInformation()
     {
         while (true)
         {
             if (m_pUIPanelMining)
             {
                 bool isDone = false;
-                UpdateActiveInformation(() => isDone = true);
+                UpdateUIForActiveInformation(() => isDone = true);
 
                 while (false == isDone)
                     yield return null;
@@ -182,20 +241,20 @@ public partial class SHBusinessLobby : MonoBehaviour
         }
     }
 
-    private IEnumerator CoroutineForMiningActiveCompany()
+    private IEnumerator CoroutineForUpdateUIForActiveCompany()
     {
         while (true)
         {
             if (m_pUIPanelMining)
             {
                 bool isDone = false;
-                UpdateActiveCompany(() => isDone = true);
+                UpdateUIForActiveCompany(() => isDone = true);
                 
                 while (false == isDone)
                     yield return null;
             }
             
-            yield return null;
+            yield return new WaitForSeconds(1.0f);
         }
     }
 

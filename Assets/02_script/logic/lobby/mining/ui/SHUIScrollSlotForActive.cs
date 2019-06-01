@@ -19,6 +19,8 @@ public class SHActiveSlotData
     public int m_iSupplyQuantity;
     public int m_iPurchaseCost;
 
+    public bool m_bIsSubItems;
+
     public Action<string> m_pEventPurchaseButton;
     public Action<string> m_pEventShowSubItemsButton;
 
@@ -36,6 +38,8 @@ public class SHActiveSlotData
         this.m_iEfficiencyLevel = pData.m_iEfficiencyLevel;
         this.m_iSupplyQuantity = pData.m_iSupplyQuantity;
         this.m_iPurchaseCost = pData.m_iPurchaseCost;
+
+        this.m_bIsSubItems = pData.m_bIsSubItems;
 
         this.m_pEventPurchaseButton = pData.m_pEventPurchaseButton;
         this.m_pEventShowSubItemsButton = pData.m_pEventShowSubItemsButton;
@@ -57,6 +61,7 @@ public class SHUIScrollSlotForActive : MonoBehaviour
     public UILabel m_pLabelResourceLevel;
 
     public GameObject m_pDimmed;
+    public GameObject m_pSubItems;
 
     [ReadOnlyField] public SHActiveSlotData m_pData = null;
 
@@ -101,6 +106,10 @@ public class SHUIScrollSlotForActive : MonoBehaviour
             else {
                 m_pDimmed.SetActive(false);
             }
+        }
+
+        if (m_pSubItems) {
+            m_pSubItems.SetActive(pData.m_bIsSubItems);
         }
 
         m_pData = pData;

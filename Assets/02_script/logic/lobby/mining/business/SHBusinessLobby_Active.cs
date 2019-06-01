@@ -136,13 +136,15 @@ public partial class SHBusinessLobby : MonoBehaviour
         List<SHActiveSlotData> pSlotDatas = new List<SHActiveSlotData>();
         foreach (var kvp in m_dicActiveCompanyData)
         {
-            var pData = kvp.Value.Find((p) => { return 0 != p.m_iSupplyQuantity; });
+            var pData = kvp.Value.FindAll((p) => { return 0 != p.m_iSupplyQuantity; });
             if (null != pData)
             {
-                pSlotDatas.Add(pData);
+                pData[0].m_bIsSubItems = (1 < pData.Count);
+                pSlotDatas.Add(pData[0]);
             }
             else
             {
+                kvp.Value[0].m_bIsSubItems = false;
                 pSlotDatas.Add(kvp.Value[0]);
             }
         }

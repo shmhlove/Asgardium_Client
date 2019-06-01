@@ -122,6 +122,17 @@ public partial class SHBusinessLobby : MonoBehaviour
                 m_dicActiveCompanyData[pData.m_strSlotId].Add(pData);
             }
         }
+
+        foreach (var kvp in m_dicActiveCompanyData)
+        {
+            foreach (var pData in kvp.Value)
+            {
+                if (false == pCompanyTable.m_dicDatas.ContainsKey(pData.m_strInstanceId))
+                {
+                    pData.m_iSupplyQuantity = 0;
+                }
+            }
+        }
     }
 
     private void UpdateUIForActiveCompany(Action pCallback)
@@ -238,6 +249,9 @@ public partial class SHBusinessLobby : MonoBehaviour
 
     public void OnEventForShowSubItems(string strSlotId)
     {
+        if (null == m_pUIPanelMiningSubActiveCompany)
+            return;
+
         if (true == m_dicActiveCompanyData.ContainsKey(strSlotId))
         {
             m_pUIPanelMiningSubActiveCompany.Show(m_dicActiveCompanyData[strSlotId]);

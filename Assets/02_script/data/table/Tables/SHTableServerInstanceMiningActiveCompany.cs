@@ -70,4 +70,16 @@ public class SHTableServerInstanceMiningActiveCompany : SHBaseTable
         
         return eErrorCode.Succeed;
     }
+
+    public SHTableServerInstanceMiningActiveCompanyData GetData(string strInstanceId)
+    {
+        if (m_dicDatas.ContainsKey(strInstanceId))
+        {
+            return m_dicDatas[strInstanceId];
+        }
+        else
+        {
+            return null;
+        }
+    }
 }

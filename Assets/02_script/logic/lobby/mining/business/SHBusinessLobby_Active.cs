@@ -10,6 +10,7 @@ using LitJson;
 
 public partial class SHBusinessLobby : MonoBehaviour
 {
+    // Key : "Level_UnitId", Value : SlotData in the same group as Level and UnitId
     private Dictionary<string, List<SHActiveSlotData>> m_dicActiveCompanyData = new Dictionary<string, List<SHActiveSlotData>>();
 
     private void SetChangeMiningTab(eMiningTabType eType)
@@ -44,7 +45,8 @@ public partial class SHBusinessLobby : MonoBehaviour
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
         var pServerGlobalConfig = await Single.Table.GetTable<SHTableServerGlobalConfig>();
 
-        var Epsilon = 500;
+        // 통신시간 갭 때문에 저장된 시간보다 3초정도 앞당겨 준다.
+        var Epsilon = 3000;
         var LastMiningPowerAt = pUserInfo.MiningPowerAt - Epsilon;
 
         // 남은 시간과 파워갯수 구하기
@@ -69,72 +71,6 @@ public partial class SHBusinessLobby : MonoBehaviour
         pCallback();
     }
 
-    private async void UpdateDataForActiveCompany()
-    {
-        var pCompanyTable = await Single.Table.GetTable<SHTableServerInstanceMiningActiveCompany>();
-        var pStringTable = await Single.Table.GetTable<SHTableClientString>();
-        var pServerGlobalUnitDataTable = await Single.Table.GetTable<SHTableServerGlobalUnitData>();
-        var pActiveMiningQuantityTable = await Single.Table.GetTable<SHTableServerMiningActiveQuantity>();
-
-        // m_dicActiveCompanyData이 데이터는 탭이 전환될때만 초기화되어야한다.
-        // 탭이 전환되기 전에는 업데이트만 쳐야하고,
-        // 없는 유닛에 대해서는 Supply를 0으로 처리해야한다.
-        // Supply 0인 유닛에 대해서는 UI에서 딤드처리를 해서 인터렉션을 받지 않도록 해야한다.
-
-        // 업데이트
-        // 삽입
-        // 삭제
-
-        foreach (var kvp in pCompanyTable.m_dicDatas)
-        {
-            var pData = new SHActiveSlotData
-            {
-                m_strSlotId = string.Format("{0}_{1}", kvp.Value.m_iEfficiencyLV, kvp.Value.m_iUnitId),
-                m_strInstanceId = kvp.Value.m_strInstanceId,
-                
-                m_strCompanyName = pStringTable.GetString(kvp.Value.m_iNameStrid.ToString()),
-                m_strCompanyIcon = kvp.Value.m_strEmblemImage,
-                m_strResourceIcon = pServerGlobalUnitDataTable.GetData(kvp.Value.m_iUnitId).m_strIconImage,
-                m_iResourceQuantity = pActiveMiningQuantityTable.GetData(kvp.Value.m_iEfficiencyLV).m_iQuantity,
-                m_iPurchaseCost = pServerGlobalUnitDataTable.GetData(kvp.Value.m_iUnitId).m_iWeight,
-                
-                m_iUnitId = kvp.Value.m_iUnitId,
-                m_iEfficiencyLevel = kvp.Value.m_iEfficiencyLV,
-                m_iSupplyQuantity = kvp.Value.m_iSupplyCount,
-                
-                m_pEventPurchaseButton = OnEventForPurchaseMining,
-                m_pEventShowSubItemsButton = OnEventForShowSubItems,
-            };
-
-            if (false == m_dicActiveCompanyData.ContainsKey(pData.m_strSlotId))
-            {
-                m_dicActiveCompanyData[pData.m_strSlotId] = new List<SHActiveSlotData>();
-            }
-
-            var pValue = m_dicActiveCompanyData[pData.m_strSlotId].Find((p) => 
-            {
-                return p.m_strInstanceId.Equals(pData.m_strInstanceId);
-            });
-            if (null != pValue) {
-                pValue.CopyFrom(pData);
-            }
-            else {
-                m_dicActiveCompanyData[pData.m_strSlotId].Add(pData);
-            }
-        }
-
-        foreach (var kvp in m_dicActiveCompanyData)
-        {
-            foreach (var pData in kvp.Value)
-            {
-                if (false == pCompanyTable.m_dicDatas.ContainsKey(pData.m_strInstanceId))
-                {
-                    pData.m_iSupplyQuantity = 0;
-                }
-            }
-        }
-    }
-
     private void UpdateUIForActiveCompany(Action pCallback)
     {
         if (0 == m_dicActiveCompanyData.Count)
@@ -143,7 +79,6 @@ public partial class SHBusinessLobby : MonoBehaviour
             return;
         }
 
-        // 출력할 데이터 선별
         List<SHActiveSlotData> pSlotDatas = new List<SHActiveSlotData>();
         foreach (var kvp in m_dicActiveCompanyData)
         {
@@ -160,7 +95,6 @@ public partial class SHBusinessLobby : MonoBehaviour
             }
         }
 
-        // 출력순서 정렬
         var m_pFilters = new List<Func<SHActiveSlotData, SHActiveSlotData, bool?>>
         {
             SortConditionForEfficiencyLevel,
@@ -185,6 +119,71 @@ public partial class SHBusinessLobby : MonoBehaviour
         pCallback();
     }
 
+    private async void UpdateDataForActiveCompany()
+    {
+        var pCompanyTable = await Single.Table.GetTable<SHTableServerInstanceMiningActiveCompany>();
+        var pStringTable = await Single.Table.GetTable<SHTableClientString>();
+        var pServerGlobalUnitDataTable = await Single.Table.GetTable<SHTableServerGlobalUnitData>();
+        var pActiveMiningQuantityTable = await Single.Table.GetTable<SHTableServerMiningActiveQuantity>();
+
+        Func<SHTableServerInstanceMiningActiveCompanyData, SHActiveSlotData> pCreateSlotData = 
+            (SHTableServerInstanceMiningActiveCompanyData pData) =>
+            {
+                return new SHActiveSlotData()
+                {
+                    m_strSlotId = string.Format("{0}_{1}", pData.m_iEfficiencyLV, pData.m_iUnitId),
+                    m_strInstanceId = pData.m_strInstanceId,
+
+                    m_strCompanyName = pStringTable.GetString(pData.m_iNameStrid.ToString()),
+                    m_strCompanyIcon = pData.m_strEmblemImage,
+                    m_strResourceIcon = pServerGlobalUnitDataTable.GetData(pData.m_iUnitId).m_strIconImage,
+                    m_iResourceQuantity = pActiveMiningQuantityTable.GetData(pData.m_iEfficiencyLV).m_iQuantity,
+                    m_iPurchaseCost = pServerGlobalUnitDataTable.GetData(pData.m_iUnitId).m_iWeight,
+
+                    m_iUnitId = pData.m_iUnitId,
+                    m_iEfficiencyLevel = pData.m_iEfficiencyLV,
+                    m_iSupplyQuantity = pData.m_iSupplyCount,
+
+                    m_pEventPurchaseButton = OnEventForPurchaseMining,
+                    m_pEventShowSubItemsButton = OnEventForShowSubItems,
+                };
+            };
+
+        if (0 == m_dicActiveCompanyData.Count)
+        {
+            foreach (var kvp in pCompanyTable.m_dicDatas)
+            {
+                var pData = pCreateSlotData(kvp.Value);
+
+                if (false == m_dicActiveCompanyData.ContainsKey(pData.m_strSlotId))
+                {
+                    m_dicActiveCompanyData[pData.m_strSlotId] = new List<SHActiveSlotData>();
+                }
+
+                m_dicActiveCompanyData[pData.m_strSlotId].Add(pData);
+            }
+        }
+        else
+        {
+            foreach (var kvp in m_dicActiveCompanyData)
+            {
+                foreach (var pSlotData in kvp.Value)
+                {
+                    var pTableData = pCompanyTable.GetData(pSlotData.m_strInstanceId);
+                    if (null == pTableData)
+                    {
+                        pSlotData.m_iSupplyQuantity = 0;
+                    }
+                    else
+                    {
+                        var pData = pCreateSlotData(pTableData);
+                        pSlotData.CopyFrom(pData);
+                    }
+                }
+            }
+        }
+    }
+    
     private async void RequestSubscribeMiningActiveInfo()
     {
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();

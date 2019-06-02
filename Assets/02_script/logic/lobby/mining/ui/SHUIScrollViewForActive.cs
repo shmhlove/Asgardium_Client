@@ -32,6 +32,7 @@ public class SHUIScrollViewForActive : SHUIMassiveScrollView
         else
         {
             m_pDatas = pDatas;
+            Paint();
         }
     }
 }

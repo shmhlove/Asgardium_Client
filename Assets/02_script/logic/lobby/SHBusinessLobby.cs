@@ -106,4 +106,16 @@ public partial class SHBusinessLobby : MonoBehaviour
     {
         RequestUnsubscribeMiningActiveInfo();
     }
+
+    [FuncButton]
+    public async void OnClickDebugGetMyInventoryInfo()
+    {
+        var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
+        var pInventoryInfo = await Single.Table.GetTable<SHTableServerInventoryInfo>();
+        
+        pInventoryInfo.RequestGetInventoryInfo(pUserInfo.UserId, (reply) => 
+        {
+            Single.BusinessGlobal.ShowAlertUI(reply);
+        });
+    }
 }

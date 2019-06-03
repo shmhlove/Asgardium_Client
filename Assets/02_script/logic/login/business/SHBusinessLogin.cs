@@ -61,7 +61,7 @@ public class SHBusinessLogin : MonoBehaviour
             ["email"] = strEmail,
             ["password"] = strPassword
         };
-        Single.Network.POST(SHAPIs.SH_API_SIGNIN, json, async (reply) =>
+        Single.Network.POST(SHAPIs.SH_API_AUTH_SIGNIN, json, async (reply) =>
         {
             if (reply.isSucceed)
             {
@@ -103,7 +103,7 @@ public class SHBusinessLogin : MonoBehaviour
             ["name"] = strName,
             ["password"] = strPassword
         };
-        Single.Network.POST(SHAPIs.SH_API_SIGNUP, json, (reply) =>
+        Single.Network.POST(SHAPIs.SH_API_AUTH_SIGNUP, json, (reply) =>
         {
             Single.BusinessGlobal.ShowAlertUI(reply, (eBtnAction) => 
             {

@@ -17,6 +17,7 @@ public partial class SHTableData : SHBaseData
         
         // 인스턴스 테이블
         m_dicTables.Add(typeof(SHTableUserInfo), new SHTableUserInfo());
+        m_dicTables.Add(typeof(SHTableServerInstanceMiningActiveCompany), new SHTableServerInstanceMiningActiveCompany());
 
         // 클라 테이블
         m_dicTables.Add(typeof(SHTableClientConfig), new SHTableClientConfig());
@@ -30,7 +31,7 @@ public partial class SHTableData : SHBaseData
         m_dicTables.Add(typeof(SHTableServerMiningActiveCompanyNPC), new SHTableServerMiningActiveCompanyNPC());
         m_dicTables.Add(typeof(SHTableServerMiningActiveQuantity), new SHTableServerMiningActiveQuantity());
         m_dicTables.Add(typeof(SHTableServerMiningActiveSupply), new SHTableServerMiningActiveSupply());
-        m_dicTables.Add(typeof(SHTableServerInstanceMiningActiveCompany), new SHTableServerInstanceMiningActiveCompany());
+        m_dicTables.Add(typeof(SHTableServerInventoryInfo), new SHTableServerInventoryInfo());
     }
     
     public override void OnFinalize()

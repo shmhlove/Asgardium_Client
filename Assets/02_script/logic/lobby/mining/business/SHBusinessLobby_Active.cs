@@ -45,8 +45,8 @@ public partial class SHBusinessLobby : MonoBehaviour
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
         var pServerGlobalConfig = await Single.Table.GetTable<SHTableServerGlobalConfig>();
 
-        // 통신시간 갭 때문에 저장된 시간보다 3초정도 앞당겨 준다.
-        var Epsilon = 3000;
+        // 통신시간 갭 때문에 저장된 시간보다 1초정도 앞당겨 준다.
+        var Epsilon = 1000;
         var LastMiningPowerAt = pUserInfo.MiningPowerAt - Epsilon;
 
         // 남은 시간과 파워갯수 구하기

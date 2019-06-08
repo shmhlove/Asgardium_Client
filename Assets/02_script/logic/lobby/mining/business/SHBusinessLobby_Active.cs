@@ -50,7 +50,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         var LastMiningPowerAt = pUserInfo.MiningPowerAt - Epsilon;
 
         // 남은 시간과 파워갯수 구하기
-        var pTimeSpan = (DateTime.UtcNow - SHUtils.GetUCTTimeByMillisecond(LastMiningPowerAt));
+        var pTimeSpan = (DateTime.UtcNow - SHUtils.GetUctTimeByMillisecond(LastMiningPowerAt));
         var iCurPowerCount = (int)(pTimeSpan.TotalMilliseconds / (double)pServerGlobalConfig.m_iBasicChargeTime);
         var fCurLeftTime = (pTimeSpan.TotalMilliseconds % (double)pServerGlobalConfig.m_iBasicChargeTime);
 
@@ -79,7 +79,7 @@ public partial class SHBusinessLobby : MonoBehaviour
             return;
         }
 
-        List<SHActiveSlotData> pSlotDatas = new List<SHActiveSlotData>();
+        var pSlotDatas = new List<SHActiveSlotData>();
         foreach (var kvp in m_dicActiveCompanyData)
         {
             var pData = kvp.Value.FindAll((p) => { return 0 != p.m_iSupplyQuantity; });
@@ -126,45 +126,74 @@ public partial class SHBusinessLobby : MonoBehaviour
         var pServerGlobalUnitDataTable = await Single.Table.GetTable<SHTableServerGlobalUnitData>();
         var pActiveMiningQuantityTable = await Single.Table.GetTable<SHTableServerMiningActiveQuantity>();
 
-        Func<SHTableServerInstanceMiningActiveCompanyData, SHActiveSlotData> pCreateSlotData = 
-            (SHTableServerInstanceMiningActiveCompanyData pData) =>
+        Func<SHTableServerInstanceMiningActiveCompanyData, SHActiveSlotData> pCreateSlotData =
+        (pData) =>
+        {
+            return new SHActiveSlotData()
             {
-                return new SHActiveSlotData()
-                {
-                    m_strSlotId = string.Format("{0}_{1}", pData.m_iEfficiencyLV, pData.m_iUnitId),
-                    m_strInstanceId = pData.m_strInstanceId,
-
-                    m_strCompanyName = pStringTable.GetString(pData.m_iNameStrid.ToString()),
-                    m_strCompanyIcon = pData.m_strEmblemImage,
-                    m_strResourceIcon = pServerGlobalUnitDataTable.GetData(pData.m_iUnitId).m_strIconImage,
-                    m_iResourceQuantity = pActiveMiningQuantityTable.GetData(pData.m_iEfficiencyLV).m_iQuantity,
-                    m_iPurchaseCost = pServerGlobalUnitDataTable.GetData(pData.m_iUnitId).m_iWeight,
-
-                    m_iUnitId = pData.m_iUnitId,
-                    m_iEfficiencyLevel = pData.m_iEfficiencyLV,
-                    m_iSupplyQuantity = pData.m_iSupplyCount,
-
-                    m_pEventPurchaseButton = OnEventForPurchaseMining,
-                    m_pEventShowSubItemsButton = OnEventForShowSubItems,
-                };
+                // GroupID
+                m_strGroupId = string.Format("{0}_{1}", pData.m_iEfficiencyLV, pData.m_iUnitId),
+                // 회사 인스턴스 ID
+                m_strInstanceId = pData.m_strInstanceId,
+                // 회사 이름
+                m_strCompanyName = pStringTable.GetString(pData.m_iNameStrid.ToString()),
+                // 회사 아이콘
+                m_strCompanyIcon = pData.m_strEmblemImage,
+                // 유닛 아이콘
+                m_strUnitIcon = pServerGlobalUnitDataTable.GetData(pData.m_iUnitId).m_strIconImage,
+                // 구매시 획득 유닛 물량
+                m_iUnitQuantity = pActiveMiningQuantityTable.GetData(pData.m_iEfficiencyLV).m_iQuantity,
+                // 구매 가격
+                m_iPurchaseCost = pServerGlobalUnitDataTable.GetData(pData.m_iUnitId).m_iWeight,
+                // 유닛 ID
+                m_iUnitId = pData.m_iUnitId,
+                // 회사 레벨
+                m_iEfficiencyLevel = pData.m_iEfficiencyLV,
+                // 구매 가능한 공급 물량
+                m_iSupplyQuantity = pData.m_iSupplyCount,
+                // NPC 회사여부
+                m_bIsNPCCompany = pData.m_bIsNPCCompany,
+                // 구매버튼 이벤트
+                m_pEventPurchaseButton = OnEventForPurchaseMining,
+                // 서브유닛 확인 버튼
+                m_pEventShowSubUnitsButton = OnEventForShowSubUnits,
             };
+        };
 
         if (0 == m_dicActiveCompanyData.Count)
         {
+            // 서버 데이터를 기준으로 클라 데이터 신규 셋팅
             foreach (var kvp in pCompanyTable.m_dicDatas)
             {
                 var pData = pCreateSlotData(kvp.Value);
 
-                if (false == m_dicActiveCompanyData.ContainsKey(pData.m_strSlotId))
+                if (false == m_dicActiveCompanyData.ContainsKey(pData.m_strGroupId))
                 {
-                    m_dicActiveCompanyData[pData.m_strSlotId] = new List<SHActiveSlotData>();
+                    m_dicActiveCompanyData[pData.m_strGroupId] = new List<SHActiveSlotData>();
                 }
 
-                m_dicActiveCompanyData[pData.m_strSlotId].Add(pData);
+                m_dicActiveCompanyData[pData.m_strGroupId].Add(pData);
+            }
+
+            // NPC 회사를 가장 뒤로 보내기
+            foreach (var kvp in m_dicActiveCompanyData)
+            {
+                kvp.Value.Sort((x, y) =>
+                {
+                    // x가 기본회사이면 x를 뒤로 보내기
+                    if ((true == x.m_bIsNPCCompany) && (false == y.m_bIsNPCCompany))
+                        return 1;
+                    // y가 기본회사이면 y를 뒤로 보내기
+                    if ((false == x.m_bIsNPCCompany) && (true == y.m_bIsNPCCompany))
+                        return -1;
+                    // 둘다 기본회사이면 자리변경 없음
+                    return 0;
+                });
             }
         }
         else
         {
+            // 클라 데이터를 기준으로 서버 데이터 업데이트
             foreach (var kvp in m_dicActiveCompanyData)
             {
                 foreach (var pSlotData in kvp.Value)
@@ -246,14 +275,11 @@ public partial class SHBusinessLobby : MonoBehaviour
         Single.BusinessGlobal.ShowAlertUI(string.Format("채굴 요청 : {0}", strInstanceId));
     }
 
-    public void OnEventForShowSubItems(string strSlotId)
+    public void OnEventForShowSubUnits(string strGroupId)
     {
-        if (null == m_pUIPanelMiningSubActiveCompany)
-            return;
-
-        if (true == m_dicActiveCompanyData.ContainsKey(strSlotId))
+        if (true == m_dicActiveCompanyData.ContainsKey(strGroupId))
         {
-            m_pUIPanelMiningSubActiveCompany.Show(m_dicActiveCompanyData[strSlotId]);
+            m_pUIPanelMiningSubActiveCompany.Show(m_dicActiveCompanyData[strGroupId]);
         }
         else
         {

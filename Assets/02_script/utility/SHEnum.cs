@@ -5,40 +5,39 @@ public enum eErrorCode
     Failed = 0,
     Succeed = 1,
 
-    // network error (Sync Server)
+    // network error
     Net_Common_HTTP = 1000,
-    Net_Common_InvalidParameter = 1001,
-    Net_Common_FailedGetCollection = 1002,
-    Net_Common_FailedFindCollection = 1003,
-    Net_Common_FailedWriteDocument = 1004,
-    Net_Common_InvalidResponseData = 1005,
-    Net_Common_JsonParse = 1006,
-    Net_Common_EmptyCollection = 1007,
-    Net_Common_InvalidHeader = 1008,
 
-    Net_Auth_AlreadySignupUser = 2001,
-    Net_Auth_NoSignupUser = 2002,
-    Net_Auth_NoMatchPassword = 2003,
-    Auth_InvalidEmail = 2004,
-    
+    // Server error (Sync ServerErrorCode)
+    Server_Auth_AlreadySignupUser = 2001,
+    Server_Net_Auth_NoSignupUser = 2002,
+    Server_Net_Auth_NoMatchPassword = 2003,
+
+    // net common error
+    Net_InvalidResponseData = 100001,
+    Net_JsonParse = 100002,
+
     // socket error
-    Net_Socket_Disconnect = 5000,
-    Net_Socket_Connect_Error = 5001,
-    Net_Socket_Connect_Timeout = 5002,
-    Net_Socket_Aready_Connect = 5003,
-    
+    Net_Socket_Disconnect = 101001,
+    Net_Socket_Connect_Error = 101002,
+    Net_Socket_Connect_Timeout = 101003,
+    Net_Socket_Aready_Connect = 101004,
+
     // data error
-    Data_NotImplementation = 1000001,
-    Resources_NotExsitInTable = 1001002,
-    Resources_LoadFailed = 1001003,
-    Table_Not_AddClass = 1002001,
-    Table_LoadFailed = 1002002,
-    Table_Not_Override = 1002004,
-    Table_Not_ExsitFile = 1002005,
-    Table_Error_Grammar = 1002006,
+    Data_NotImplementation = 102001,
+    Resources_NotExsitInTable = 102002,
+    Resources_LoadFailed = 102003,
+    Table_Not_AddedClass = 102004,
+    Table_LoadFailed = 102005,
+    Table_Not_OverrideFunc = 102006,
+    Table_Not_ExsitFile = 102007,
+    Table_Error_Grammar = 102008,
 
     // scene error
-    Scene_Already_Loaded = 1010001,
+    Scene_Already_Loaded = 103001,
+
+    // Auth
+    Auth_InvalidEmail = 104001,
 }
 
 public enum eSceneType

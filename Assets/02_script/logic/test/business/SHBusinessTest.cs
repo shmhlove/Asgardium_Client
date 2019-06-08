@@ -207,4 +207,30 @@ public class SHBusinessTest : MonoBehaviour
         }
         Debug.Log(logBuff);
     }
+
+    [FuncButton]
+    void OnClickSort2()
+    {
+        List<int> pListData = new List<int>();
+        for (int iLoop = 0; iLoop < 10; ++iLoop)
+        {
+            pListData.Add(iLoop);
+        }
+
+        pListData.Sort((x, y) =>
+        {
+            if (0 == x)
+                return 1;
+            if (0 == y)
+                return -1;
+            return 0;
+        });
+
+        string logBuff = "";
+        foreach (var pData in pListData)
+        {
+            logBuff += pData.ToString() + "\n";
+        }
+        Debug.Log(logBuff);
+    }
 }

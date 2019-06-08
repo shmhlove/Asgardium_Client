@@ -18,19 +18,19 @@ public abstract class SHBaseTable
     public virtual bool IsLoadTable()                                 { return m_bIsLoaded; }
 
     // 다양화(로드) : 코드로 데이터를 생성 ( 코드에 데이터가 포함되어 있는 형태 )
-    public virtual eErrorCode LoadStaticTable()                       { return eErrorCode.Table_Not_Override; }
+    public virtual eErrorCode LoadStaticTable()                       { return eErrorCode.Table_Not_OverrideFunc; }
 
     // 다양화(로드) : Json파일에서 로드
-    public virtual eErrorCode LoadJsonTable(JsonData pJson)           { return eErrorCode.Table_Not_Override; }
+    public virtual eErrorCode LoadJsonTable(JsonData pJson)           { return eErrorCode.Table_Not_OverrideFunc; }
 
     // 다양화(로드) : XML파일에서 로드
-    public virtual eErrorCode LoadXMLTable(XmlNode pNode)             { return eErrorCode.Table_Not_Override; }
+    public virtual eErrorCode LoadXMLTable(XmlNode pNode)             { return eErrorCode.Table_Not_OverrideFunc; }
 
     // 다양화(로드) : Byte파일에서 로드
-    public virtual eErrorCode LoadBytesTable(byte[] pByte)            { return eErrorCode.Table_Not_Override; }
+    public virtual eErrorCode LoadBytesTable(byte[] pByte)            { return eErrorCode.Table_Not_OverrideFunc; }
 
     // 다양화(로드) : Server에서 테이블 로드
-    public virtual eErrorCode LoadServerTable(Action<eErrorCode> pCallback) { return eErrorCode.Table_Not_Override; }
+    public virtual eErrorCode LoadServerTable(Action<eErrorCode> pCallback) { return eErrorCode.Table_Not_OverrideFunc; }
     
     // 다양화(로드) : 컨테이너를 시리얼 라이즈해서 Byte파일로 내어주는 함수
     public virtual byte[] GetBytesTable()                      { return null; }
@@ -40,9 +40,9 @@ public abstract class SHBaseTable
     // 인터페이스 : Static 한 데이터 로드 ( 코드에 데이터가 포함되어 있는 형태 )
     public virtual void LoadStatic(Action<eErrorCode> pCallback)
     {
-        if (eErrorCode.Table_Not_Override == LoadStaticTable())
+        if (eErrorCode.Table_Not_OverrideFunc == LoadStaticTable())
         {
-            pCallback(eErrorCode.Table_Not_Override);
+            pCallback(eErrorCode.Table_Not_OverrideFunc);
         }
         
         Initialize();
@@ -55,9 +55,9 @@ public abstract class SHBaseTable
     // 인터페이스 : Json파일 로드
     public virtual void LoadJson(Action<eErrorCode> pCallback)
     {
-        if (eErrorCode.Table_Not_Override == LoadJsonTable(null))
+        if (eErrorCode.Table_Not_OverrideFunc == LoadJsonTable(null))
         {
-            pCallback(eErrorCode.Table_Not_Override);
+            pCallback(eErrorCode.Table_Not_OverrideFunc);
             return;
         }
         
@@ -80,9 +80,9 @@ public abstract class SHBaseTable
     // 인터페이스 : XML파일 로드
     public virtual void LoadXML(Action<eErrorCode> pCallback) 
     {
-        if (eErrorCode.Table_Not_Override == LoadXMLTable(null))
+        if (eErrorCode.Table_Not_OverrideFunc == LoadXMLTable(null))
         {
-            pCallback(eErrorCode.Table_Not_Override);
+            pCallback(eErrorCode.Table_Not_OverrideFunc);
             return;
         }
         
@@ -123,9 +123,9 @@ public abstract class SHBaseTable
     // 인터페이스 : Byte파일 로드
     public virtual void LoadByte(Action<eErrorCode> pCallback)
     {
-        if (eErrorCode.Table_Not_Override == LoadBytesTable(null))
+        if (eErrorCode.Table_Not_OverrideFunc == LoadBytesTable(null))
         {
-            pCallback(eErrorCode.Table_Not_Override);
+            pCallback(eErrorCode.Table_Not_OverrideFunc);
             return;
         }
         
@@ -148,9 +148,9 @@ public abstract class SHBaseTable
     // 인터페이스 : Server 데이터 로드
     public virtual void LoadServer(Action<eErrorCode> pCallback)
     {
-        if (eErrorCode.Table_Not_Override == LoadServerTable(null))
+        if (eErrorCode.Table_Not_OverrideFunc == LoadServerTable(null))
         {
-            pCallback(eErrorCode.Table_Not_Override);
+            pCallback(eErrorCode.Table_Not_OverrideFunc);
             return;
         }
 
@@ -166,11 +166,11 @@ public abstract class SHBaseTable
     // 인터페이스 : 테이블 타입
     public eTableLoadType GetTableType()
     {
-        if (eErrorCode.Table_Not_Override != LoadStaticTable())      return eTableLoadType.Static;
-        if (eErrorCode.Table_Not_Override != LoadServerTable(null))  return eTableLoadType.Server;
-        if (eErrorCode.Table_Not_Override != LoadBytesTable(null))   return eTableLoadType.Byte;
-        if (eErrorCode.Table_Not_Override != LoadXMLTable(null))     return eTableLoadType.XML;
-        if (eErrorCode.Table_Not_Override != LoadJsonTable(null))    return eTableLoadType.Json;
+        if (eErrorCode.Table_Not_OverrideFunc != LoadStaticTable())      return eTableLoadType.Static;
+        if (eErrorCode.Table_Not_OverrideFunc != LoadServerTable(null))  return eTableLoadType.Server;
+        if (eErrorCode.Table_Not_OverrideFunc != LoadBytesTable(null))   return eTableLoadType.Byte;
+        if (eErrorCode.Table_Not_OverrideFunc != LoadXMLTable(null))     return eTableLoadType.XML;
+        if (eErrorCode.Table_Not_OverrideFunc != LoadJsonTable(null))    return eTableLoadType.Json;
 
         return eTableLoadType.None;
     }

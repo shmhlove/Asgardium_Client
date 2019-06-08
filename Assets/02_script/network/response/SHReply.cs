@@ -76,7 +76,7 @@ public class SHReply
         if (0 == this.rawResponse.Keys.Count)
         {
             this.isSucceed = false;
-            this.error = new SHError(eErrorCode.Net_Common_InvalidResponseData, strMessage);
+            this.error = new SHError(eErrorCode.Net_InvalidResponseData, strMessage);
         }
         else
         {
@@ -133,7 +133,7 @@ public class SHReply
                 if (0 == this.rawResponse.Keys.Count)
                 {
                     this.isSucceed = false;
-                    this.error = new SHError(eErrorCode.Net_Common_InvalidResponseData, request.downloadHandler.text);
+                    this.error = new SHError(eErrorCode.Net_InvalidResponseData, request.downloadHandler.text);
                 }
                 else
                 {
@@ -163,7 +163,7 @@ public class SHReply
             {
                 this.isSucceed = false;
                 this.error = new SHError(
-                    eErrorCode.Net_Common_JsonParse, 
+                    eErrorCode.Net_JsonParse, 
                     string.Format("{0}\n{1}", "Err Json Parse With Server ResponseData", 
                     request.downloadHandler.text));
             }

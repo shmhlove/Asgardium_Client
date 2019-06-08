@@ -6,43 +6,45 @@ using System.Collections.Generic;
 
 public class SHActiveSlotData
 {
-    public string m_strSlotId;
+    public string m_strGroupId;
 
     public string m_strInstanceId;
     public string m_strCompanyName;
     public string m_strCompanyIcon;
-    public string m_strResourceIcon;
+    public string m_strUnitIcon;
 
     public int m_iUnitId;
-    public int m_iResourceQuantity;
+    public int m_iUnitQuantity;
     public int m_iEfficiencyLevel;
     public int m_iSupplyQuantity;
     public int m_iPurchaseCost;
 
     public bool m_bIsSubItems;
+    public bool m_bIsNPCCompany;
 
     public Action<string> m_pEventPurchaseButton;
-    public Action<string> m_pEventShowSubItemsButton;
+    public Action<string> m_pEventShowSubUnitsButton;
 
     public void CopyFrom(SHActiveSlotData pData)
     {
-        this.m_strSlotId = pData.m_strSlotId;
+        this.m_strGroupId = pData.m_strGroupId;
 
         this.m_strInstanceId = pData.m_strInstanceId;
         this.m_strCompanyName = pData.m_strCompanyName;
         this.m_strCompanyIcon = pData.m_strCompanyIcon;
-        this.m_strResourceIcon = pData.m_strResourceIcon;
+        this.m_strUnitIcon = pData.m_strUnitIcon;
 
         this.m_iUnitId = pData.m_iUnitId;
-        this.m_iResourceQuantity = pData.m_iResourceQuantity;
+        this.m_iUnitQuantity = pData.m_iUnitQuantity;
         this.m_iEfficiencyLevel = pData.m_iEfficiencyLevel;
         this.m_iSupplyQuantity = pData.m_iSupplyQuantity;
         this.m_iPurchaseCost = pData.m_iPurchaseCost;
 
         this.m_bIsSubItems = pData.m_bIsSubItems;
+        this.m_bIsNPCCompany = pData.m_bIsNPCCompany;
 
         this.m_pEventPurchaseButton = pData.m_pEventPurchaseButton;
-        this.m_pEventShowSubItemsButton = pData.m_pEventShowSubItemsButton;
+        this.m_pEventShowSubUnitsButton = pData.m_pEventShowSubUnitsButton;
     }
 }
 
@@ -76,11 +78,11 @@ public class SHUIScrollSlotForActive : MonoBehaviour
         }
 
         if (m_pSpriteResource) {
-            m_pSpriteResource.spriteName = pData.m_strResourceIcon;
+            m_pSpriteResource.spriteName = pData.m_strUnitIcon;
         }
 
         if (m_pLabelResourceQuantity) {
-            m_pLabelResourceQuantity.text = pData.m_iResourceQuantity.ToString();
+            m_pLabelResourceQuantity.text = pData.m_iUnitQuantity.ToString();
         }
 
         if (m_pLabelResourceLevel) {
@@ -123,11 +125,11 @@ public class SHUIScrollSlotForActive : MonoBehaviour
         m_pData.m_pEventPurchaseButton?.Invoke(m_pData.m_strInstanceId);
     }
 
-    public void OnClickShowSubItemsButton()
+    public void OnClickShowSubUnitsButton()
     {
         if (null == m_pData)
             return;
 
-        m_pData.m_pEventShowSubItemsButton?.Invoke(m_pData.m_strSlotId);
+        m_pData.m_pEventShowSubUnitsButton?.Invoke(m_pData.m_strGroupId);
     }
 }

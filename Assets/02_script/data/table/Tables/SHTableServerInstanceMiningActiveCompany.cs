@@ -15,7 +15,7 @@ public class SHTableServerInstanceMiningActiveCompanyData
     public string m_strEmblemImage;
     public int m_iEfficiencyLV;
     public int m_iSupplyCount;
-    public bool m_bIsBasicCompany;
+    public bool m_bIsNPCCompany;
 }
 
 public class SHTableServerInstanceMiningActiveCompany : SHBaseTable
@@ -63,7 +63,7 @@ public class SHTableServerInstanceMiningActiveCompany : SHBaseTable
             pData.m_strEmblemImage = GetStrToJson(pJson[iLoop], "emblem_image");
             pData.m_iEfficiencyLV = GetIntToJson(pJson[iLoop], "efficiency_lv");
             pData.m_iSupplyCount = GetIntToJson(pJson[iLoop], "supply_count");
-            pData.m_bIsBasicCompany = GetBoolToJson(pJson[iLoop], "is_basic_company");
+            pData.m_bIsNPCCompany = GetBoolToJson(pJson[iLoop], "is_npc_company");
             
             m_dicDatas.Add(pData.m_strInstanceId, pData);
         }

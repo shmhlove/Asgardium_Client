@@ -40,27 +40,20 @@ public partial class SHBusinessGlobal : SHSingleton<SHBusinessGlobal>
                 case eErrorCode.Net_Common_HTTP:
                     // Network Module 에서 처리...
                     return;
-                case eErrorCode.Net_Common_InvalidParameter:
-                case eErrorCode.Net_Common_FailedGetCollection:
-                case eErrorCode.Net_Common_FailedFindCollection:
-                case eErrorCode.Net_Common_FailedWriteDocument:
-                case eErrorCode.Net_Common_InvalidResponseData:
-                case eErrorCode.Net_Common_JsonParse:
-                case eErrorCode.Net_Common_EmptyCollection:
-                case eErrorCode.Net_Common_InvalidHeader:
-                    errorMessage = pStringTable.GetString("1002");
-                    break;
-                case eErrorCode.Net_Auth_AlreadySignupUser:
+                case eErrorCode.Server_Auth_AlreadySignupUser:
                     errorMessage = pStringTable.GetString("1003");
                     break;
-                case eErrorCode.Net_Auth_NoSignupUser:
+                case eErrorCode.Server_Net_Auth_NoSignupUser:
                     errorMessage = pStringTable.GetString("1004");
                     break;
-                case eErrorCode.Net_Auth_NoMatchPassword:
+                case eErrorCode.Server_Net_Auth_NoMatchPassword:
                     errorMessage = pStringTable.GetString("1005");
                     break;
                 case eErrorCode.Auth_InvalidEmail:
                     errorMessage = pStringTable.GetString("1001");
+                    break;
+                default:
+                    errorMessage = pStringTable.GetString("1002");
                     break;
             }
         }

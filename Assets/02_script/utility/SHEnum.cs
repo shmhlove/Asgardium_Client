@@ -10,8 +10,10 @@ public enum eErrorCode
 
     // Server error (Sync ServerErrorCode)
     Server_Auth_AlreadySignupUser = 2001,
-    Server_Net_Auth_NoSignupUser = 2002,
-    Server_Net_Auth_NoMatchPassword = 2003,
+    Server_Auth_NoSignupUser = 2002,
+    Server_Auth_NoMatchPassword = 2003,
+    Server_Mining_ZeroSupplyQuantity = 4001,
+    Server_Mining_NotEnoughMiningPower = 4002,
 
     // net common error
     Net_InvalidResponseData = 100001,

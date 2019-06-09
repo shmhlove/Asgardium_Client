@@ -15,7 +15,6 @@ public class SHTableUserInfo : SHBaseTable
     public string Password = string.Empty;
     public long CreatedAt = 0;
     public long UpdatedAt = 0;
-    public long MiningPowerAt = 0;
 	
     public SHTableUserInfo()
     {
@@ -38,7 +37,6 @@ public class SHTableUserInfo : SHBaseTable
         Password = GetStrToJson(pJson, "password");
         CreatedAt = GetLongToJson(pJson, "created_at");
         UpdatedAt = GetLongToJson(pJson, "updated_at");
-        MiningPowerAt = GetLongToJson(pJson, "mining_power_at");
 
         m_bIsLoaded = true;
 
@@ -49,11 +47,14 @@ public class SHTableUserInfo : SHBaseTable
     {
         return (false == string.IsNullOrEmpty(UserId));
     }
-
-    public void SetUserInfoForDevelop()
+    
+    public void RequestGetUserInfoForDevelop(Action<SHReply> pCallback)
     {
         if (true == m_bIsLoaded)
+        {
+            pCallback(new SHReply());
             return;
+        }
         
         JsonData json = new JsonData
         {
@@ -70,6 +71,7 @@ public class SHTableUserInfo : SHBaseTable
             {
                 Single.BusinessGlobal.ShowAlertUI(reply);
             }
+            pCallback(reply);
         });
     }
 }

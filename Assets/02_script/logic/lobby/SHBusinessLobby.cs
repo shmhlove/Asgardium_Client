@@ -27,7 +27,11 @@ public partial class SHBusinessLobby : MonoBehaviour
         // 개발용 : 로그인 체크 후 테스트 계정으로 로그인 시켜주기
         var pConfigTable = await Single.Table.GetTable<SHTableClientConfig>();
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
-        pUserInfo.SetUserInfoForDevelop();
+        var pInventory = await Single.Table.GetTable<SHTableServerInventoryInfo>();
+        pUserInfo.RequestGetUserInfoForDevelop((userInfoReply) =>
+        {
+            pInventory.RequestGetInventoryInfo(pUserInfo.UserId, (inventoryReply) => { });
+        });
 
         // 소켓 연결 및 이벤트 바인딩
         Single.Network.ConnectWebSocket();
@@ -46,7 +50,8 @@ public partial class SHBusinessLobby : MonoBehaviour
         m_pUIPanelMining.SetEventForChangeTab(OnEventForChangeMiningTab);
         m_pUIPanelMiningSubActiveCompany = await pUIRoot.GetPanel<SHUIPanelMiningSubActiveCompany>(SHUIConstant.PANEL_MINING_SUB_ACTIVE_COMPANY);
 
-        // 초기화면 : Mining Tab 초기화
+        // 초기화면설정 : Mining Tab 초기화
+        m_eCurrentLobbyMenuType = eLobbyMenuType.Mining;
         SetChangeMiningTab(eMiningTabType.Active);
         StartCoroutine("CoroutineForUpdateUIForActiveInformation");
     }
@@ -56,7 +61,9 @@ public partial class SHBusinessLobby : MonoBehaviour
         // On
         if ((eLobbyMenuType.Mining == eType) 
             && (eLobbyMenuType.Mining != m_eCurrentLobbyMenuType)) {
-            SetChangeMiningTab(m_eCurrentMiningTabType);
+            var currentMiningTabType = m_eCurrentMiningTabType;
+            m_eCurrentMiningTabType = eMiningTabType.None;
+            SetChangeMiningTab(currentMiningTabType);
         }
 
         // Off
@@ -70,7 +77,16 @@ public partial class SHBusinessLobby : MonoBehaviour
 
     private void OnEventForSocketReconnect(SHReply pReply)
     {
-        SetChangeMiningTab(m_eCurrentMiningTabType);
+        switch (m_eCurrentLobbyMenuType)
+        {
+            case eLobbyMenuType.Mining:
+                var currentMiningTabType = m_eCurrentMiningTabType;
+                m_eCurrentMiningTabType = eMiningTabType.None;
+                SetChangeMiningTab(currentMiningTabType);
+                break;
+            default:
+                break;
+        }
     }
     
     [FuncButton]
@@ -116,6 +132,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         pInventoryInfo.RequestGetInventoryInfo(pUserInfo.UserId, (reply) => 
         {
             Single.BusinessGlobal.ShowAlertUI(reply);
+            pInventoryInfo.LoadJsonTable(reply.data);
         });
     }
 }

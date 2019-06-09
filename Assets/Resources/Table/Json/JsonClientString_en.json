@@ -2,7 +2,7 @@
   {
     "0": "Form",
     "1": "Form",
-    
+
     "1000": "Login is required.",
     "1001": "This is not a valid email format.",
     "1002": "A system error has occurred.",
@@ -13,6 +13,8 @@
     "1007": "Transient system error.",
     "1008": "Retrying({0}/{1})",
     "1009": "Would you like to retry?",
+    "1010": "Supply quantity are exhausted.",
+    "1011": "to lack mining power.",
 
     "10000": "Email",
     "10001": "Password",

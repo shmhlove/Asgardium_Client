@@ -43,10 +43,10 @@ public partial class SHBusinessGlobal : SHSingleton<SHBusinessGlobal>
                 case eErrorCode.Server_Auth_AlreadySignupUser:
                     errorMessage = pStringTable.GetString("1003");
                     break;
-                case eErrorCode.Server_Net_Auth_NoSignupUser:
+                case eErrorCode.Server_Auth_NoSignupUser:
                     errorMessage = pStringTable.GetString("1004");
                     break;
-                case eErrorCode.Server_Net_Auth_NoMatchPassword:
+                case eErrorCode.Server_Auth_NoMatchPassword:
                     errorMessage = pStringTable.GetString("1005");
                     break;
                 case eErrorCode.Auth_InvalidEmail:

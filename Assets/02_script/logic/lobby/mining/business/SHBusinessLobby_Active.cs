@@ -33,7 +33,7 @@ public partial class SHBusinessLobby : MonoBehaviour
             && (eMiningTabType.Active == m_eCurrentMiningTabType))
         {
             RequestUnsubscribeMiningActiveInfo();
-
+            
             StopCoroutine("CoroutineForUpdateUIForActiveCompany");
         }
 
@@ -42,12 +42,12 @@ public partial class SHBusinessLobby : MonoBehaviour
 
     private async void UpdateUIForActiveInformation(Action pCallback)
     {
-        var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
+        var pInventory = await Single.Table.GetTable<SHTableServerInventoryInfo>();
         var pServerGlobalConfig = await Single.Table.GetTable<SHTableServerGlobalConfig>();
 
         // 통신시간 갭 때문에 저장된 시간보다 1초정도 앞당겨 준다.
         var Epsilon = 1000;
-        var LastMiningPowerAt = pUserInfo.MiningPowerAt - Epsilon;
+        var LastMiningPowerAt = pInventory.MiningPowerAt - Epsilon;
 
         // 남은 시간과 파워갯수 구하기
         var pTimeSpan = (DateTime.UtcNow - SHUtils.GetUctTimeByMillisecond(LastMiningPowerAt));
@@ -83,7 +83,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         foreach (var kvp in m_dicActiveCompanyData)
         {
             var pData = kvp.Value.FindAll((p) => { return 0 != p.m_iSupplyQuantity; });
-            if (null != pData)
+            if ((null != pData) && (0 != pData.Count))
             {
                 pData[0].m_bIsSubItems = (1 < pData.Count);
                 pSlotDatas.Add(pData[0]);
@@ -226,17 +226,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         {
             ["user_id"] = pUserInfo.UserId
         };
-        Single.Network.SendRequestSocket(SHAPIs.SH_SOCKET_REQ_SUBSCRIBE_MINING_ACTIVE_INFO, json, (reply) =>
-        {
-            if (reply.isSucceed)
-            {
-                //pUserInfo.LoadJsonTable(reply.data);
-            }
-            else
-            {
-                Single.BusinessGlobal.ShowAlertUI(reply);
-            }
-        });
+        Single.Network.SendRequestSocket(SHAPIs.SH_SOCKET_REQ_SUBSCRIBE_MINING_ACTIVE_INFO, json, (reply) => { });
     }
 
     private async void RequestUnsubscribeMiningActiveInfo()
@@ -252,15 +242,63 @@ public partial class SHBusinessLobby : MonoBehaviour
         {
             ["user_id"] = pUserInfo.UserId
         };
-        Single.Network.SendRequestSocket(SHAPIs.SH_SOCKET_REQ_UNSUBSCRIBE_MINING_ACTIVE_INFO, json, (reply) =>
+        Single.Network.SendRequestSocket(SHAPIs.SH_SOCKET_REQ_UNSUBSCRIBE_MINING_ACTIVE_INFO, json, (reply) => { });
+    }
+
+    private async void RequestPurchaseMiningActiveCompany(string strInstanceId)
+    {
+        var pStringTable = await Single.Table.GetTable<SHTableClientString>();
+        var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
+        if (false == pUserInfo.IsLogin())
         {
+            Single.BusinessGlobal.ShowAlertUI(pStringTable.GetString("1000"));
+            return;
+        }
+
+        JsonData json = new JsonData
+        {
+            ["user_id"] = pUserInfo.UserId,
+            ["active_company_instance_id"] = strInstanceId
+        };
+        Single.Network.POST(SHAPIs.SH_API_MINING_PURCHASE_ACTIVE, json, async (reply) =>
+        {
+            var pInventory = await Single.Table.GetTable<SHTableServerInventoryInfo>();
+            pInventory.LoadJsonTable(reply.data);
+
             if (reply.isSucceed)
             {
-                //pUserInfo.LoadJsonTable(reply.data);
+                // 서버 소켓 데이터가 오기전 UI에 빠르게 반영해주기 위해...
+                foreach (var kvp in m_dicActiveCompanyData)
+                {
+                    var pData = kvp.Value.Find((p) => { return strInstanceId == p.m_strInstanceId; });
+                    if (null != pData)
+                    {
+                        pData.m_iSupplyQuantity = Math.Max(pData.m_iSupplyQuantity - 1, 0);
+                        
+                        if (m_pUIPanelMiningSubActiveCompany.IsActive())
+                        {
+                            m_pUIPanelMiningSubActiveCompany.Show(m_dicActiveCompanyData[pData.m_strGroupId]);
+                        }
+                        break;
+                    }
+                }
+
+                UpdateUIForActiveCompany(() => { });
             }
             else
             {
-                Single.BusinessGlobal.ShowAlertUI(reply);
+                switch (reply.errorCode)
+                {
+                    case eErrorCode.Server_Mining_ZeroSupplyQuantity:
+                        Single.BusinessGlobal.ShowAlertUI(pStringTable.GetString("1010"));
+                        break;
+                    case eErrorCode.Server_Mining_NotEnoughMiningPower:
+                        Single.BusinessGlobal.ShowAlertUI(pStringTable.GetString("1011"));
+                        break;
+                    default:
+                        Single.BusinessGlobal.ShowAlertUI(reply);
+                        break;
+                }
             }
         });
     }
@@ -272,7 +310,7 @@ public partial class SHBusinessLobby : MonoBehaviour
 
     public void OnEventForPurchaseMining(string strInstanceId)
     {
-        Single.BusinessGlobal.ShowAlertUI(string.Format("채굴 요청 : {0}", strInstanceId));
+        RequestPurchaseMiningActiveCompany(strInstanceId);
     }
 
     public void OnEventForShowSubUnits(string strGroupId)
@@ -334,6 +372,7 @@ public partial class SHBusinessLobby : MonoBehaviour
     public async void OnClickDebugReset()
     {
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
+        var pInventoryInfo = await Single.Table.GetTable<SHTableServerInventoryInfo>();
 
         JsonData json = new JsonData
         {
@@ -343,7 +382,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         {
             if (reply.isSucceed)
             {
-                pUserInfo.LoadJsonTable(reply.data);
+                pInventoryInfo.LoadJsonTable(reply.data);
             }
             else
             {
@@ -355,6 +394,7 @@ public partial class SHBusinessLobby : MonoBehaviour
     public async void OnClickDebugUsePower()
     {
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
+        var pInventoryInfo = await Single.Table.GetTable<SHTableServerInventoryInfo>();
 
         JsonData json = new JsonData
         {
@@ -365,7 +405,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         {
             if (reply.isSucceed)
             {
-                pUserInfo.LoadJsonTable(reply.data);
+                pInventoryInfo.LoadJsonTable(reply.data);
             }
             else
             {

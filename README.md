@@ -211,6 +211,100 @@ ctrl+shift+m|오류 보기|workbench.actions.view.problems
 alt+왼쪽|뒤로 이동|workbench.action.navigateBack
 alt+오른쪽|앞으로 이동|workbench.action.navigateForward
 --------------------------------------------------------------------------------------------------------------------
+# node-schedule
+
+*    *    *    *    *    *
+┬    ┬    ┬    ┬    ┬    ┬
+│    │    │    │    │    │
+│    │    │    │    │    └ day of week (0 - 7) (0 or 7 is Sun)
+│    │    │    │    └───── month (1 - 12)
+│    │    │    └────────── day of month (1 - 31)
+│    │    └─────────────── hour (0 - 23)
+│    └──────────────────── minute (0 - 59)
+└───────────────────────── second (0 - 59, OPTIONAL)
+
+## 특수문자 의미
+* : 모든 값을 의미한다.
+, : 쉼표는 한 항목에 여러 목록을 입력할 때 사용된다. 예를 들어, 5 번째 필드 (요일)에 “MON, WED, FRI”를 사용하면 월요일, 수요일, 금요일을 의미한다.
+- : 하이폰은 범위를 정의한다. 예를 들어 2000-2010 년은 2000 년에서 2010 년 사이의 모든 연도를 나타낸다.
+% : 명령에서 백분율 기호 (%)는 백 슬래시 ()로 이스케이프하지 않는 한 개행 문자로 변경되고 첫 번째 % 이후의 모든 데이터는 표준 입력으로 명령에 전송된다.
+
+## Example
+``` javascript
+var schedule = require('node-schedule');
+ 
+var j = schedule.scheduleJob('42 * * * *', function(){
+  console.log('The answer to life, the universe, and everything!');
+});
+```
+
+``` javascript
+var j = schedule.scheduleJob('0 17 ? * 0,4-6', function(){
+  console.log('Today is recognized by Rebecca Black!');
+});
+```
+
+``` javascript
+var j = schedule.scheduleJob('0 1 * * *', function(fireDate){
+  console.log('This job was supposed to run at ' + fireDate + ', but actually ran at ' + new Date());
+});
+```
+
+``` javascript
+var j = schedule.scheduleJob({hour: 14, minute: 30, dayOfWeek: 0}, function(){
+  console.log('Time for tea!');
+});
+```
+
+``` javascript
+var schedule = require('node-schedule');
+var date = new Date(2012, 11, 21, 5, 30, 0);
+ 
+var j = schedule.scheduleJob(date, function(){
+  console.log('The world is going to end today.');
+});
+```
+
+``` javascript
+var schedule = require('node-schedule');
+var date = new Date(2012, 11, 21, 5, 30, 0);
+var x = 'Tada!';
+var j = schedule.scheduleJob(date, function(y){
+  console.log(y);
+}.bind(null,x));
+x = 'Changing Data';
+```
+
+``` javascript
+var schedule = require('node-schedule');
+ 
+var rule = new schedule.RecurrenceRule();
+rule.minute = 42;
+ 
+var j = schedule.scheduleJob(rule, function(){
+  console.log('The answer to life, the universe, and everything!');
+});
+```
+
+``` javascript
+var rule = new schedule.RecurrenceRule();
+rule.dayOfWeek = [0, new schedule.Range(4, 6)];
+rule.hour = 17;
+rule.minute = 0;
+ 
+var j = schedule.scheduleJob(rule, function(){
+  console.log('Today is recognized by Rebecca Black!');
+});
+```
+
+``` javascript
+let startTime = new Date(Date.now() + 5000);
+let endTime = new Date(startTime.getTime() + 5000);
+var j = schedule.scheduleJob({ start: startTime, end: endTime, rule: '*/1 * * * * *' }, function(){
+  console.log('Time for tea!');
+});
+```
+--------------------------------------------------------------------------------------------------------------------
 # 할일
 2017-
 * ~~라우터로 API를 추가할 수 있는 구조를 만들자.~~
@@ -364,11 +458,14 @@ alt+오른쪽|앞으로 이동|workbench.action.navigateForward
             * ~~클라 : 스크롤뷰에 데이터 갱신 안되는 문제~~
             * ~~클라 : 안내가 필요한 서버에러에 대한 처리~~
 		--
-        * 폴리싱
+        * ~~폴리싱~~
             * ~~클라 : 스크롤뷰 갱신에 대한 문제가 있음 -> 갱신 프로세스를 변경하기로 함.(갯수변화 처리안함, 클라기준 정보업데이트만)~~
             * ~~클라 : 소켓 재접속시 재구독처리 안되는 문제~~
-            * 서버 : NPC회사 공급물량 업데이트(매일 x시)
+            * ~~서버 : NPC회사 공급물량 업데이트(매일 x시) , schedule_refresh_active_mining 0 0 10 * * *~~
             * ~~테스트 : 수량 마감에 대한 테스트~~
+        --
+        * 필터기능
+            * 지정한 Unit에 대해서만 메인 스크롤뷰에 출력 (비휘발성)
 ---
 * 인증
 	* ~~서버/클라 : JWT 적용~~

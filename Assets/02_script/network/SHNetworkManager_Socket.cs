@@ -228,7 +228,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         }
         else
         {
-            Debug.LogError(strLog);
+            Debug.LogWarning(strLog);
         }
     }
 }

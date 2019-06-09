@@ -53,14 +53,14 @@ public class SHUIScrollSlotForActive : MonoBehaviour
     public UILabel m_pLabelCompany;
     public UISprite m_pSpriteCompany;
 
-    public UISprite m_pSpriteResource;
-    public UILabel m_pLabelResourceQuantity;
+    public UISprite m_pSpriteUnit;
+    public UILabel m_pLabelUnitQuantity;
 
     public UILabel m_pLabelSupplyQuantity;
     public UILabel m_pLabelPurchaseCost;
 
-    public UISprite m_pSpriteResourceLevel;
-    public UILabel m_pLabelResourceLevel;
+    public UISprite m_pSpriteUnitLevel;
+    public UILabel m_pLabelUnitLevel;
 
     public GameObject m_pDimmed;
     public GameObject m_pSubItems;
@@ -77,16 +77,16 @@ public class SHUIScrollSlotForActive : MonoBehaviour
             m_pSpriteCompany.spriteName = pData.m_strCompanyIcon;
         }
 
-        if (m_pSpriteResource) {
-            m_pSpriteResource.spriteName = pData.m_strUnitIcon;
+        if (m_pSpriteUnit) {
+            m_pSpriteUnit.spriteName = pData.m_strUnitIcon;
         }
 
-        if (m_pLabelResourceQuantity) {
-            m_pLabelResourceQuantity.text = pData.m_iUnitQuantity.ToString();
+        if (m_pLabelUnitQuantity) {
+            m_pLabelUnitQuantity.text = pData.m_iUnitQuantity.ToString();
         }
 
-        if (m_pLabelResourceLevel) {
-            m_pLabelResourceLevel.text = pData.m_iEfficiencyLevel.ToString();
+        if (m_pLabelUnitLevel) {
+            m_pLabelUnitLevel.text = pData.m_iEfficiencyLevel.ToString();
         }
 
         if (m_pLabelSupplyQuantity) {
@@ -97,8 +97,8 @@ public class SHUIScrollSlotForActive : MonoBehaviour
             m_pLabelPurchaseCost.text = pData.m_iPurchaseCost.ToString();
         }
 
-        if (m_pSpriteResourceLevel) {
-            m_pSpriteResourceLevel.gameObject.SetActive(1 < pData.m_iEfficiencyLevel);
+        if (m_pSpriteUnitLevel) {
+            m_pSpriteUnitLevel.gameObject.SetActive(1 < pData.m_iEfficiencyLevel);
         }
 
         if (m_pDimmed) {

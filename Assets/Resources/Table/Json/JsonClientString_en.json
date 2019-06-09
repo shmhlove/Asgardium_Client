@@ -30,6 +30,10 @@
     "10011": "Cancel",
     "10012": "Retry",
     "10013": "Exit",
+    "10014": "Supply",
+    "10015": "Resource Filter",
+    "10016": "ALL ON",
+    "10017": "ALL OFF",
 
     "1010000": "ASGARDIUM",
     "1010001": "ASGARDIUM",

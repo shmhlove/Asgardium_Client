@@ -212,6 +212,7 @@ alt+왼쪽|뒤로 이동|workbench.action.navigateBack
 alt+오른쪽|앞으로 이동|workbench.action.navigateForward
 --------------------------------------------------------------------------------------------------------------------
 # node-schedule
+https://www.npmjs.com/package/node-schedule
 
 *    *    *    *    *    *
 ┬    ┬    ┬    ┬    ┬    ┬

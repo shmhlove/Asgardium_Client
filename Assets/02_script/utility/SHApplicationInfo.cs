@@ -131,11 +131,11 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
 
     void SetStatusBar()
     {
-#if UNITY_ANDROID && !UNITY_EDITOR
-        ApplicationChrome.statusBarState = ApplicationChrome.States.VisibleOverContent;
-#elif (UNITY_IPHONE || UNITY_IOS) && !UNITY_EDITOR
-        PlayerSettings.statusBarHidden = false;
-#endif
+// #if UNITY_ANDROID && !UNITY_EDITOR
+//         ApplicationChrome.statusBarState = ApplicationChrome.States.VisibleOverContent;
+// #elif (UNITY_IPHONE || UNITY_IOS) && !UNITY_EDITOR
+//         PlayerSettings.statusBarHidden = false;
+// #endif
     }
 
     // UUID

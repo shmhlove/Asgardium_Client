@@ -48,6 +48,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         // MiningTab UIs 로드 및 이벤트 바인딩
         m_pUIPanelMining = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
         m_pUIPanelMining.SetEventForChangeTab(OnEventForChangeMiningTab);
+        m_pUIPanelMining.SetEventForFilter(OnEventForMiningFilter);
         m_pUIPanelMiningSubActiveCompany = await pUIRoot.GetPanel<SHUIPanelMiningSubActiveCompany>(SHUIConstant.PANEL_MINING_SUB_ACTIVE_COMPANY);
 
         // 초기화면설정 : Mining Tab 초기화
@@ -73,6 +74,13 @@ public partial class SHBusinessLobby : MonoBehaviour
         }
         
         m_eCurrentLobbyMenuType = eType;
+    }
+
+    private async void OnEventForMiningFilter()
+    {
+        var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
+        var pPanel = await pUIRoot.GetPanel<SHUIPanelMiningActiveUnitFilter>(SHUIConstant.PANEL_MINING_FILTER);
+        pPanel.Show(null);
     }
 
     private void OnEventForSocketReconnect(SHReply pReply)

@@ -60,7 +60,7 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
         SetSleepMode();
         SetOrientation();
         SetCrittercism();
-        
+        SetStatusBar();
         // UnityEngine.Debug.LogFormat("[LSH] ProcessID : {0}", GetProcessID());
         // UnityEngine.Debug.LogFormat("[LSH] DebugPort : {0}", GetDebugPort());
     }
@@ -127,6 +127,15 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
         //         CrittercismIOS.Init("7d02af2372694b93b84d75a999dd7dd400555300");
         //         CrittercismIOS.SetLogUnhandledExceptionAsCrash(true);
         // #endif
+    }
+
+    void SetStatusBar()
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        ApplicationChrome.statusBarState = ApplicationChrome.States.VisibleOverContent;
+#elif (UNITY_IPHONE || UNITY_IOS) && !UNITY_EDITOR
+        PlayerSettings.statusBarHidden = false;
+#endif
     }
 
     // UUID

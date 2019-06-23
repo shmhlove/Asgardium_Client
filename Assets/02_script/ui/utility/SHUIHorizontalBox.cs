@@ -14,44 +14,45 @@ public class SHUIHorizontalBox : MonoBehaviour
 {
     public float m_fSlotSize;
     public float m_fGapSize;
-    public int m_iTotalCount;
+    public int m_iMaxCount;
     public eHorizontalAlignment m_eAlignment;
 
-    public List<GameObject> m_pSlots = new List<GameObject>();
-
-    public void SetSlot(GameObject pSlot)
+    public void Alignment(List<GameObject> pItems)
     {
-        m_pSlots.Add(pSlot);
-        ResetPosition();
-    }
-
-    [FuncButton]
-    public void ResetPosition()
-    {
-        int iSlotLen = m_pSlots.Count;
-        float fTotalSize = 0;
-        float fStartPosition = 0;
-        switch(m_eAlignment)
+        // 시작위치 결정 : 좌측부터 차례로 쌓이는 형태
+        var fStartPosition = 0.0f;
+        var fHalfSlotSize = (m_fSlotSize / 2.0f);
+        switch (m_eAlignment)
         {
             case eHorizontalAlignment.Left:
-                fTotalSize = ((m_iTotalCount-1) * (m_fSlotSize + m_fGapSize)) - m_fGapSize;
-                fStartPosition = -(fTotalSize/2);
-            break;
+                {
+                    var fTotalSize = (m_fSlotSize * m_iMaxCount) + (m_fGapSize * (m_iMaxCount - 1));
+                    var fHalfSize = (fTotalSize * 0.5f);
+                    fStartPosition = -fHalfSize;
+                }
+                break;
             case eHorizontalAlignment.Center:
-                fTotalSize = ((iSlotLen-1) * (m_fSlotSize + m_fGapSize)) - m_fGapSize;
-                fStartPosition = -(fTotalSize/2);
-            break;
+                {
+                    var fSlotTotalSize = (m_fSlotSize * pItems.Count) + (m_fGapSize * (pItems.Count - 1));
+                    var fHalfSize = (fSlotTotalSize * 0.5f);
+                    fStartPosition = -fHalfSize;
+                }
+                break;
             case eHorizontalAlignment.Right:
-                fTotalSize = ((iSlotLen-1) * (m_fSlotSize + m_fGapSize)) - m_fGapSize;
-                fStartPosition = -(fTotalSize/2);
-            break;
+                {
+                    var fTotalSize = (m_fSlotSize * m_iMaxCount) + (m_fGapSize * (m_iMaxCount - 1));
+                    var fSlotTotalSize = (m_fSlotSize * pItems.Count) + (m_fGapSize * (pItems.Count - 1));
+                    var fHalfSize = (fTotalSize * 0.5f);
+                    fStartPosition = (fHalfSize - fSlotTotalSize);
+                }
+                break;
         }
-        
-        for (int iLoop = 0; iLoop < iSlotLen; ++iLoop)
+
+        for (int iLoop = 0; iLoop < pItems.Count; ++iLoop)
         {
-            var position = m_pSlots[iLoop].transform.localPosition;
-            position.x = fStartPosition + ((iLoop * (m_fSlotSize + m_fGapSize)) - (m_fGapSize/2));
-            m_pSlots[iLoop].transform.localPosition = position;
+            var vPosition = pItems[iLoop].transform.localPosition;
+            vPosition.x = fHalfSlotSize + (fStartPosition + ((iLoop * m_fSlotSize) + (iLoop * m_fGapSize)));
+            pItems[iLoop].transform.localPosition = vPosition;
         }
     }
 }

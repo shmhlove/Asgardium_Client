@@ -9,45 +9,41 @@ public class SHUIScrollViewForActiveFilter : SHUIMassiveScrollView
 
     protected override void SetSlotData(GameObject go, int index)
     {
-        if (null == go)
-        {
-            return;
-        }
-
-        if (0 > index)
-        {
-            return;
-        }
-
-        if (null == m_pDatas)
+        if ((null == go) || (null == m_pDatas))
         {
             return;
         }
 
         var pSlot = go.GetComponent<SHUIScrollSlotForActiveFilter>();
+        var iLength = pSlot.m_iMaxCount;
         var iStartIndex = pSlot.m_iMaxCount * index;
+
         if (iStartIndex >= m_pDatas.Count)
         {
             return;
         }
 
-        var iLength = pSlot.m_iMaxCount;
         if ((iStartIndex + iLength) > m_pDatas.Count)
         {
             iLength = m_pDatas.Count - iStartIndex;
         }
 
-        Debug.LogFormat("StartIndex : {0}, Length : {1}", iStartIndex, iLength);
         pSlot.SetData(m_pDatas.GetRange(iStartIndex, iLength), OnToggleUnit);
     }
 
     public void ResetDatas(List<SHActiveFilterUnitData> pDatas)
     {
-        if ((null == m_pDatas) || 
-            (m_pDatas.Count != pDatas.Count))
+        if ((null == m_pDatas) || (m_pDatas.Count != pDatas.Count))
         {
             m_pDatas = pDatas;
-            SetSlotCount(m_pDatas.Count);
+
+            var pSlot = m_pSample.GetComponent<SHUIScrollSlotForActiveFilter>();
+            if ((null == pSlot) || (0 == pSlot.m_iMaxCount))
+            {
+                return;
+            }
+            
+            SetSlotCount(Mathf.RoundToInt((float)m_pDatas.Count / (float)pSlot.m_iMaxCount));
         }
         else
         {

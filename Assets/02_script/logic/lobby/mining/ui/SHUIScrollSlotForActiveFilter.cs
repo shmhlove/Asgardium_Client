@@ -34,6 +34,11 @@ public class SHUIScrollSlotForActiveFilter : MonoBehaviour
 
     public void SetData(List<SHActiveFilterUnitData> pDatas, Action<int, bool> pEventUnitToggle)
     {
+        if (0 == m_pUnitObjects.Count)
+        {
+            MakeSpareSlots();
+        }
+
         var pUnits = new List<GameObject>();
         for (int iLoop = 0; iLoop < m_pUnitObjects.Count; ++iLoop)
         {
@@ -56,6 +61,9 @@ public class SHUIScrollSlotForActiveFilter : MonoBehaviour
 
     private void MakeSpareSlots()
     {
+        if (0 != m_pUnitObjects.Count)
+            return;
+
         for (int iLoop = 0; iLoop < m_iMaxCount; ++iLoop)
         {
             var pSlot = Single.Resources.Instantiate<GameObject>(m_pUnitSample);

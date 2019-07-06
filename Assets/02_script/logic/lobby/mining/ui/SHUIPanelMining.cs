@@ -17,6 +17,9 @@ public class SHUIPanelMining : SHUIPanel
     [Header("Information")]
     public SHUIActiveInformation m_pActiveInfo;
 
+    [Header("FilterBar")]
+    public SHUIScrollViewForActiveFilterbar m_pActiveFilterbarScrollView;
+
     [Header("ScrollView")]
     public SHUIScrollViewForActive m_pActiveScrollView;
 
@@ -37,6 +40,11 @@ public class SHUIPanelMining : SHUIPanel
     {
         m_pActiveInfo.SetMiningPower(strPower);
         m_pActiveInfo.SetTimer(strTimer);
+    }
+
+    public void SetActiveFilterbarScrollview(List<SHActiveFilterUnitData> pDatas)
+    {
+        m_pActiveFilterbarScrollView.ResetDatas(pDatas);
     }
 
     public void SetActiveScrollview(List<SHActiveSlotData> pDatas)

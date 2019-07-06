@@ -23,6 +23,7 @@ public partial class SHBusinessLobby : MonoBehaviour
 
             m_dicActiveCompanyData.Clear();
             UpdateDataForActiveCompany();
+            UpdateUIForActiveFilterbar();
 
             StopCoroutine("CoroutineForUpdateUIForActiveCompany");
             StartCoroutine("CoroutineForUpdateUIForActiveCompany");
@@ -71,6 +72,27 @@ public partial class SHBusinessLobby : MonoBehaviour
         pCallback();
     }
 
+    private async void UpdateUIForActiveFilterbar()
+    {
+        var pSlotDatas = new List<SHActiveFilterUnitData>();
+        var pUnitTable = await Single.Table.GetTable<SHTableServerGlobalUnitData>();
+        foreach (var kvp in pUnitTable.m_dicDatas)
+        {
+            var bIsOn = SHPlayerPrefs.GetBool(kvp.Value.m_iUnitId.ToString());
+            bIsOn = (null == bIsOn) ? true : bIsOn.Value;
+            if (false == bIsOn)
+                continue;
+
+            var pData = new SHActiveFilterUnitData();
+            pData.m_iUnitId = kvp.Value.m_iUnitId;
+            pData.m_strIconImage = kvp.Value.m_strIconImage;
+
+            pSlotDatas.Add(pData);
+        }
+
+        m_pUIPanelMining.SetActiveFilterbarScrollview(pSlotDatas);
+    }
+
     private void UpdateUIForActiveCompany(Action pCallback)
     {
         if (0 == m_dicActiveCompanyData.Count)
@@ -82,6 +104,15 @@ public partial class SHBusinessLobby : MonoBehaviour
         var pSlotDatas = new List<SHActiveSlotData>();
         foreach (var kvp in m_dicActiveCompanyData)
         {
+            // 유닛 필터링 체크
+            var keySplit = kvp.Key.Split('_');
+            var bIsOn = SHPlayerPrefs.GetBool(keySplit[1]);
+            if (false == ((null == bIsOn) ? true : bIsOn.Value))
+            {
+                continue;
+            }
+
+            // 공급량 체크
             var pData = kvp.Value.FindAll((p) => { return 0 != p.m_iSupplyQuantity; });
             if ((null != pData) && (0 != pData.Count))
             {
@@ -95,14 +126,14 @@ public partial class SHBusinessLobby : MonoBehaviour
             }
         }
 
-        var m_pFilters = new List<Func<SHActiveSlotData, SHActiveSlotData, bool?>>
+        var m_pSortFilters = new List<Func<SHActiveSlotData, SHActiveSlotData, bool?>>
         {
             SortConditionForEfficiencyLevel,
             SortConditionForUnitID
         };
         pSlotDatas.Sort((x, y) =>
         {
-            foreach (var pFilter in m_pFilters)
+            foreach (var pFilter in m_pSortFilters)
             {
                 bool? result = pFilter(x, y);
                 if (null != result)
@@ -267,7 +298,7 @@ public partial class SHBusinessLobby : MonoBehaviour
 
             if (reply.isSucceed)
             {
-                // 서버 소켓 데이터가 오기전 UI에 빠르게 반영해주기 위해...
+                // 갱신된 소켓 데이터가 오기전 UI에 빠르게 선반영해주기 위해...
                 foreach (var kvp in m_dicActiveCompanyData)
                 {
                     var pData = kvp.Value.Find((p) => { return strInstanceId == p.m_strInstanceId; });

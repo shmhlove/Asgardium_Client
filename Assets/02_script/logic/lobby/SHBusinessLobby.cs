@@ -24,15 +24,19 @@ public partial class SHBusinessLobby : MonoBehaviour
 
     async void Start()
     {
-        // 개발용 : 로그인 체크 후 테스트 계정으로 로그인 시켜주기
+        // 테이블 정보 얻기
         var pConfigTable = await Single.Table.GetTable<SHTableClientConfig>();
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
         var pInventory = await Single.Table.GetTable<SHTableServerInventoryInfo>();
+
+        // 개발용 : 로그인 체크 후 테스트 계정으로 로그인 시켜주기
+        ////////////////////////////////////////////////////////////////////////////////////
         pUserInfo.RequestGetUserInfoForDevelop((userInfoReply) =>
         {
             pInventory.RequestGetInventoryInfo(pUserInfo.UserId, (inventoryReply) => { });
         });
-
+        ////////////////////////////////////////////////////////////////////////////////////
+        
         // 소켓 연결 및 이벤트 바인딩
         Single.Network.ConnectWebSocket();
         Single.Network.AddEventObserver(SystemEvents.connect.ToString(), OnEventForSocketReconnect);
@@ -82,8 +86,8 @@ public partial class SHBusinessLobby : MonoBehaviour
         var pPanel = await pUIRoot.GetPanel<SHUIPanelMiningActiveUnitFilter>(SHUIConstant.PANEL_MINING_FILTER);
 
         // 필터링 대상유닛 데이터 생성
-        var pUnitTable = await Single.Table.GetTable<SHTableServerGlobalUnitData>();
         var pUnitDatas = new List<SHActiveFilterUnitData>();
+        var pUnitTable = await Single.Table.GetTable<SHTableServerGlobalUnitData>();
         foreach (var kvp in pUnitTable.m_dicDatas)
         {
             var pData = new SHActiveFilterUnitData();
@@ -96,7 +100,7 @@ public partial class SHBusinessLobby : MonoBehaviour
             pUnitDatas.Add(pData);
         }
         
-        // 필터링 UI가 닫힐때 정보를 받아와서 PlayerPreb에 셋팅하자
+        // 필터링 UI가 닫힐때 PlayerPreb에 셋팅하고, UI를 업데이트 한다.
         Action<List<SHActiveFilterUnitData>> pCloseEvent = (pDatas) =>
         {
             foreach (var pData in pDatas)
@@ -104,7 +108,8 @@ public partial class SHBusinessLobby : MonoBehaviour
                 SHPlayerPrefs.SetBool(pData.m_iUnitId.ToString(), pData.m_bIsOn);
             }
 
-            // @@ Mining Active ScrollView 리셋
+            UpdateUIForActiveCompany(() => { });
+            UpdateUIForActiveFilterbar();
         };
         
         // 필터링 UI Open

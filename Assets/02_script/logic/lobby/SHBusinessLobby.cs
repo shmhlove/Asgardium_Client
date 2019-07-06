@@ -80,7 +80,35 @@ public partial class SHBusinessLobby : MonoBehaviour
     {
         var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
         var pPanel = await pUIRoot.GetPanel<SHUIPanelMiningActiveUnitFilter>(SHUIConstant.PANEL_MINING_FILTER);
-        pPanel.Show(null);
+
+        // 필터링 대상유닛 데이터 생성
+        var pUnitTable = await Single.Table.GetTable<SHTableServerGlobalUnitData>();
+        var pUnitDatas = new List<SHActiveFilterUnitData>();
+        foreach (var kvp in pUnitTable.m_dicDatas)
+        {
+            var pData = new SHActiveFilterUnitData();
+            pData.m_iUnitId = kvp.Value.m_iUnitId;
+            pData.m_strIconImage = kvp.Value.m_strIconImage;
+
+            var bIsOn = SHPlayerPrefs.GetBool(kvp.Value.m_iUnitId.ToString());
+            pData.m_bIsOn = (null == bIsOn) ? true : bIsOn.Value;
+
+            pUnitDatas.Add(pData);
+        }
+        
+        // 필터링 UI가 닫힐때 정보를 받아와서 PlayerPreb에 셋팅하자
+        Action<List<SHActiveFilterUnitData>> pCloseEvent = (pDatas) =>
+        {
+            foreach (var pData in pDatas)
+            {
+                SHPlayerPrefs.SetBool(pData.m_iUnitId.ToString(), pData.m_bIsOn);
+            }
+
+            // @@ Mining Active ScrollView 리셋
+        };
+        
+        // 필터링 UI Open
+        pPanel.Show(pUnitDatas, pCloseEvent);
     }
 
     private void OnEventForSocketReconnect(SHReply pReply)

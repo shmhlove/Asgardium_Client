@@ -233,4 +233,44 @@ public class SHBusinessTest : MonoBehaviour
         }
         Debug.Log(logBuff);
     }
+
+    [FuncButton]
+    public void OnClickListRange()
+    {
+        // 검증필요
+        // GetRange 시 EndIndex가 Last보다 클때 어떻게 되는가?
+        // m_pDatas 데이터가 GetRange로 가져온 데이터와 공유되는가?
+        
+        List<SHSortData> pDatas = new List<SHSortData>();
+        pDatas.Add(new SHSortData(){iLevel = 1});
+        pDatas.Add(new SHSortData(){iLevel = 2});
+        pDatas.Add(new SHSortData(){iLevel = 3});
+        pDatas.Add(new SHSortData(){iLevel = 4});
+
+        // ArgumentException: Offset and length were out of bounds for the array or count is greater than the number of elements from index to the end of the source collection.
+        //var getRange = pDatas.GetRange(2, 5);
+
+        var startIndex = 3;
+        var length = 5;
+        if ((startIndex + length) > pDatas.Count)
+        {
+            length = pDatas.Count - startIndex;
+        }
+        Debug.LogFormat("StartIndex : {0}, Length : {1}", startIndex, length);
+        
+        var getRange = pDatas.GetRange(startIndex, length);
+        Debug.LogFormat("count : {0}", getRange.Count);
+
+        foreach (var pData in getRange)
+        {
+            pData.iLevel = 5;
+        }
+
+        string logBuff = "";
+        foreach (var pData in pDatas)
+        {
+            logBuff += pData.iLevel.ToString() + ", ";
+        }
+        Debug.Log(logBuff);
+    }
 }

@@ -16,10 +16,10 @@ public class SHUIScrollUnitForActiveFilter : MonoBehaviour
     public UISprite m_pSpriteUnit;
     public UIToggle m_pToggle;
 
-    public Action<int, bool> m_pEventToToggle;
-    public SHTableServerGlobalUnitDataData m_pData;
+    public Action<int, bool> m_pEventUnitToggle;
+    public SHActiveFilterUnitData m_pData;
 
-    public void SetUnitInfo(SHActiveFilterUnitData pData, Action<int, bool> pEventToToggle)
+    public void SetUnitInfo(SHActiveFilterUnitData pData, Action<int, bool> pEventUnitToggle)
     {
         if (m_pSpriteUnit)
         {
@@ -28,12 +28,11 @@ public class SHUIScrollUnitForActiveFilter : MonoBehaviour
 
         if (m_pToggle)
         {
-            bool? bIsOn = SHPlayerPrefs.GetBool(pData.m_iUnitId.ToString());
-            m_pToggle.Set((null == bIsOn || bIsOn.Value), false);
+            m_pToggle.Set(pData.m_bIsOn, false);
         }
-
+        
         m_pData = pData;
-        m_pEventToToggle = pEventToToggle;
+        m_pEventUnitToggle = pEventUnitToggle;
     }
 
     public void OnClickToggle(bool isOn)
@@ -41,9 +40,9 @@ public class SHUIScrollUnitForActiveFilter : MonoBehaviour
         if (null == m_pData)
             return;
 
-        if (null == m_pEventToToggle)
+        if (null == m_pEventUnitToggle)
             return;
 
-        m_pEventToToggle(m_pData.m_iUnitId, isOn);
+        m_pEventUnitToggle(m_pData.m_iUnitId, isOn);
     }
 }

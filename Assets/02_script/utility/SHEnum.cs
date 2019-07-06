@@ -108,3 +108,10 @@ public enum eDirection
     Top,
     Bottom
 }
+
+public enum eHorizontalAlignment
+{
+    Left,
+    Center,
+    Right
+}

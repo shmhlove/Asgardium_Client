@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class SHUIScrollViewForActiveFilter : SHUIMassiveScrollView
 {
-    List<SHActiveFilterUnitData> m_pDatas = new List<SHActiveFilterUnitData>();
+    List<SHActiveFilterUnitData> m_pDatas;
 
     protected override void SetSlotData(GameObject go, int index)
     {
@@ -19,20 +19,32 @@ public class SHUIScrollViewForActiveFilter : SHUIMassiveScrollView
             return;
         }
 
-        // 검증필요
-        // GetRange 시 EndIndex가 Last보다 클때 어떻게 되는가?
-        // m_pDatas 데이터가 GetRange로 가져온 데이터와 공유되는가?
+        if (null == m_pDatas)
+        {
+            return;
+        }
 
-        var pHorizontalBox = go.GetComponent<SHUIHorizontalBox>();
-        var iStartIndex = pHorizontalBox.m_iMaxCount * index;
-        var pSubDatas = m_pDatas.GetRange(iStartIndex, iStartIndex + pHorizontalBox.m_iMaxCount);
+        var pSlot = go.GetComponent<SHUIScrollSlotForActiveFilter>();
+        var iStartIndex = pSlot.m_iMaxCount * index;
+        if (iStartIndex >= m_pDatas.Count)
+        {
+            return;
+        }
 
-        go.GetComponent<SHUIScrollSlotForActiveFilter>().SetData(pSubDatas);
+        var iLength = pSlot.m_iMaxCount;
+        if ((iStartIndex + iLength) > m_pDatas.Count)
+        {
+            iLength = m_pDatas.Count - iStartIndex;
+        }
+
+        Debug.LogFormat("StartIndex : {0}, Length : {1}", iStartIndex, iLength);
+        pSlot.SetData(m_pDatas.GetRange(iStartIndex, iLength), OnToggleUnit);
     }
 
     public void ResetDatas(List<SHActiveFilterUnitData> pDatas)
     {
-        if (m_pDatas.Count != pDatas.Count)
+        if ((null == m_pDatas) || 
+            (m_pDatas.Count != pDatas.Count))
         {
             m_pDatas = pDatas;
             SetSlotCount(m_pDatas.Count);
@@ -63,5 +75,19 @@ public class SHUIScrollViewForActiveFilter : SHUIMassiveScrollView
         ResetDatas(m_pDatas);
     }
 
-    public void OnClick
+    public void OnToggleUnit(int iUnitId, bool bIsOn)
+    {
+        if (null == m_pDatas)
+        {
+            return;
+        }
+        
+        var pUnit = m_pDatas.Find((pData) => { return pData.m_iUnitId == iUnitId; });
+        if (null == pUnit)
+        {
+            return;
+        }
+
+        pUnit.m_bIsOn = bIsOn;
+    }
 }

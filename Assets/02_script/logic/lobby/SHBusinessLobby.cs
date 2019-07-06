@@ -12,7 +12,6 @@ public partial class SHBusinessLobby : MonoBehaviour
 {
     [Header("UI Objects")]
     private SHUIPanelMining m_pUIPanelMining = null;
-    private SHUIPanelMiningSubActiveCompany m_pUIPanelMiningSubActiveCompany = null;
 
     private eLobbyMenuType m_eCurrentLobbyMenuType = eLobbyMenuType.None;
     private eMiningTabType m_eCurrentMiningTabType = eMiningTabType.None;
@@ -53,7 +52,6 @@ public partial class SHBusinessLobby : MonoBehaviour
         m_pUIPanelMining = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
         m_pUIPanelMining.SetEventForChangeTab(OnEventForChangeMiningTab);
         m_pUIPanelMining.SetEventForFilter(OnEventForMiningFilter);
-        m_pUIPanelMiningSubActiveCompany = await pUIRoot.GetPanel<SHUIPanelMiningSubActiveCompany>(SHUIConstant.PANEL_MINING_SUB_ACTIVE_COMPANY);
 
         // 초기화면설정 : Mining Tab 초기화
         m_eCurrentLobbyMenuType = eLobbyMenuType.Mining;
@@ -83,7 +81,7 @@ public partial class SHBusinessLobby : MonoBehaviour
     private async void OnEventForMiningFilter()
     {
         var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
-        var pPanel = await pUIRoot.GetPanel<SHUIPanelMiningActiveUnitFilter>(SHUIConstant.PANEL_MINING_FILTER);
+        var pPanel = await pUIRoot.GetPanel<SHUIPopupPanelMiningActiveUnitFilter>(SHUIConstant.PANEL_MINING_FILTER);
 
         // 필터링 대상유닛 데이터 생성
         var pUnitDatas = new List<SHActiveFilterUnitData>();

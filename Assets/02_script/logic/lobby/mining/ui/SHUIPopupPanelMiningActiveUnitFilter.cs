@@ -9,9 +9,9 @@ using System.Collections.Generic;
     Panel(Open/Close 처리) - ScrollView(UI 이벤트 관리) - ScrollViewSlot(오브젝트 관리) - ScrollViewUnit(유닛표현)
 */
 
-public class SHUIPanelMiningActiveUnitFilter : SHUIPanel
+public class SHUIPopupPanelMiningActiveUnitFilter : SHUIPanel
 {
-    public SHUIScrollViewForActiveFilter m_pScrollView;
+    public SHUIPopupScrollViewForActiveFilter m_pScrollView;
 
     private List<SHActiveFilterUnitData> m_pDatas;
     private Action<List<SHActiveFilterUnitData>> m_pEventClose;

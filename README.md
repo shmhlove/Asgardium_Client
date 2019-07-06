@@ -465,8 +465,11 @@ var j = schedule.scheduleJob({ start: startTime, end: endTime, rule: '*/1 * * * 
             * ~~서버 : NPC회사 공급물량 업데이트(매일 x시) , schedule_refresh_active_mining 0 0 10 * * *~~
             * ~~테스트 : 수량 마감에 대한 테스트~~
         --
-        * 필터기능
-            * 지정한 Unit에 대해서만 메인 스크롤뷰에 출력 (비휘발성)
+        * ~~필터기능~~
+            * ~~지정한 Unit에 대해서만 메인 스크롤뷰에 출력 (비휘발성)~~
+        * 폴리싱
+            * ~~UI 클래스 이름에 Popup을 명시해주고 싶다.~~
+            * 코드 다듬기
 ---
 * 인증
 	* ~~서버/클라 : JWT 적용~~

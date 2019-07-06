@@ -3,7 +3,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class SHUIScrollViewForActiveFilter : SHUIMassiveScrollView
+public class SHUIPopupScrollViewForActiveFilter : SHUIMassiveScrollView
 {
     List<SHActiveFilterUnitData> m_pDatas;
 
@@ -14,7 +14,7 @@ public class SHUIScrollViewForActiveFilter : SHUIMassiveScrollView
             return;
         }
 
-        var pSlot = go.GetComponent<SHUIScrollSlotForActiveFilter>();
+        var pSlot = go.GetComponent<SHUIPopupScrollSlotForActiveFilter>();
         var iLength = pSlot.m_iMaxCount;
         var iStartIndex = pSlot.m_iMaxCount * index;
 
@@ -37,7 +37,7 @@ public class SHUIScrollViewForActiveFilter : SHUIMassiveScrollView
         {
             m_pDatas = pDatas;
 
-            var pSlot = m_pSample.GetComponent<SHUIScrollSlotForActiveFilter>();
+            var pSlot = m_pSample.GetComponent<SHUIPopupScrollSlotForActiveFilter>();
             if ((null == pSlot) || (0 == pSlot.m_iMaxCount))
             {
                 return;

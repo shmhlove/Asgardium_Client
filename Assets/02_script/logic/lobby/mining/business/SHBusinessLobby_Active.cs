@@ -299,6 +299,9 @@ public partial class SHBusinessLobby : MonoBehaviour
             if (reply.isSucceed)
             {
                 // 갱신된 소켓 데이터가 오기전 UI에 빠르게 선반영해주기 위해...
+                var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
+                var pPanel = await pUIRoot.GetPanel<SHUIPopupPanelMiningSubActiveCompany>(SHUIConstant.PANEL_MINING_SUB_ACTIVE_COMPANY);
+
                 foreach (var kvp in m_dicActiveCompanyData)
                 {
                     var pData = kvp.Value.Find((p) => { return strInstanceId == p.m_strInstanceId; });
@@ -306,9 +309,9 @@ public partial class SHBusinessLobby : MonoBehaviour
                     {
                         pData.m_iSupplyQuantity = Math.Max(pData.m_iSupplyQuantity - 1, 0);
                         
-                        if (m_pUIPanelMiningSubActiveCompany.IsActive())
+                        if (pPanel.IsActive())
                         {
-                            m_pUIPanelMiningSubActiveCompany.Show(m_dicActiveCompanyData[pData.m_strGroupId]);
+                            pPanel.Show(m_dicActiveCompanyData[pData.m_strGroupId]);
                         }
                         break;
                     }
@@ -344,15 +347,18 @@ public partial class SHBusinessLobby : MonoBehaviour
         RequestPurchaseMiningActiveCompany(strInstanceId);
     }
 
-    public void OnEventForShowSubUnits(string strGroupId)
+    public async void OnEventForShowSubUnits(string strGroupId)
     {
+        var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
+        var pPanel = await pUIRoot.GetPanel<SHUIPopupPanelMiningSubActiveCompany>(SHUIConstant.PANEL_MINING_SUB_ACTIVE_COMPANY);
+
         if (true == m_dicActiveCompanyData.ContainsKey(strGroupId))
         {
-            m_pUIPanelMiningSubActiveCompany.Show(m_dicActiveCompanyData[strGroupId]);
+            pPanel.Show(m_dicActiveCompanyData[strGroupId]);
         }
         else
         {
-            m_pUIPanelMiningSubActiveCompany.Show(new List<SHActiveSlotData>());
+            pPanel.Show(new List<SHActiveSlotData>());
         }
     }
 

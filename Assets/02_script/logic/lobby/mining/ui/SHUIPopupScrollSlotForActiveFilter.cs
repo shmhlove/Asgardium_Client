@@ -8,7 +8,7 @@ using System.Collections.Generic;
 // GameObject를 이아이가 관리해야한다.
 // HorizontalBox는 정렬할때 GameObjects를 받아서 정렬하도록 하고 관리에서 빼는게 좋은거 같다.
 
-public class SHUIScrollSlotForActiveFilter : MonoBehaviour
+public class SHUIPopupScrollSlotForActiveFilter : MonoBehaviour
 {
     public float m_fSlotSize;
     public float m_fGapSize;
@@ -46,7 +46,7 @@ public class SHUIScrollSlotForActiveFilter : MonoBehaviour
             {
                 NGUITools.SetActive(m_pUnitObjects[iLoop], true);
                 
-                var pSlot = m_pUnitObjects[iLoop].GetComponent<SHUIScrollUnitForActiveFilter>();
+                var pSlot = m_pUnitObjects[iLoop].GetComponent<SHUIPopupScrollUnitForActiveFilter>();
                 pSlot.SetUnitInfo(pDatas[iLoop], pEventUnitToggle);
                 pUnits.Add(m_pUnitObjects[iLoop]);
             }

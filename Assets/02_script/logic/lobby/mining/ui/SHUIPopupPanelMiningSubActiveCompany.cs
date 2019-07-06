@@ -4,7 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public class SHUIPanelMiningSubActiveCompany : SHUIPanel
+public class SHUIPopupPanelMiningSubActiveCompany : SHUIPanel
 {
     public SHUIScrollViewForActive m_pActiveScrollView;
 

@@ -11,7 +11,7 @@ public class SHActiveFilterUnitData
     public bool m_bIsOn;
 }
 
-public class SHUIScrollUnitForActiveFilter : MonoBehaviour
+public class SHUIPopupScrollUnitForActiveFilter : MonoBehaviour
 {
     public UISprite m_pSpriteUnit;
     public UIToggle m_pToggle;

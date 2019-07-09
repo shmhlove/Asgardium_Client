@@ -42,9 +42,9 @@ public class SHUIPanelMining : SHUIPanel
         m_pActiveInfo.SetTimer(strTimer);
     }
 
-    public void SetActiveFilterbarScrollview(List<SHActiveFilterUnitData> pDatas)
+    public void SetActiveFilterbarScrollview(List<SHActiveFilterUnitData> pDatas, bool bIsAllOn)
     {
-        m_pActiveFilterbarScrollView.ResetDatas(pDatas);
+        m_pActiveFilterbarScrollView.ResetDatas(pDatas, bIsAllOn);
     }
 
     public void SetActiveScrollview(List<SHActiveSlotData> pDatas)

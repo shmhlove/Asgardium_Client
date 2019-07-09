@@ -5,7 +5,10 @@ using System.Collections.Generic;
 
 public class SHUIScrollViewForActiveFilterbar : SHUIMassiveScrollView
 {
-    List<SHActiveFilterUnitData> m_pDatas = new List<SHActiveFilterUnitData>();
+    [Header("Filter Objects")]
+    public UISprite m_pSpriteAllOn;
+
+    private List<SHActiveFilterUnitData> m_pDatas = new List<SHActiveFilterUnitData>();
 
     protected override void SetSlotData(GameObject go, int index)
     {
@@ -22,8 +25,13 @@ public class SHUIScrollViewForActiveFilterbar : SHUIMassiveScrollView
         go.GetComponent<SHUIScrollSlotForActiveFilterbar>().SetData(m_pDatas[index]);
     }
 
-    public void ResetDatas(List<SHActiveFilterUnitData> pDatas)
+    public void ResetDatas(List<SHActiveFilterUnitData> pDatas, bool bIsAllOn)
     {
+        if (null != m_pSpriteAllOn)
+        {
+            NGUITools.SetActive(m_pSpriteAllOn.gameObject, bIsAllOn);
+        }
+
         if (m_pDatas.Count != pDatas.Count)
         {
             m_pDatas = pDatas;

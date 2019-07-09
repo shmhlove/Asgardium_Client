@@ -74,6 +74,7 @@ public partial class SHBusinessLobby : MonoBehaviour
 
     private async void UpdateUIForActiveFilterbar()
     {
+        var bIsAllOn = true;
         var pSlotDatas = new List<SHActiveFilterUnitData>();
         var pUnitTable = await Single.Table.GetTable<SHTableServerGlobalUnitData>();
         foreach (var kvp in pUnitTable.m_dicDatas)
@@ -81,7 +82,10 @@ public partial class SHBusinessLobby : MonoBehaviour
             var bIsOn = SHPlayerPrefs.GetBool(kvp.Value.m_iUnitId.ToString());
             bIsOn = (null == bIsOn) ? true : bIsOn.Value;
             if (false == bIsOn)
+            {
+                bIsAllOn = false;
                 continue;
+            }
 
             var pData = new SHActiveFilterUnitData();
             pData.m_iUnitId = kvp.Value.m_iUnitId;
@@ -90,7 +94,7 @@ public partial class SHBusinessLobby : MonoBehaviour
             pSlotDatas.Add(pData);
         }
 
-        m_pUIPanelMining.SetActiveFilterbarScrollview(pSlotDatas);
+        m_pUIPanelMining.SetActiveFilterbarScrollview(pSlotDatas, bIsAllOn);
     }
 
     private void UpdateUIForActiveCompany(Action pCallback)

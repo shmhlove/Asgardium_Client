@@ -470,6 +470,21 @@ var j = schedule.scheduleJob({ start: startTime, end: endTime, rule: '*/1 * * * 
         * 폴리싱
             * ~~UI 클래스 이름에 Popup을 명시해주고 싶다.~~
             * 코드 다듬기
+
+* 저장소
+	* 클라 : 접기/펼치기 스크롤뷰 UI 개발
+	* 클라 : 기본 재화 개발
+		* UI 개발 및 컨트롤 스크립트 추가
+		Console.WriteLine(String.Format("{0:##,##0}",price)); //1,234,567
+		Int32.Format(12345, "#,##0") ---> "12,345" 
+
+	* 클라 : 자원 개발
+		* UI 개발 및 컨트롤 스크립트 추가
+		* 비지니스 로직 개발
+
+    * 클라 : Artifact 개발
+    	* UI 개발 및 컨트롤 스크립트 추가
+    	
 ---
 * 인증
 	* ~~서버/클라 : JWT 적용~~

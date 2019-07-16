@@ -12,6 +12,7 @@ public partial class SHBusinessLobby : MonoBehaviour
 {
     [Header("UI Objects")]
     private SHUIPanelMining m_pUIPanelMining = null;
+    private SHUIPanelStorage m_pUIPanelStorage = null;
 
     private eLobbyMenuType m_eCurrentLobbyMenuType = eLobbyMenuType.None;
     private eMiningTabType m_eCurrentMiningTabType = eMiningTabType.None;
@@ -48,11 +49,14 @@ public partial class SHBusinessLobby : MonoBehaviour
         var pMenubar = await pUIRoot.GetPanel<SHUIPanelMenubar>(SHUIConstant.PANEL_MENUBAR);
         pMenubar.SetEventForChangeLobbyMenu(OnEventForChangeLobbyMenu);
         
-        // MiningTab UIs 로드 및 이벤트 바인딩
+        // Lobby Mining UIs 로드 및 이벤트 바인딩
         m_pUIPanelMining = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
         m_pUIPanelMining.SetEventForChangeTab(OnEventForChangeMiningTab);
         m_pUIPanelMining.SetEventForFilter(OnEventForMiningFilter);
 
+        // Lobby Storage UIs 로드 및 이벤트 바인딩
+        m_pUIPanelStorage = await pUIRoot.GetPanel<SHUIPanelStorage>(SHUIConstant.PANEL_STORAGE);
+        
         // 초기화면설정 : Mining Tab 초기화
         m_eCurrentLobbyMenuType = eLobbyMenuType.Mining;
         SetChangeMiningTab(eMiningTabType.Active);
@@ -61,17 +65,22 @@ public partial class SHBusinessLobby : MonoBehaviour
 
     private void OnEventForChangeLobbyMenu(eLobbyMenuType eType)
     {
+        // @@ 리팩토링이 필요하다.
+
         // On
-        if ((eLobbyMenuType.Mining == eType) 
-            && (eLobbyMenuType.Mining != m_eCurrentLobbyMenuType)) {
+        if ((eLobbyMenuType.Mining == eType) && (eLobbyMenuType.Mining != m_eCurrentLobbyMenuType)) {
             var currentMiningTabType = m_eCurrentMiningTabType;
             m_eCurrentMiningTabType = eMiningTabType.None;
             SetChangeMiningTab(currentMiningTabType);
         }
+        
+        // On
+        if ((eLobbyMenuType.Storage == eType) && (eLobbyMenuType.Storage != m_eCurrentLobbyMenuType)) {
+            SetChangeStorageTab();
+        }
 
         // Off
-        if ((eLobbyMenuType.Mining != eType) 
-            && (eLobbyMenuType.Mining == m_eCurrentLobbyMenuType)) {
+        if ((eLobbyMenuType.Mining != eType) && (eLobbyMenuType.Mining == m_eCurrentLobbyMenuType)) {
             SetChangeMiningTab(eMiningTabType.None);
         }
         

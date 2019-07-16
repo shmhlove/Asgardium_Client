@@ -51,7 +51,7 @@ public class SHUITableSlotForUnitGoods : MonoBehaviour
         var pUITable = transform.GetComponentInParent<UITable>();
         pUITable.repositionNow = true;
 
-        m_pSpriteBG.height = (int)(m_pGrid.GetChildList().Count * m_pGrid.cellHeight) + 10;
+        m_pSpriteBG.height = (int)(pDatas.Count * m_pGrid.cellHeight) + 10;
     }
 
     private void MakeSpareSlots(int iCount)

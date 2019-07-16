@@ -28,10 +28,7 @@ public class SHUITableSlotForUnitGoods : MonoBehaviour
 
     public void SetData(List<SHTableGridSlotForUnitData> pDatas, Action<int> pEventTransaction)
     {
-        if (0 == m_pUnitObjects.Count)
-        {
-            MakeSpareSlots(pDatas.Count);
-        }
+        MakeSpareSlots(pDatas.Count);
         
         for (int iLoop = 0; iLoop < m_pUnitObjects.Count; ++iLoop)
         {
@@ -49,13 +46,17 @@ public class SHUITableSlotForUnitGoods : MonoBehaviour
         }
 
         m_pEventTransaction = pEventTransaction;
+
+        m_pGrid.repositionNow = true;
+        var pUITable = transform.GetComponentInParent<UITable>();
+        pUITable.repositionNow = true;
     }
 
     private void MakeSpareSlots(int iCount)
     {
         if (0 != m_pUnitObjects.Count)
         {
-            for (int iLoop = 0; iLoop < iCount; ++iLoop)
+            for (int iLoop = 0; iLoop < m_pUnitObjects.Count; ++iLoop)
             {
                 Destroy(m_pUnitObjects[iLoop]);
             }
@@ -75,9 +76,8 @@ public class SHUITableSlotForUnitGoods : MonoBehaviour
         }
 
         NGUITools.SetActive(m_pUnitSample, false);
-        m_pGrid.repositionNow = true;
     }
-    
+
     public void OnClickButton(int iUnitId)
     {
         if (null == m_pEventTransaction)

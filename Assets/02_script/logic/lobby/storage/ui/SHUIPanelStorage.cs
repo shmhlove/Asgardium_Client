@@ -17,6 +17,6 @@ public class SHUIPanelStorage : SHUIPanel
 
     public void SetUnitGoods(List<SHTableGridSlotForUnitData> pDatas, Action<int> pEventTransaction)
     {
-        m_pUnitGoods.SetData(pDatas, pEventTransaction);
+        m_pUnitGoods.ResetData(pDatas, pEventTransaction);
     }
 }

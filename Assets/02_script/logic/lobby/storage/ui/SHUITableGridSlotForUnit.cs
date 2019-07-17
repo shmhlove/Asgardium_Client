@@ -6,11 +6,11 @@ using System.Collections.Generic;
 
 public class SHTableGridSlotForUnitData
 {
-    public int m_iUnitID;
-    public string m_strIconName;
-    public string m_strUnitName;
-    public int m_iUnitValue;
-    public int m_iGoldValue;
+    public int      m_iUnitID;
+    public string   m_strIconName;
+    public string   m_strUnitName;
+    public int      m_iUnitValue;
+    public int      m_iGoldValue;
 }
 
 public class SHUITableGridSlotForUnit : MonoBehaviour

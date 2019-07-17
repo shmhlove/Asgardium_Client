@@ -5,10 +5,10 @@ using System.Collections.Generic;
 
 public partial class SHBusinessLobby : MonoBehaviour
 {
-    private async void SetChangeStorageTab()
+    private async void ResetStorage()
     {
-        var pInventory = await Single.Table.GetTable<SHTableServerInventoryInfo>();
-        var pUnitTable = await Single.Table.GetTable<SHTableServerGlobalUnitData>();
+        var pInventory   = await Single.Table.GetTable<SHTableServerInventoryInfo>();
+        var pUnitTable   = await Single.Table.GetTable<SHTableServerGlobalUnitData>();
         var pStringTable = await Single.Table.GetTable<SHTableClientString>();
 
         // Basic Goods 셋팅
@@ -18,24 +18,22 @@ public partial class SHBusinessLobby : MonoBehaviour
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
         pInventory.RequestGetInventoryInfo(pUserInfo.UserId, (reply) => 
         {
-            pUserInfo.LoadJsonTable(reply.data);
-
-            var pUnitInfos = new List<SHTableGridSlotForUnitData>();
+            var pUnitData = new List<SHTableGridSlotForUnitData>();
             foreach (var kvp in pInventory.HasUnits)
             {
-                var pUnit = new SHTableGridSlotForUnitData();
-                var pUnitData = pUnitTable.GetData(kvp.Key);
+                var pData = new SHTableGridSlotForUnitData();
+                var pUnit = pUnitTable.GetData(kvp.Key);
 
-                pUnit.m_iUnitID = pUnitData.m_iUnitId;
-                pUnit.m_strIconName = pUnitData.m_strIconImage;
-                pUnit.m_strUnitName = pStringTable.GetString(pUnitData.m_iNameStrId.ToString());
-                pUnit.m_iUnitValue = kvp.Value;
-                pUnit.m_iGoldValue = (int)(kvp.Value * 1.5f);
+                pData.m_iUnitID     = pUnit.m_iUnitId;
+                pData.m_strIconName = pUnit.m_strIconImage;
+                pData.m_strUnitName = pStringTable.GetString(pUnit.m_iNameStrId.ToString());
+                pData.m_iUnitValue  = kvp.Value;
+                pData.m_iGoldValue  = (int)(kvp.Value * 1.5f);
 
-                pUnitInfos.Add(pUnit);
+                pUnitData.Add(pData);
             }
 
-            m_pUIPanelStorage.SetUnitGoods(pUnitInfos, OnEventForTransaction);
+            m_pUIPanelStorage.SetUnitGoods(pUnitData, OnEventForTransaction);
         });
 
         // Artifact Goods 셋팅

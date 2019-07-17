@@ -6,12 +6,11 @@ using System.Collections.Generic;
 
 public class SHUITableSlotForUnitGoods : MonoBehaviour
 {
-    public UISprite m_pSpriteBG;
-    public UIGrid m_pGrid;
-    public GameObject m_pUnitSample;
+    public UISprite     m_pSpriteBG;
+    public UIGrid       m_pGrid;
+    public GameObject   m_pUnitSample;
 
     private List<GameObject> m_pUnitObjects = new List<GameObject>();
-    private Action<int> m_pEventTransaction;
 
     private void Awake()
     {
@@ -21,23 +20,23 @@ public class SHUITableSlotForUnitGoods : MonoBehaviour
         }
     }
 
-    private void OnEnable()
+    public void ResetData(List<SHTableGridSlotForUnitData> pData, Action<int> pEventTransaction)
     {
-        m_pSpriteBG.height = (int)(m_pGrid.GetChildList().Count * m_pGrid.cellHeight) + 10;
-    }
+        if (m_pSpriteBG)
+        {
+            m_pSpriteBG.height = (int)(pData.Count * m_pGrid.cellHeight) + 10;
+        }
 
-    public void SetData(List<SHTableGridSlotForUnitData> pDatas, Action<int> pEventTransaction)
-    {
-        MakeSpareSlots(pDatas.Count);
+        MakeSpareSlots(pData.Count);
         
         for (int iLoop = 0; iLoop < m_pUnitObjects.Count; ++iLoop)
         {
-            if (iLoop < pDatas.Count)
+            if (iLoop < pData.Count)
             {
                 NGUITools.SetActive(m_pUnitObjects[iLoop], true);
                 
                 var pSlot = m_pUnitObjects[iLoop].GetComponent<SHUITableGridSlotForUnit>();
-                pSlot.SetData(pDatas[iLoop], OnClickButton);
+                pSlot.SetData(pData[iLoop], pEventTransaction);
             }
             else
             {
@@ -45,27 +44,26 @@ public class SHUITableSlotForUnitGoods : MonoBehaviour
             }
         }
 
-        m_pEventTransaction = pEventTransaction;
-
         m_pGrid.repositionNow = true;
-        var pUITable = transform.GetComponentInParent<UITable>();
-        pUITable.repositionNow = true;
+        m_pGrid.Reposition();
 
-        m_pSpriteBG.height = (int)(pDatas.Count * m_pGrid.cellHeight) + 10;
+        var pUITable = transform.GetComponentInParent<UITable>();
+        if (pUITable)
+        {
+            pUITable.repositionNow = true;
+            pUITable.Reposition();
+        }
     }
 
     private void MakeSpareSlots(int iCount)
     {
-        if (0 != m_pUnitObjects.Count)
+        if (null == m_pUnitSample)
         {
-            for (int iLoop = 0; iLoop < m_pUnitObjects.Count; ++iLoop)
-            {
-                Destroy(m_pUnitObjects[iLoop]);
-            }
-            m_pUnitObjects.Clear();
+            return;
         }
 
-        for (int iLoop = 0; iLoop < iCount; ++iLoop)
+        int iMakeSlotCount = iCount - m_pUnitObjects.Count;
+        for (int iLoop = 0; iLoop < iMakeSlotCount; ++iLoop)
         {
             var pSlot = Single.Resources.Instantiate<GameObject>(m_pUnitSample);
             pSlot.transform.SetParent(m_pGrid.gameObject.transform);
@@ -78,15 +76,5 @@ public class SHUITableSlotForUnitGoods : MonoBehaviour
         }
 
         NGUITools.SetActive(m_pUnitSample, false);
-    }
-
-    public void OnClickButton(int iUnitId)
-    {
-        if (null == m_pEventTransaction)
-        {
-            return;
-        }
-
-        m_pEventTransaction(iUnitId);
     }
 }

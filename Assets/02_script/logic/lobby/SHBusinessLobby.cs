@@ -11,7 +11,7 @@ using socket.io;
 public partial class SHBusinessLobby : MonoBehaviour
 {
     [Header("UI Objects")]
-    private SHUIPanelMining m_pUIPanelMining = null;
+    private SHUIPanelMining  m_pUIPanelMining = null;
     private SHUIPanelStorage m_pUIPanelStorage = null;
 
     private eLobbyMenuType m_eCurrentLobbyMenuType = eLobbyMenuType.None;
@@ -26,10 +26,11 @@ public partial class SHBusinessLobby : MonoBehaviour
     {
         // 테이블 정보 얻기
         var pConfigTable = await Single.Table.GetTable<SHTableClientConfig>();
-        var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
-        var pInventory = await Single.Table.GetTable<SHTableServerInventoryInfo>();
+        var pUserInfo    = await Single.Table.GetTable<SHTableUserInfo>();
+        var pInventory   = await Single.Table.GetTable<SHTableServerInventoryInfo>();
 
         // 개발용 : 로그인 체크 후 테스트 계정으로 로그인 시켜주기
+        // UserInfo가 로드되었는지 확인하고 있기때문에 실제 배포시에도 이 코드는 유지해도 된다.
         ////////////////////////////////////////////////////////////////////////////////////
         pUserInfo.RequestGetUserInfoForDevelop((userInfoReply) =>
         {
@@ -66,6 +67,7 @@ public partial class SHBusinessLobby : MonoBehaviour
     private void OnEventForChangeLobbyMenu(eLobbyMenuType eType)
     {
         // @@ 리팩토링이 필요하다.
+        // 조건 분기문도 마음에 안들고, Mining 탭 처리과정도 마음에 안듬
 
         // On
         if ((eLobbyMenuType.Mining == eType) && (eLobbyMenuType.Mining != m_eCurrentLobbyMenuType)) {
@@ -76,7 +78,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         
         // On
         if ((eLobbyMenuType.Storage == eType) && (eLobbyMenuType.Storage != m_eCurrentLobbyMenuType)) {
-            SetChangeStorageTab();
+            ResetStorage();
         }
 
         // Off
@@ -89,6 +91,9 @@ public partial class SHBusinessLobby : MonoBehaviour
 
     private async void OnEventForMiningFilter()
     {
+        // @@ 필터오픈코드가 여기 있는게 맞나??
+        // 마이닝에 있어야될듯해보이는디??
+
         var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
         var pPanel = await pUIRoot.GetPanel<SHUIPopupPanelMiningActiveUnitFilter>(SHUIConstant.PANEL_MINING_FILTER);
 
@@ -137,6 +142,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         }
     }
     
+    // @@ 디버그기능은 추후에 루나콘솔로 옮기자!!
     [FuncButton]
     public void OnClickDebugSocketDisconnect()
     {

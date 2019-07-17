@@ -37,8 +37,17 @@ public class UIPlaySound : MonoBehaviour
 		get
 		{
 			if (!enabled) return false;
-			UIButton btn = GetComponent<UIButton>();
-			return (btn == null || btn.isEnabled);
+
+            SHUIButton shbtn = GetComponent<SHUIButton>();
+            if (shbtn)
+            {
+                return true;
+            }
+            else
+            {
+                UIButton btn = GetComponent<UIButton>();
+                return (btn == null || btn.isEnabled);
+            }
 		}
 	}
 

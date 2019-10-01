@@ -8,6 +8,7 @@ public static class SHAPIs
     public static string SH_API_TEST_RESET_POWER = "/process/test_reset_mining_power";
     
     // Web : 인증 관련
+    public static string SH_API_AUTH_IS_SIGNUP = "/process/is_signup";
     public static string SH_API_AUTH_SIGNUP = "/process/signup";
     public static string SH_API_AUTH_SIGNIN = "/process/signin";
 

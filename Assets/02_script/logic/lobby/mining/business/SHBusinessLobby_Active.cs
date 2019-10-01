@@ -45,6 +45,7 @@ public partial class SHBusinessLobby : MonoBehaviour
     {
         var pInventory = await Single.Table.GetTable<SHTableServerInventoryInfo>();
         var pServerGlobalConfig = await Single.Table.GetTable<SHTableServerGlobalConfig>();
+        // 업그레이드 테이블 추가
 
         // 통신시간 갭 때문에 저장된 시간보다 1초정도 앞당겨 준다.
         var Epsilon = 1000;

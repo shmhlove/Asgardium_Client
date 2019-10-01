@@ -30,38 +30,50 @@ public partial class SHBusinessLobby : MonoBehaviour
         var pInventory   = await Single.Table.GetTable<SHTableServerInventoryInfo>();
 
         // 개발용 : 로그인 체크 후 테스트 계정으로 로그인 시켜주기
-        // UserInfo가 로드되었는지 확인하고 있기때문에 실제 배포시에도 이 코드는 유지해도 된다.
+        // 이 코드에 진입하기 위해서는 로그인 이후 진입된다.
+        // 즉, 로그인이 되어 있다면 실제 유저의 정보가 넘어오기 때문에 실제 배포시에도 이 코드는 유지해도 된다.
         ////////////////////////////////////////////////////////////////////////////////////
-        pUserInfo.RequestGetUserInfoForDevelop((userInfoReply) =>
+        pUserInfo.RequestLoginForDevelop(async (signinReply) =>
         {
-            pInventory.RequestGetInventoryInfo(pUserInfo.UserId, (inventoryReply) => { });
+            if (false == signinReply.isSucceed)
+            {
+                Single.BusinessGlobal.ShowAlertUI(signinReply, (action) =>
+                {
+                    SHUtils.GameQuit();
+                });
+            }
+            else
+            {
+                pUserInfo.LoadJsonTable(signinReply.data);
+                pInventory.RequestGetInventoryInfo(pUserInfo.UserId, (inventoryReply) => { });
+
+                // 소켓 연결 및 이벤트 바인딩
+                Single.Network.ConnectWebSocket();
+                Single.Network.AddEventObserver(SystemEvents.connect.ToString(), OnEventForSocketReconnect);
+                Single.Network.AddEventObserver(SHAPIs.SH_SOCKET_POLLING_MINING_ACTIVE_INFO, OnEventForSocketPollingMiningActiveInfo);
+
+                // UI 초기화
+                var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
+
+                // Lobby MainMenu 이벤트 바인딩
+                var pMenubar = await pUIRoot.GetPanel<SHUIPanelMenubar>(SHUIConstant.PANEL_MENUBAR);
+                pMenubar.SetEventForChangeLobbyMenu(OnEventForChangeLobbyMenu);
+
+                // Lobby Mining UIs 로드 및 이벤트 바인딩
+                m_pUIPanelMining = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
+                m_pUIPanelMining.SetEventForChangeTab(OnEventForChangeMiningTab);
+                m_pUIPanelMining.SetEventForFilter(OnEventForMiningFilter);
+
+                // Lobby Storage UIs 로드 및 이벤트 바인딩
+                m_pUIPanelStorage = await pUIRoot.GetPanel<SHUIPanelStorage>(SHUIConstant.PANEL_STORAGE);
+
+                // 초기화면설정 : Mining Tab 초기화
+                m_eCurrentLobbyMenuType = eLobbyMenuType.Mining;
+                SetChangeMiningTab(eMiningTabType.Active);
+                StartCoroutine("CoroutineForUpdateUIForActiveInformation");
+            }
         });
         ////////////////////////////////////////////////////////////////////////////////////
-        
-        // 소켓 연결 및 이벤트 바인딩
-        Single.Network.ConnectWebSocket();
-        Single.Network.AddEventObserver(SystemEvents.connect.ToString(), OnEventForSocketReconnect);
-        Single.Network.AddEventObserver(SHAPIs.SH_SOCKET_POLLING_MINING_ACTIVE_INFO, OnEventForSocketPollingMiningActiveInfo);
-        
-        // UI 초기화
-        var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
-
-        // Lobby MainMenu 이벤트 바인딩
-        var pMenubar = await pUIRoot.GetPanel<SHUIPanelMenubar>(SHUIConstant.PANEL_MENUBAR);
-        pMenubar.SetEventForChangeLobbyMenu(OnEventForChangeLobbyMenu);
-        
-        // Lobby Mining UIs 로드 및 이벤트 바인딩
-        m_pUIPanelMining = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
-        m_pUIPanelMining.SetEventForChangeTab(OnEventForChangeMiningTab);
-        m_pUIPanelMining.SetEventForFilter(OnEventForMiningFilter);
-
-        // Lobby Storage UIs 로드 및 이벤트 바인딩
-        m_pUIPanelStorage = await pUIRoot.GetPanel<SHUIPanelStorage>(SHUIConstant.PANEL_STORAGE);
-        
-        // 초기화면설정 : Mining Tab 초기화
-        m_eCurrentLobbyMenuType = eLobbyMenuType.Mining;
-        SetChangeMiningTab(eMiningTabType.Active);
-        StartCoroutine("CoroutineForUpdateUIForActiveInformation");
     }
 
     private void OnEventForChangeLobbyMenu(eLobbyMenuType eType)

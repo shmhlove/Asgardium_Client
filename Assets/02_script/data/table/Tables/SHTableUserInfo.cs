@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 using System;
 using System.IO;
@@ -48,7 +48,7 @@ public class SHTableUserInfo : SHBaseTable
         return (false == string.IsNullOrEmpty(UserId));
     }
     
-    public void RequestGetUserInfoForDevelop(Action<SHReply> pCallback)
+    public void RequestLoginForDevelop(Action<SHReply> pCallback)
     {
         if (true == m_bIsLoaded)
         {
@@ -59,19 +59,42 @@ public class SHTableUserInfo : SHBaseTable
         JsonData json = new JsonData
         {
             ["email"] = "shmhlove@naver.com",
+            ["name"] = "이상호",
             ["password"] = "1234"
         };
-        Single.Network.POST(SHAPIs.SH_API_AUTH_SIGNIN, json, (reply) =>
+
+        Single.Network.POST(SHAPIs.SH_API_AUTH_IS_SIGNUP, json, (isSignupReply) =>
         {
-            if (reply.isSucceed)
+            if (false == isSignupReply.isSucceed)
             {
-                LoadJsonTable(reply.data);
+                pCallback(isSignupReply);
+                return;
+            }
+            
+            if (true == GetBoolToJson(isSignupReply.data, "is_signup"))
+            {
+                Single.Network.POST(SHAPIs.SH_API_AUTH_SIGNIN, json, (signinReply) =>
+                {
+                    pCallback(signinReply);
+                });
             }
             else
             {
-                Single.BusinessGlobal.ShowAlertUI(reply);
+                Single.Network.POST(SHAPIs.SH_API_AUTH_SIGNUP, json, (signupReply) =>
+                {
+                    if (signupReply.isSucceed)
+                    {
+                        Single.Network.POST(SHAPIs.SH_API_AUTH_SIGNIN, json, (signinReply) =>
+                        {
+                            pCallback(signinReply);
+                        });
+                    }
+                    else
+                    {
+                        pCallback(signupReply);
+                    }
+                });
             }
-            pCallback(reply);
         });
     }
 }

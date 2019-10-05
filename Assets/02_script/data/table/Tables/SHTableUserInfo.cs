@@ -28,8 +28,10 @@ public class SHTableUserInfo : SHBaseTable
 
     public override eErrorCode LoadJsonTable(JsonData pJson)
     {
-        if (null == pJson)
+        if ((null == pJson) || (0 == pJson.Count))
+        {
             return eErrorCode.Table_LoadFailed;
+        }
         
         UserId = GetStrToJson(pJson, "user_id");
         UserEmail = GetStrToJson(pJson, "user_email");

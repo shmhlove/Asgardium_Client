@@ -14,6 +14,11 @@ public enum eMiningTabType
 
 public class SHUIPanelMining : SHUIPanel
 {
+    [Header("Tabs")]
+    public SHUIButton m_pActiveButton;
+    public SHUIButton m_pPassiveButton;
+    public SHUIButton m_pCompanyButton;
+
     [Header("Information")]
     public SHUIActiveInformation m_pActiveInfo;
 
@@ -23,15 +28,16 @@ public class SHUIPanelMining : SHUIPanel
     [Header("ScrollView")]
     public SHUIScrollViewForActive m_pActiveScrollView;
 
-    private Action<eMiningTabType> m_pEventOfChangeTab;
+    private eMiningTabType m_eCurrentTab = eMiningTabType.None;
+    private Action<eMiningTabType, eMiningTabType> m_pEventOfChangeTab;
     private Action m_pEventOfFilter;
 
-    public void SetEventForChangeTab(Action<eMiningTabType> pCallback)
+    public void SetEventForChangeMiningTab(Action<eMiningTabType, eMiningTabType> pCallback)
     {
         m_pEventOfChangeTab = pCallback;
     }
 
-    public void SetEventForFilter(Action pCallback)
+    public void SetEventForClickFilter(Action pCallback)
     {
         m_pEventOfFilter = pCallback;
     }
@@ -52,19 +58,48 @@ public class SHUIPanelMining : SHUIPanel
         m_pActiveScrollView.ResetDatas(pDatas);
     }
 
+    public void ExecuteClick(eMiningTabType eType)
+    {
+        switch(eType)
+        {
+            case eMiningTabType.Active:
+                m_pActiveButton.ExecuteClick();
+                break;
+            case eMiningTabType.Passive:
+                m_pPassiveButton.ExecuteClick();
+                break;
+            case eMiningTabType.Company:
+                m_pCompanyButton.ExecuteClick();
+                break;
+        }
+    }
+
+    public eMiningTabType GetCurrentTab()
+    {
+        return m_eCurrentTab;
+    }
+
+    private void SetMoveTab(eMiningTabType eType)
+    {
+        m_eCurrentTab = eType;
+    }
+
     public void OnClickActive()
     {
-        m_pEventOfChangeTab?.Invoke(eMiningTabType.Active);
+        m_pEventOfChangeTab?.Invoke(eMiningTabType.Active, m_eCurrentTab);
+        SetMoveTab(eMiningTabType.Active);
     }
 
     public void OnClickPassive()
     {
-        m_pEventOfChangeTab?.Invoke(eMiningTabType.Passive);
+        m_pEventOfChangeTab?.Invoke(eMiningTabType.Passive, m_eCurrentTab);
+        SetMoveTab(eMiningTabType.Passive);
     }
 
     public void OnClickCompany()
     {
-        m_pEventOfChangeTab?.Invoke(eMiningTabType.Company);
+        m_pEventOfChangeTab?.Invoke(eMiningTabType.Company, m_eCurrentTab);
+        SetMoveTab(eMiningTabType.Company);
     }
 
     public void OnClickFilter()

@@ -13,40 +13,31 @@ public partial class SHBusinessLobby : MonoBehaviour
     // Key : "Level_UnitId", Value : SlotData in the same group as Level and UnitId
     private Dictionary<string, List<SHActiveSlotData>> m_dicActiveCompanyData = new Dictionary<string, List<SHActiveSlotData>>();
 
-    private void SetChangeMiningTab(eMiningTabType eType)
+    private void EnableMiningActiveTab()
     {
-        // On
-        if ((eMiningTabType.Active == eType)
-            && (eMiningTabType.Active != m_eCurrentMiningTabType))
-        {
-            RequestSubscribeMiningActiveInfo();
+        RequestSubscribeMiningActiveInfo();
 
-            m_dicActiveCompanyData.Clear();
-            UpdateDataForActiveCompany();
-            UpdateUIForActiveFilterbar();
+        m_dicActiveCompanyData.Clear();
+        UpdateDataForActiveCompany();
+        UpdateUIForActiveFilterbar();
 
-            StopCoroutine("CoroutineForUpdateUIForActiveCompany");
-            StartCoroutine("CoroutineForUpdateUIForActiveCompany");
-        }
+        StopCoroutine("CoroutineForUpdateUIForActiveCompany");
+        StartCoroutine("CoroutineForUpdateUIForActiveCompany");
+    }
 
-        // Off
-        if ((eMiningTabType.Active != eType)
-            && (eMiningTabType.Active == m_eCurrentMiningTabType))
-        {
-            RequestUnsubscribeMiningActiveInfo();
-            
-            StopCoroutine("CoroutineForUpdateUIForActiveCompany");
-        }
+    private void DisableMiningActiveTab()
+    {
+        RequestUnsubscribeMiningActiveInfo();
 
-        m_eCurrentMiningTabType = eType;
+        StopCoroutine("CoroutineForUpdateUIForActiveCompany");
     }
 
     private async void UpdateUIForActiveInformation(Action pCallback)
     {
-        var pInventory = await Single.Table.GetTable<SHTableServerInventoryInfo>();
+        var pInventory = await Single.Table.GetTable<SHTableServerUserInventory>();
+        var pUpgrade = await Single.Table.GetTable<SHTableServerUserUpgradeInfo>();
         var pServerGlobalConfig = await Single.Table.GetTable<SHTableServerGlobalConfig>();
-        // 업그레이드 테이블 추가
-
+        
         // 통신시간 갭 때문에 저장된 시간보다 1초정도 앞당겨 준다.
         var Epsilon = 1000;
         var LastMiningPowerAt = pInventory.MiningPowerAt - Epsilon;
@@ -78,6 +69,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         var bIsAllOn = true;
         var pSlotDatas = new List<SHActiveFilterUnitData>();
         var pUnitTable = await Single.Table.GetTable<SHTableServerGlobalUnitData>();
+
         foreach (var kvp in pUnitTable.m_dicDatas)
         {
             var bIsOn = SHPlayerPrefs.GetBool(kvp.Value.m_iUnitId.ToString());
@@ -167,31 +159,19 @@ public partial class SHBusinessLobby : MonoBehaviour
         {
             return new SHActiveSlotData()
             {
-                // GroupID
                 m_strGroupId = string.Format("{0}_{1}", pData.m_iEfficiencyLV, pData.m_iUnitId),
-                // 회사 인스턴스 ID
                 m_strInstanceId = pData.m_strInstanceId,
-                // 회사 이름
                 m_strCompanyName = pStringTable.GetString(pData.m_iNameStrid.ToString()),
-                // 회사 아이콘
                 m_strCompanyIcon = pData.m_strEmblemImage,
-                // 유닛 아이콘
                 m_strUnitIcon = pServerGlobalUnitDataTable.GetData(pData.m_iUnitId).m_strIconImage,
-                // 구매시 획득 유닛 물량
-                m_iUnitQuantity = pActiveMiningQuantityTable.GetData(pData.m_iEfficiencyLV).m_iQuantity,
-                // 구매 가격
-                m_iPurchaseCost = pServerGlobalUnitDataTable.GetData(pData.m_iUnitId).m_iWeight,
-                // 유닛 ID
                 m_iUnitId = pData.m_iUnitId,
-                // 회사 레벨
+                m_iUnitQuantity = pActiveMiningQuantityTable.GetData(pData.m_iEfficiencyLV).m_iQuantity,
+                m_iPurchaseCost = pServerGlobalUnitDataTable.GetData(pData.m_iUnitId).m_iWeight,
                 m_iEfficiencyLevel = pData.m_iEfficiencyLV,
-                // 구매 가능한 공급 물량
                 m_iSupplyQuantity = pData.m_iSupplyCount,
-                // NPC 회사여부
                 m_bIsNPCCompany = pData.m_bIsNPCCompany,
-                // 구매버튼 이벤트
+                
                 m_pEventPurchaseButton = OnEventForPurchaseMining,
-                // 서브유닛 확인 버튼
                 m_pEventShowSubUnitsButton = OnEventForShowSubUnits,
             };
         };
@@ -298,12 +278,13 @@ public partial class SHBusinessLobby : MonoBehaviour
         };
         Single.Network.POST(SHAPIs.SH_API_MINING_PURCHASE_ACTIVE, json, async (reply) =>
         {
-            var pInventory = await Single.Table.GetTable<SHTableServerInventoryInfo>();
+            var pInventory = await Single.Table.GetTable<SHTableServerUserInventory>();
             pInventory.LoadJsonTable(reply.data);
 
             if (reply.isSucceed)
             {
-                // 갱신된 소켓 데이터가 오기전 UI에 빠르게 선반영해주기 위해...
+                // 갱신된 소켓 데이터가 오기전 UI에 빠르게 선반영해주기 위해 미리 UI에 반영해준다.
+                // 부작용으로 실제 소켓 데이터가 도착하면 UI상 임시 데이터가 순간 변할 수 있다.
                 var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
                 var pPanel = await pUIRoot.GetPanel<SHUIPopupPanelMiningSubActiveCompany>(SHUIConstant.PANEL_MINING_SUB_ACTIVE_COMPANY);
 
@@ -340,11 +321,6 @@ public partial class SHBusinessLobby : MonoBehaviour
                 }
             }
         });
-    }
-
-    public void OnEventForChangeMiningTab(eMiningTabType eType)
-    {
-        SetChangeMiningTab(eType);
     }
 
     public void OnEventForPurchaseMining(string strInstanceId)
@@ -414,7 +390,7 @@ public partial class SHBusinessLobby : MonoBehaviour
     public async void OnClickDebugReset()
     {
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
-        var pInventoryInfo = await Single.Table.GetTable<SHTableServerInventoryInfo>();
+        var pInventoryInfo = await Single.Table.GetTable<SHTableServerUserInventory>();
 
         JsonData json = new JsonData
         {
@@ -436,7 +412,7 @@ public partial class SHBusinessLobby : MonoBehaviour
     public async void OnClickDebugUsePower()
     {
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
-        var pInventoryInfo = await Single.Table.GetTable<SHTableServerInventoryInfo>();
+        var pInventoryInfo = await Single.Table.GetTable<SHTableServerUserInventory>();
 
         JsonData json = new JsonData
         {

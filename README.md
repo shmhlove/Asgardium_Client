@@ -502,8 +502,8 @@ var j = schedule.scheduleJob({ start: startTime, end: endTime, rule: '*/1 * * * 
     * ~~서버 : 유저 생성시 테이블 생성 로직 리팩토링 필요~~
             ~~async/await/promise 로 가자~~
             ~~예외발생시 생성 했던 유저, 인벤토리, 업그레이드 정보 제거하기~~
-    * 클라 : 서버 유저 업그레이드 정보 테이블 얻기
-    * 클라 : UI 추가
+    * ~~클라 : 서버 유저 업그레이드 정보 테이블 얻기~~
+    * 클라 : 업그레이드 UI 개발
 ---
 * 인증
 	* ~~서버/클라 : JWT 적용~~
@@ -515,6 +515,7 @@ var j = schedule.scheduleJob({ start: startTime, end: endTime, rule: '*/1 * * * 
 ---
 * 기타
 	* ~~String 테이블을 만들어야 한다.~~
+    * ~~클라 : 로비씬 메뉴와 세부탭 이동 처리방식 변경~~
 	* 클라 : 일시정지 아이디어가 필요하다.
 	* 클라 : 서버데이터 Escape 문제 해결 필요
 	* 업데이트에 프로그래스 UI 만들어야 한다.

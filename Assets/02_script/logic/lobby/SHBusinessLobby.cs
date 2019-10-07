@@ -14,21 +14,48 @@ public partial class SHBusinessLobby : MonoBehaviour
     private SHUIPanelMining  m_pUIPanelMining = null;
     private SHUIPanelStorage m_pUIPanelStorage = null;
 
-    private eLobbyMenuType m_eCurrentLobbyMenuType = eLobbyMenuType.None;
-    private eMiningTabType m_eCurrentMiningTabType = eMiningTabType.None;
+    private Dictionary<string, Action> m_dicEnableMainMenuDelegate;
+    private Dictionary<string, Action> m_dicDisableMainMenuDelegate;
 
-    void Awake()
+    private void Awake()
     {
         Single.AppInfo.CreateSingleton();
     }
 
-    async void Start()
+    private async void Start()
     {
+        // 델리게이트 함수 등록
+        m_dicEnableMainMenuDelegate = new Dictionary<string, Action>
+        {
+            { eLobbyMenuType.Mining.ToString(), EnableMiningMenu },
+            { eLobbyMenuType.Storage.ToString(), EnableStorageMenu },
+            //{ eLobbyMenuType.Market.ToString(), EnableMarketMenu },
+            { eLobbyMenuType.Upgrade.ToString(), EnableUpgradeMenu },
+            //{ eLobbyMenuType.Menu.ToString(), EnableMenuMenu },
+        };
+
+        m_dicDisableMainMenuDelegate = new Dictionary<string, Action>
+        {
+            { eLobbyMenuType.Mining.ToString(), DisableMiningMenu },
+            { eLobbyMenuType.Storage.ToString(), DisableStorageMenu },
+            //{ eLobbyMenuType.Market.ToString(), DisableMarketTab },
+            { eLobbyMenuType.Upgrade.ToString(), DisableUpgradeMenu },
+            //{ eLobbyMenuType.Menu.ToString(), DisableMenuTab },
+        };
+
+        // 탭별 시작함수 호출
+        StartMining();
+        StartStorage();
+        //StartMarket();
+        StartUpgrade();
+        //StartMenu();
+
         // 테이블 정보 얻기
         var pConfigTable = await Single.Table.GetTable<SHTableClientConfig>();
         var pUserInfo    = await Single.Table.GetTable<SHTableUserInfo>();
-        var pInventory   = await Single.Table.GetTable<SHTableServerInventoryInfo>();
-
+        var pInventory   = await Single.Table.GetTable<SHTableServerUserInventory>();
+        var pUpgrade     = await Single.Table.GetTable<SHTableServerUserUpgradeInfo>();
+        
         // 개발용 : 로그인 체크 후 테스트 계정으로 로그인 시켜주기
         // 이 코드에 진입하기 위해서는 로그인 이후 진입된다.
         // 즉, 로그인이 되어 있다면 실제 유저의 정보가 넘어오기 때문에 실제 배포시에도 이 코드는 유지해도 된다.
@@ -44,8 +71,9 @@ public partial class SHBusinessLobby : MonoBehaviour
             }
             else
             {
-                pUserInfo.LoadJsonTable(signinReply.data);
-                pInventory.RequestGetInventoryInfo(pUserInfo.UserId, (inventoryReply) => { });
+                // 유저 데이터 요청
+                pInventory.RequestGetUserInventory(pUserInfo.UserId, (inventoryReply) => { });
+                pUpgrade.RequestGetUserUpgradeInfo(pUserInfo.UserId, (inventoryReply) => { });
 
                 // 소켓 연결 및 이벤트 바인딩
                 Single.Network.ConnectWebSocket();
@@ -61,97 +89,44 @@ public partial class SHBusinessLobby : MonoBehaviour
 
                 // Lobby Mining UIs 로드 및 이벤트 바인딩
                 m_pUIPanelMining = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
-                m_pUIPanelMining.SetEventForChangeTab(OnEventForChangeMiningTab);
-                m_pUIPanelMining.SetEventForFilter(OnEventForMiningFilter);
+                m_pUIPanelMining.SetEventForChangeMiningTab(OnEventForChangeMiningTab);
+                m_pUIPanelMining.SetEventForClickFilter(OnEventForMiningFilter);
 
                 // Lobby Storage UIs 로드 및 이벤트 바인딩
                 m_pUIPanelStorage = await pUIRoot.GetPanel<SHUIPanelStorage>(SHUIConstant.PANEL_STORAGE);
 
-                // 초기화면설정 : Mining Tab 초기화
-                m_eCurrentLobbyMenuType = eLobbyMenuType.Mining;
-                SetChangeMiningTab(eMiningTabType.Active);
+                // 초기화면설정 : Mining 탭 으로 초기화
+                pMenubar.ExecuteClick(eLobbyMenuType.Mining);
                 StartCoroutine("CoroutineForUpdateUIForActiveInformation");
             }
         });
         ////////////////////////////////////////////////////////////////////////////////////
     }
 
-    private void OnEventForChangeLobbyMenu(eLobbyMenuType eType)
+    private void OnEventForChangeLobbyMenu(eLobbyMenuType eTo, eLobbyMenuType eFrom)
     {
-        // @@ 리팩토링이 필요하다.
-        // 조건 분기문도 마음에 안들고, Mining 탭 처리과정도 마음에 안듬
-
-        // On
-        if ((eLobbyMenuType.Mining == eType) && (eLobbyMenuType.Mining != m_eCurrentLobbyMenuType)) {
-            var currentMiningTabType = m_eCurrentMiningTabType;
-            m_eCurrentMiningTabType = eMiningTabType.None;
-            SetChangeMiningTab(currentMiningTabType);
-        }
-        
-        // On
-        if ((eLobbyMenuType.Storage == eType) && (eLobbyMenuType.Storage != m_eCurrentLobbyMenuType)) {
-            ResetStorage();
+        if (eTo == eFrom)
+        {
+            return;
         }
 
-        // Off
-        if ((eLobbyMenuType.Mining != eType) && (eLobbyMenuType.Mining == m_eCurrentLobbyMenuType)) {
-            SetChangeMiningTab(eMiningTabType.None);
+        if (m_dicEnableMainMenuDelegate.ContainsKey(eTo.ToString()))
+        {
+            m_dicEnableMainMenuDelegate[eTo.ToString()]();
         }
-        
-        m_eCurrentLobbyMenuType = eType;
+
+        if (m_dicDisableMainMenuDelegate.ContainsKey(eFrom.ToString()))
+        {
+            m_dicDisableMainMenuDelegate[eFrom.ToString()]();
+        }
     }
 
-    private async void OnEventForMiningFilter()
+    private async void OnEventForSocketReconnect(SHReply pReply)
     {
-        // @@ 필터오픈코드가 여기 있는게 맞나??
-        // 마이닝에 있어야될듯해보이는디??
-
+        // 현재 머물고있는 UI 업데이트
         var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
-        var pPanel = await pUIRoot.GetPanel<SHUIPopupPanelMiningActiveUnitFilter>(SHUIConstant.PANEL_MINING_FILTER);
-
-        // 필터링 대상유닛 데이터 생성
-        var pUnitDatas = new List<SHActiveFilterUnitData>();
-        var pUnitTable = await Single.Table.GetTable<SHTableServerGlobalUnitData>();
-        foreach (var kvp in pUnitTable.m_dicDatas)
-        {
-            var pData = new SHActiveFilterUnitData();
-            pData.m_iUnitId = kvp.Value.m_iUnitId;
-            pData.m_strIconImage = kvp.Value.m_strIconImage;
-
-            var bIsOn = SHPlayerPrefs.GetBool(kvp.Value.m_iUnitId.ToString());
-            pData.m_bIsOn = (null == bIsOn) ? true : bIsOn.Value;
-
-            pUnitDatas.Add(pData);
-        }
-        
-        // 필터링 UI가 닫힐때 PlayerPreb에 셋팅하고, UI를 업데이트 한다.
-        Action<List<SHActiveFilterUnitData>> pCloseEvent = (pDatas) =>
-        {
-            foreach (var pData in pDatas)
-            {
-                SHPlayerPrefs.SetBool(pData.m_iUnitId.ToString(), pData.m_bIsOn);
-            }
-
-            UpdateUIForActiveCompany(() => { });
-            UpdateUIForActiveFilterbar();
-        };
-        
-        // 필터링 UI Open
-        pPanel.Show(pUnitDatas, pCloseEvent);
-    }
-
-    private void OnEventForSocketReconnect(SHReply pReply)
-    {
-        switch (m_eCurrentLobbyMenuType)
-        {
-            case eLobbyMenuType.Mining:
-                var currentMiningTabType = m_eCurrentMiningTabType;
-                m_eCurrentMiningTabType = eMiningTabType.None;
-                SetChangeMiningTab(currentMiningTabType);
-                break;
-            default:
-                break;
-        }
+        var pMenubar = await pUIRoot.GetPanel<SHUIPanelMenubar>(SHUIConstant.PANEL_MENUBAR);
+        OnEventForChangeLobbyMenu(pMenubar.GetCurrentMenu(), eLobbyMenuType.None);
     }
     
     // @@ 디버그기능은 추후에 루나콘솔로 옮기자!!
@@ -193,12 +168,23 @@ public partial class SHBusinessLobby : MonoBehaviour
     public async void OnClickDebugGetMyInventoryInfo()
     {
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
-        var pInventoryInfo = await Single.Table.GetTable<SHTableServerInventoryInfo>();
+        var pInventoryInfo = await Single.Table.GetTable<SHTableServerUserInventory>();
         
-        pInventoryInfo.RequestGetInventoryInfo(pUserInfo.UserId, (reply) => 
+        pInventoryInfo.RequestGetUserInventory(pUserInfo.UserId, (reply) => 
         {
             Single.BusinessGlobal.ShowAlertUI(reply);
-            pInventoryInfo.LoadJsonTable(reply.data);
+        });
+    }
+
+    [FuncButton]
+    public async void OnClickDebugGetMyUpgradeInfo()
+    {
+        var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
+        var UpgradeInfo = await Single.Table.GetTable<SHTableServerUserUpgradeInfo>();
+
+        UpgradeInfo.RequestGetUserUpgradeInfo(pUserInfo.UserId, (reply) =>
+        {
+            Single.BusinessGlobal.ShowAlertUI(reply);
         });
     }
 }

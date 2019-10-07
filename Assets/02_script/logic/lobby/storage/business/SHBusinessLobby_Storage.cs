@@ -5,9 +5,14 @@ using System.Collections.Generic;
 
 public partial class SHBusinessLobby : MonoBehaviour
 {
-    private async void ResetStorage()
+    private void StartStorage()
     {
-        var pInventory   = await Single.Table.GetTable<SHTableServerInventoryInfo>();
+
+    }
+
+    private async void EnableStorageMenu()
+    {
+        var pInventory   = await Single.Table.GetTable<SHTableServerUserInventory>();
         var pUnitTable   = await Single.Table.GetTable<SHTableServerGlobalUnitData>();
         var pStringTable = await Single.Table.GetTable<SHTableClientString>();
 
@@ -16,7 +21,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         
         // Unit Goods 셋팅
         var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
-        pInventory.RequestGetInventoryInfo(pUserInfo.UserId, (reply) => 
+        pInventory.RequestGetUserInventory(pUserInfo.UserId, (reply) => 
         {
             var pUnitData = new List<SHTableGridSlotForUnitData>();
             foreach (var kvp in pInventory.HasUnits)
@@ -38,6 +43,10 @@ public partial class SHBusinessLobby : MonoBehaviour
 
         // Artifact Goods 셋팅
         //m_pUIPanelStorage
+    }
+
+    private void DisableStorageMenu()
+    {
     }
 
     public void OnEventForTransaction(int iUnitId)

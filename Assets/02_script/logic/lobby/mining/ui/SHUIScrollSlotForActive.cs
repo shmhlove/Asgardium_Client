@@ -6,21 +6,21 @@ using System.Collections.Generic;
 
 public class SHActiveSlotData
 {
-    public string m_strGroupId;
+    public string m_strGroupId;         // GroupID
 
-    public string m_strInstanceId;
-    public string m_strCompanyName;
-    public string m_strCompanyIcon;
-    public string m_strUnitIcon;
+    public string m_strInstanceId;      // 회사 인스턴스 ID
+    public string m_strCompanyName;     // 회사 이름
+    public string m_strCompanyIcon;     // 회사 아이콘
+    public string m_strUnitIcon;        // 유닛 아이콘
 
-    public int m_iUnitId;
-    public int m_iUnitQuantity;
-    public int m_iEfficiencyLevel;
-    public int m_iSupplyQuantity;
-    public int m_iPurchaseCost;
+    public int m_iUnitId;               // 유닛 ID
+    public int m_iUnitQuantity;         // 구매시 획득 유닛 물량
+    public int m_iEfficiencyLevel;      // 회사 레벨
+    public int m_iSupplyQuantity;       // 구매 가능한 공급 물량
+    public int m_iPurchaseCost;         // 구매 가격
 
     public bool m_bIsSubItems;
-    public bool m_bIsNPCCompany;
+    public bool m_bIsNPCCompany;        // NPC 회사여부
 
     public Action<string> m_pEventPurchaseButton;
     public Action<string> m_pEventShowSubUnitsButton;

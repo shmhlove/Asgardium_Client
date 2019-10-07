@@ -14,6 +14,7 @@ public static class SHAPIs
 
     // Web : User 관련
     public static string SH_API_USER_GET_INVENTORY = "/process/instance_user_inventory";
+    public static string SH_API_USER_GET_UPGRADE_INFO = "/process/instance_user_upgrade_info";
 
     // Web : Mining 관련
     public static string SH_API_MINING_PURCHASE_ACTIVE = "/process/purchase_unit_at_mining_active";

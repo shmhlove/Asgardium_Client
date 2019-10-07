@@ -31,7 +31,8 @@ public partial class SHTableData : SHBaseData
         m_dicTables.Add(typeof(SHTableServerMiningActiveCompanyNPC), new SHTableServerMiningActiveCompanyNPC());
         m_dicTables.Add(typeof(SHTableServerMiningActiveQuantity), new SHTableServerMiningActiveQuantity());
         m_dicTables.Add(typeof(SHTableServerMiningActiveSupply), new SHTableServerMiningActiveSupply());
-        m_dicTables.Add(typeof(SHTableServerInventoryInfo), new SHTableServerInventoryInfo());
+        m_dicTables.Add(typeof(SHTableServerUserInventory), new SHTableServerUserInventory());
+        m_dicTables.Add(typeof(SHTableServerUserUpgradeInfo), new SHTableServerUserUpgradeInfo());
     }
     
     public override void OnFinalize()

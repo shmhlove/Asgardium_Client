@@ -7,15 +7,15 @@ using System.Collections.Generic;
 
 using LitJson;
 
-public class SHTableServerInventoryInfo : SHBaseTable
+public class SHTableServerUserInventory : SHBaseTable
 {
     public string UserId = string.Empty;
     public long MiningPowerAt = 0;
 	public Dictionary<int, int> HasUnits = new Dictionary<int, int>();
 
-    public SHTableServerInventoryInfo()
+    public SHTableServerUserInventory()
     {
-        m_strIdentity = "ServerInventoryInfo";
+        m_strIdentity = "ServerUserInventory";
     }
 
     public override bool IsLoadTable()
@@ -45,7 +45,7 @@ public class SHTableServerInventoryInfo : SHBaseTable
         return eErrorCode.Succeed;
     }
 
-    public void RequestGetInventoryInfo(string strUserId, Action<SHReply> pCallback)
+    public void RequestGetUserInventory(string strUserId, Action<SHReply> pCallback)
     {
         JsonData json = new JsonData
         {

@@ -77,6 +77,10 @@ public class SHTableUserInfo : SHBaseTable
             {
                 Single.Network.POST(SHAPIs.SH_API_AUTH_SIGNIN, json, (signinReply) =>
                 {
+                    if (signinReply.isSucceed)
+                    {
+                        LoadJsonTable(signinReply.data);
+                    }
                     pCallback(signinReply);
                 });
             }
@@ -88,6 +92,10 @@ public class SHTableUserInfo : SHBaseTable
                     {
                         Single.Network.POST(SHAPIs.SH_API_AUTH_SIGNIN, json, (signinReply) =>
                         {
+                            if (signinReply.isSucceed)
+                            {
+                                LoadJsonTable(signinReply.data);
+                            }
                             pCallback(signinReply);
                         });
                     }

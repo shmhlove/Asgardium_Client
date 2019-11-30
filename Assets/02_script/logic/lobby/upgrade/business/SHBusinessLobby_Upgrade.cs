@@ -7,7 +7,8 @@ public partial class SHBusinessLobby : MonoBehaviour
 {
     private void StartUpgrade()
     {
-
+        AddEnableDelegate(eLobbyMenuType.Upgrade, EnableUpgradeMenu);
+        AddDisableDelegate(eLobbyMenuType.Upgrade, DisableUpgradeMenu);
     }
 
     private async void EnableUpgradeMenu()

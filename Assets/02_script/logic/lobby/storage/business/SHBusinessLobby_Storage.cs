@@ -7,7 +7,8 @@ public partial class SHBusinessLobby : MonoBehaviour
 {
     private void StartStorage()
     {
-
+        AddEnableDelegate(eLobbyMenuType.Storage, EnableStorageMenu);
+        AddDisableDelegate(eLobbyMenuType.Storage, DisableStorageMenu);
     }
 
     private async void EnableStorageMenu()

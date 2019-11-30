@@ -15,6 +15,9 @@ public partial class SHBusinessLobby : MonoBehaviour
 
     private void StartMining()
     {
+        AddEnableDelegate(eLobbyMenuType.Mining, EnableMiningMenu);
+        AddDisableDelegate(eLobbyMenuType.Mining, DisableMiningMenu);
+
         m_dicMiningMenuEnableDelegate = new Dictionary<string, Action>
         {
             { eMiningTabType.Active.ToString(), EnableMiningActiveTab }

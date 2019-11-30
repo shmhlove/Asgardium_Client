@@ -14,8 +14,8 @@ public partial class SHBusinessLobby : MonoBehaviour
     private SHUIPanelMining  m_pUIPanelMining = null;
     private SHUIPanelStorage m_pUIPanelStorage = null;
 
-    private Dictionary<string, Action> m_dicEnableMainMenuDelegate;
-    private Dictionary<string, Action> m_dicDisableMainMenuDelegate;
+    private Dictionary<string, Action> m_dicEnableMainMenuDelegate = new Dictionary<string, Action>();
+    private Dictionary<string, Action> m_dicDisableMainMenuDelegate = new Dictionary<string, Action>();
 
     private void Awake()
     {
@@ -24,25 +24,6 @@ public partial class SHBusinessLobby : MonoBehaviour
 
     private async void Start()
     {
-        // 델리게이트 함수 등록
-        m_dicEnableMainMenuDelegate = new Dictionary<string, Action>
-        {
-            { eLobbyMenuType.Mining.ToString(), EnableMiningMenu },
-            { eLobbyMenuType.Storage.ToString(), EnableStorageMenu },
-            //{ eLobbyMenuType.Market.ToString(), EnableMarketMenu },
-            { eLobbyMenuType.Upgrade.ToString(), EnableUpgradeMenu },
-            //{ eLobbyMenuType.Menu.ToString(), EnableMenuMenu },
-        };
-
-        m_dicDisableMainMenuDelegate = new Dictionary<string, Action>
-        {
-            { eLobbyMenuType.Mining.ToString(), DisableMiningMenu },
-            { eLobbyMenuType.Storage.ToString(), DisableStorageMenu },
-            //{ eLobbyMenuType.Market.ToString(), DisableMarketTab },
-            { eLobbyMenuType.Upgrade.ToString(), DisableUpgradeMenu },
-            //{ eLobbyMenuType.Menu.ToString(), DisableMenuTab },
-        };
-
         // 탭별 시작함수 호출
         StartMining();
         StartStorage();
@@ -102,6 +83,30 @@ public partial class SHBusinessLobby : MonoBehaviour
         });
         ////////////////////////////////////////////////////////////////////////////////////
     }
+
+    private void AddEnableDelegate(eLobbyMenuType eMenuType, Action pCallback)
+    {
+        if (true == m_dicEnableMainMenuDelegate.ContainsKey(eMenuType.ToString()))
+        {
+            m_dicEnableMainMenuDelegate[eMenuType.ToString()] = pCallback;
+        }
+        else
+        {
+            m_dicEnableMainMenuDelegate.Add(eMenuType.ToString(), pCallback);
+        }
+    }
+
+    private void AddDisableDelegate(eLobbyMenuType eMenuType, Action pCallback)
+    {
+        if (true == m_dicDisableMainMenuDelegate.ContainsKey(eMenuType.ToString()))
+        {
+            m_dicDisableMainMenuDelegate[eMenuType.ToString()] = pCallback;
+        }
+        else
+        {
+            m_dicDisableMainMenuDelegate.Add(eMenuType.ToString(), pCallback);
+        }
+}
 
     private void OnEventForChangeLobbyMenu(eLobbyMenuType eTo, eLobbyMenuType eFrom)
     {

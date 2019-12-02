@@ -6,7 +6,15 @@ using System.Collections.Generic;
 
 public class SHUIPanelUpgrade : SHUIPanel
 {
-    // 마이닝 업그레이드
+    public SHUIActiveUpgrade m_pActiveUpgradeInfo;
+
+    // 엑티브 업그레이드
+    public void SetActiveUpgradeInfo(long lPowerLv, long lTimeLv)
+    {
+        m_pActiveUpgradeInfo.SetPowerLevel(lPowerLv.ToString());
+        m_pActiveUpgradeInfo.SetTimeLevel(lTimeLv.ToString());
+    }
+
     // 열린 회사 업그레이드
-    // 회사 구매
+    // 닫힌 회사 구매
 }

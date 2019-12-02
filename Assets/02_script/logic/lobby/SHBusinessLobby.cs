@@ -13,6 +13,7 @@ public partial class SHBusinessLobby : MonoBehaviour
     [Header("UI Objects")]
     private SHUIPanelMining  m_pUIPanelMining = null;
     private SHUIPanelStorage m_pUIPanelStorage = null;
+    private SHUIPanelUpgrade m_pUIPanelUpgrade = null;
 
     private Dictionary<string, Action> m_dicEnableMainMenuDelegate = new Dictionary<string, Action>();
     private Dictionary<string, Action> m_dicDisableMainMenuDelegate = new Dictionary<string, Action>();
@@ -75,6 +76,9 @@ public partial class SHBusinessLobby : MonoBehaviour
 
                 // Lobby Storage UIs 로드 및 이벤트 바인딩
                 m_pUIPanelStorage = await pUIRoot.GetPanel<SHUIPanelStorage>(SHUIConstant.PANEL_STORAGE);
+
+                // Lobby Upgrade UIs 로드 및 이벤트 바인딩
+                m_pUIPanelUpgrade = await pUIRoot.GetPanel<SHUIPanelUpgrade>(SHUIConstant.PANEL_UPGRADE);
 
                 // 초기화면설정 : Mining 탭 으로 초기화
                 pMenubar.ExecuteClick(eLobbyMenuType.Mining);

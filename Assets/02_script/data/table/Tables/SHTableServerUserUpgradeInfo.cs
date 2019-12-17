@@ -29,8 +29,8 @@ public class SHTableServerUserUpgradeInfo : SHBaseTable
             return eErrorCode.Table_LoadFailed;
         
         UserId = GetStrToJson(pJson, "user_id");
-        MiningPowerLv = GetLongToJson(pJson, "mining_power_lv");
-        ChargeTimeLv = GetLongToJson(pJson, "charge_time_lv");
+        MiningPowerLv = GetIntToJson(pJson, "mining_power_lv");
+        ChargeTimeLv = GetIntToJson(pJson, "charge_time_lv");
 
         m_bIsLoaded = true;
 

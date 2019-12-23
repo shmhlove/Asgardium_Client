@@ -38,7 +38,7 @@ public class SHDataManager : SHSingleton<SHDataManager>
     
     public async Task Load(eSceneType eType, Action<SHLoadingInfo> pDone, Action<SHLoadingInfo> pProgress)
     {
-        OnEventToLoadStart();
+        OnEventForLoadStart();
 
         await GetLoadList(eType, (pLoadList) => 
         {
@@ -49,7 +49,7 @@ public class SHDataManager : SHSingleton<SHDataManager>
                     pDone(pLoadInfo);
                 }
                 
-                OnEventToLoadDone();
+                OnEventForLoadDone();
             }, pProgress);
         });
     }
@@ -95,7 +95,7 @@ public class SHDataManager : SHSingleton<SHDataManager>
         });
     }
     
-    public void OnEventToLoadStart()
+    public void OnEventForLoadStart()
     {
         UnityEngine.Resources.UnloadUnusedAssets();
         
@@ -105,7 +105,7 @@ public class SHDataManager : SHSingleton<SHDataManager>
         }
     }
     
-    public void OnEventToLoadDone()
+    public void OnEventForLoadDone()
     {
         UnityEngine.Resources.UnloadUnusedAssets();
         

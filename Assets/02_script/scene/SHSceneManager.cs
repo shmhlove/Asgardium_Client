@@ -36,7 +36,7 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
         {
             Single.Coroutine.CachingWait(()=> 
             {
-                SendEventToBeforeLoad(eType);
+                SendEventForBeforeLoad(eType);
                 Single.Coroutine.Async(SceneManager.LoadSceneAsync(eType.ToString(), eMode), async (pAsync) => 
                 {
                     if (true == bIsUseFade)
@@ -44,7 +44,7 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
                     else
                         pCallback(new SHReply());
 
-                    SendEventToAfterLoad(eType);
+                    SendEventForAfterLoad(eType);
                 });
             });
         };
@@ -117,7 +117,7 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
         return SHUtils.GetSceneTypeByString(SceneManager.GetActiveScene().name);
     }
     
-    private void SendEventToBeforeLoad(eSceneType eLoadScene)
+    private void SendEventForBeforeLoad(eSceneType eLoadScene)
     {
         foreach (var callback in beforeLoadSceneEvents)
         {
@@ -125,7 +125,7 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
         }
     }
 
-    private void SendEventToAfterLoad(eSceneType eLoadScene)
+    private void SendEventForAfterLoad(eSceneType eLoadScene)
     {
         foreach (var callback in afterLoadSceneEvents)
         {

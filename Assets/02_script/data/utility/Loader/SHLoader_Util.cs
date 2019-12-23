@@ -18,7 +18,7 @@ public partial class SHLoader
     
     void CoroutineToLoadProgressEvent()
     {
-        CallEventToProgress();
+        CallEventForProgress();
 
         if (true == IsLoadDone())
             return;
@@ -38,7 +38,7 @@ public partial class SHLoader
             return;
         }
         
-        pDataInfo.LoadCall(OnEventToLoadStart, OnEventToLoadDone);
+        pDataInfo.LoadCall(OnEventForLoadStart, OnEventForLoadDone);
     }
 
     void AddLoadDatas(List<Dictionary<string, SHLoadData>> pLoadData)
@@ -51,16 +51,16 @@ public partial class SHLoader
 
     void AddLoadEvent(Action<SHLoadingInfo> pDone, Action<SHLoadingInfo> pProgress)
     {
-        EventToDone = pDone;
-        EventToProgress = pProgress;
+        EventForDone = pDone;
+        EventForProgress = pProgress;
     }
 
-    void OnEventToLoadStart(string strFileName, SHLoadStartInfo pData)
+    void OnEventForLoadStart(string strFileName, SHLoadStartInfo pData)
     {
         m_pProgress.SetLoadStartInfo(strFileName, pData);
     }
 
-    void OnEventToLoadDone(string strFileName, SHLoadEndInfo pData)
+    void OnEventForLoadDone(string strFileName, SHLoadEndInfo pData)
     {
         m_pProgress.SetLoadDoneInfo(strFileName, pData);
 
@@ -69,24 +69,24 @@ public partial class SHLoader
             return;
         }
 
-        CallEventToProgress();
-        CallEventToDone();
+        CallEventForProgress();
+        CallEventForDone();
     }
     
-    void CallEventToProgress()
+    void CallEventForProgress()
     {
-        if (null == EventToProgress)
+        if (null == EventForProgress)
             return;
 
-        EventToProgress(m_pProgress.GetLoadingInfo());
+        EventForProgress(m_pProgress.GetLoadingInfo());
     }
 
-    void CallEventToDone()
+    void CallEventForDone()
     {
-        if (null == EventToDone)
+        if (null == EventForDone)
             return;
 
-        EventToDone(m_pProgress.GetLoadingInfo());
+        EventForDone(m_pProgress.GetLoadingInfo());
     }
     
     // 로드가 완료되었는가?(성공/실패유무가 아님)

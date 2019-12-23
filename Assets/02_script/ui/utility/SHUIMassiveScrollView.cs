@@ -32,7 +32,7 @@ public class SHUIMassiveScrollView : MonoBehaviour
     #region Members : Info
     protected Dictionary<int, GameObject>   m_dicSlots          = new Dictionary<int, GameObject>();
     private Queue<GameObject>               m_pSpareSlots       = new Queue<GameObject>();
-    private Action<GameObject, int>         m_pEventToSetData   = null;
+    private Action<GameObject, int>         m_pEventForSetData   = null;
 
     private int     m_iTotalCount           = -1;
     private int     m_iReservedCount        = -1;
@@ -423,7 +423,7 @@ public class SHUIMassiveScrollView : MonoBehaviour
 
     public void SetListenerForSetData(System.Action<GameObject, int> listener)
     {
-        m_pEventToSetData = listener;
+        m_pEventForSetData = listener;
     }
     #endregion
 
@@ -581,9 +581,9 @@ public class SHUIMassiveScrollView : MonoBehaviour
                 {
                     SetSlotData(slot, i);
 
-                    if (m_pEventToSetData != null)
+                    if (m_pEventForSetData != null)
                     {
-                        m_pEventToSetData(slot, i);
+                        m_pEventForSetData(slot, i);
                     }
                 }
             }
@@ -596,9 +596,9 @@ public class SHUIMassiveScrollView : MonoBehaviour
 
                 SetSlotData(slot, i);
 
-                if (m_pEventToSetData != null)
+                if (m_pEventForSetData != null)
                 {
-                    m_pEventToSetData(slot, i);
+                    m_pEventForSetData(slot, i);
                 }
             }
         }
@@ -658,9 +658,9 @@ public class SHUIMassiveScrollView : MonoBehaviour
                 {
                     SetSlotData(slot, i);
 
-                    if (m_pEventToSetData != null)
+                    if (m_pEventForSetData != null)
                     {
-                        m_pEventToSetData(slot, i);
+                        m_pEventForSetData(slot, i);
                     }
                 }
             }
@@ -673,9 +673,9 @@ public class SHUIMassiveScrollView : MonoBehaviour
 
                 SetSlotData(slot, i);
 
-                if (m_pEventToSetData != null)
+                if (m_pEventForSetData != null)
                 {
-                    m_pEventToSetData(slot, i);
+                    m_pEventForSetData(slot, i);
                 }
             }
         }

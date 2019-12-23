@@ -36,7 +36,7 @@ public partial class SHLoader
         
         if (false == IsRemainLoadFiles())
         {
-            CallEventToDone();
+            CallEventForDone();
             return;
         }
 

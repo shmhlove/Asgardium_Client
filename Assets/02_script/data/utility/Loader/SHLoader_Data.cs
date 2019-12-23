@@ -220,13 +220,13 @@ public partial class SHLoader
     public SHLoadProgress m_pProgress = new SHLoadProgress();
 
     // 이벤트
-    public Action<SHLoadingInfo> EventToDone;
-    public Action<SHLoadingInfo> EventToProgress;
+    public Action<SHLoadingInfo> EventForDone;
+    public Action<SHLoadingInfo> EventForProgress;
 
     public void Initialize()
     {
         m_pProgress.Initialize();
-        EventToDone = null;
-        EventToProgress = null;
+        EventForDone = null;
+        EventForProgress = null;
     }
 }

@@ -38,4 +38,18 @@ public partial class SHBusinessLobby : MonoBehaviour
     }
 
     // 닫힌 회사 구매
+    // 마이닝파워 업그레이드 이벤트
+    private void OnEventForUpgradePowerupBtn()
+    {
+        Debug.Log("파워 이벤트 옴");
+    }
+
+    // 충전시간 업그레이드 이벤트
+    private void OnEventForUpgradeTimeupBtn()
+    {
+        Debug.Log("타임 이벤트 옴");
+    }
+
+    // 회사 설립 이벤트
+    // 회사 업그레이드 이벤트
 }

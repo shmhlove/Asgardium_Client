@@ -9,6 +9,11 @@ public class SHUIPanelUpgrade : SHUIPanel
     public SHUIActiveUpgrade m_pActiveUpgradeInfo;
 
     // 엑티브 업그레이드
+    public void AddEventForActiveUpgrade(GameObject gameObject)
+    {
+        m_pActiveUpgradeInfo.AddEvent(gameObject);
+    }
+
     public void SetActiveUpgradeInfo(long lPowerLv, long lTimeLv)
     {
         m_pActiveUpgradeInfo.SetPowerLevel(lPowerLv.ToString());

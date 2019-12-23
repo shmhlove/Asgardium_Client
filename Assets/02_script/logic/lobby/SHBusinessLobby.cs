@@ -7,6 +7,7 @@ using System.Collections.Generic;
 
 using LitJson;
 using socket.io;
+using LunarConsolePlugin;
 
 public partial class SHBusinessLobby : MonoBehaviour
 {
@@ -65,26 +66,35 @@ public partial class SHBusinessLobby : MonoBehaviour
                 // UI 초기화
                 var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
 
-                // Lobby MainMenu 이벤트 바인딩
+                // Lobby MainMenu
                 var pMenubar = await pUIRoot.GetPanel<SHUIPanelMenubar>(SHUIConstant.PANEL_MENUBAR);
                 pMenubar.SetEventForChangeLobbyMenu(OnEventForChangeLobbyMenu);
 
-                // Lobby Mining UIs 로드 및 이벤트 바인딩
+                // Lobby Mining
                 m_pUIPanelMining = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
                 m_pUIPanelMining.SetEventForChangeMiningTab(OnEventForChangeMiningTab);
                 m_pUIPanelMining.SetEventForClickFilter(OnEventForMiningFilter);
 
-                // Lobby Storage UIs 로드 및 이벤트 바인딩
+                // Lobby Storage
                 m_pUIPanelStorage = await pUIRoot.GetPanel<SHUIPanelStorage>(SHUIConstant.PANEL_STORAGE);
 
-                // Lobby Upgrade UIs 로드 및 이벤트 바인딩
+                // Lobby Upgrade
                 m_pUIPanelUpgrade = await pUIRoot.GetPanel<SHUIPanelUpgrade>(SHUIConstant.PANEL_UPGRADE);
-
+                m_pUIPanelUpgrade.AddEventForActiveUpgrade(gameObject);
+                
                 // 초기화면설정 : Mining 탭 으로 초기화
                 pMenubar.ExecuteClick(eLobbyMenuType.Mining);
                 StartCoroutine("CoroutineForUpdateUIForActiveInformation");
             }
         });
+
+        // 디버그 기능
+        LunarConsole.RegisterAction("Socket Disconnect", OnClickDebugSocketDisconnect);
+        LunarConsole.RegisterAction("Socket SendMessage", OnClickDebugSocketSendMessage);
+        LunarConsole.RegisterAction("Socket Mining Subscribe", OnClickDebugSocketMiningSubscribe);
+        LunarConsole.RegisterAction("Socket Mining Unsubscribe", OnClickDebugSocketMiningUnubscribe);
+        LunarConsole.RegisterAction("Web GetMyInventoryInfo", OnClickDebugGetMyInventoryInfo);
+        LunarConsole.RegisterAction("Web GetMyUpgradeInfo", OnClickDebugGetMyUpgradeInfo);
         ////////////////////////////////////////////////////////////////////////////////////
     }
 
@@ -138,7 +148,6 @@ public partial class SHBusinessLobby : MonoBehaviour
         OnEventForChangeLobbyMenu(pMenubar.GetCurrentMenu(), eLobbyMenuType.None);
     }
     
-    // @@ 디버그기능은 추후에 루나콘솔로 옮기자!!
     [FuncButton]
     public void OnClickDebugSocketDisconnect()
     {

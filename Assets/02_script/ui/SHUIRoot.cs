@@ -37,8 +37,12 @@ public class SHUIRoot : MonoBehaviour
     
     public async Task<T> GetPanel<T>(string strName) where T : SHUIPanel
     {
+        // 아래 코드를 한순간에 한번만 실행 될 수 있도록 세마포어로 대기시켜준다.
+        // 비동기 실행시 똑같은 리소스를 여러번 동적로드 할 수 있다.
         await m_pSemaphoreSlim.WaitAsync();
 
+        // Single.Resources.GetComponentByObject에 의한 비동기 동적로드가 있을 수 있으므로
+        // Promise 개념으로 Async-Await 처리를 한다.
         var pPromise = new TaskCompletionSource<T>();
         try
         {
@@ -55,7 +59,7 @@ public class SHUIRoot : MonoBehaviour
         }
         finally
         {
-            m_pSemaphoreSlim.Release();
+            m_pSemaphoreSlim.Release(1);
         }
 
         return await pPromise.Task;

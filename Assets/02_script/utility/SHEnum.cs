@@ -7,25 +7,29 @@ public enum eErrorCode
 
     // network error
     Net_Common_HTTP = 1000,
-
-    // Server error (Sync ServerErrorCode)
+    
+    // Server error
+    Server_Common_InvalidAccessToken = 1003,
     Server_Auth_AlreadySignupUser = 2001,
     Server_Auth_NoSignupUser = 2002,
     Server_Auth_NoMatchPassword = 2003,
     Server_Mining_ZeroSupplyQuantity = 4001,
     Server_Mining_NotEnoughMiningPower = 4002,
+    Server_Upgrade_MaxLevel = 5001,
+    Server_Upgrade_NotEnoughGold = 5002,
+    
+    // ClientErr : common error
+    Common_Net_InvalidResponseData = 100001,
+    Common_Net_JsonParse = 100002,
+    Common_Need_login = 100003,
 
-    // net common error
-    Net_InvalidResponseData = 100001,
-    Net_JsonParse = 100002,
-
-    // socket error
+    // ClientErr : socket error
     Net_Socket_Disconnect = 101001,
     Net_Socket_Connect_Error = 101002,
     Net_Socket_Connect_Timeout = 101003,
     Net_Socket_Aready_Connect = 101004,
 
-    // data error
+    // ClientErr : data error
     Data_NotImplementation = 102001,
     Resources_NotExsitInTable = 102002,
     Resources_LoadFailed = 102003,
@@ -35,10 +39,10 @@ public enum eErrorCode
     Table_Not_ExsitFile = 102007,
     Table_Error_Grammar = 102008,
 
-    // scene error
+    // ClientErr : scene error
     Scene_Already_Loaded = 103001,
 
-    // Auth
+    // ClientErr : Auth
     Auth_InvalidEmail = 104001,
 }
 

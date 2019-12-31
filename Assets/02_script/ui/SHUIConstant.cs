@@ -36,4 +36,8 @@ public static class SHUIConstant
     // Lobby Mining
     public static string PANEL_MINING_SUB_ACTIVE_COMPANY = "Panel - MiningSubActiveCompany";
     public static string PANEL_MINING_FILTER = "Panel - MiningActiveUnitFilter";
+
+    // Lobby Upgrade
+    public static string PANEL_UPGRADE_POWER = "Panel - UpgradePower";
+    
 }

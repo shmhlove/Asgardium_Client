@@ -15,6 +15,8 @@
     "1009": "Would you like to retry?",
     "1010": "Supply quantity are exhausted.",
     "1011": "to lack mining power.",
+    "1012": "Upgrade max level reached.",
+    "1013": "You are short of gold.",
 
     "10000": "Email",
     "10001": "Password",

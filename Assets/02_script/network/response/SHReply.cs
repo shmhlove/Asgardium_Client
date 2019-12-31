@@ -20,16 +20,16 @@ public class SHReply
     public string requestMethod;
     public string requestUrl;
 
-    public eErrorCode errorCode
+    public int errorCode
     {
         get
         {
             if (null == error)
             {
                 if (isSucceed)
-                    return eErrorCode.Succeed;
+                    return (int)eErrorCode.Succeed;
                 else
-                    return eErrorCode.Failed;
+                    return (int)eErrorCode.Failed;
             }
             
             return error.code;
@@ -76,7 +76,7 @@ public class SHReply
         if (0 == this.rawResponse.Keys.Count)
         {
             this.isSucceed = false;
-            this.error = new SHError(eErrorCode.Net_InvalidResponseData, strMessage);
+            this.error = new SHError(eErrorCode.Common_Net_InvalidResponseData, strMessage);
         }
         else
         {
@@ -133,7 +133,7 @@ public class SHReply
                 if (0 == this.rawResponse.Keys.Count)
                 {
                     this.isSucceed = false;
-                    this.error = new SHError(eErrorCode.Net_InvalidResponseData, request.downloadHandler.text);
+                    this.error = new SHError(eErrorCode.Common_Net_InvalidResponseData, request.downloadHandler.text);
                 }
                 else
                 {
@@ -153,9 +153,9 @@ public class SHReply
                     {
                         var pError = this.rawResponse["error"];
                         if (pError.Keys.Contains("extras"))
-                            this.error = new SHError((eErrorCode)(int)pError["code"], (string)pError["message"], pError["extras"]);
+                            this.error = new SHError((int)pError["code"], (string)pError["message"], pError["extras"]);
                         else
-                            this.error = new SHError((eErrorCode)(int)pError["code"], (string)pError["message"]);
+                            this.error = new SHError((int)pError["code"], (string)pError["message"]);
                     }
                 }
             }
@@ -163,7 +163,7 @@ public class SHReply
             {
                 this.isSucceed = false;
                 this.error = new SHError(
-                    eErrorCode.Net_JsonParse, 
+                    eErrorCode.Common_Net_JsonParse, 
                     string.Format("{0}\n{1}", "Err Json Parse With Server ResponseData", 
                     request.downloadHandler.text));
             }

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 using LitJson;
 
-public class SHTableServerGlobalUnitDataData
+public class SHTableServerGlobalUnitData
 {
     public int m_iUnitId;
     public int m_iNameStrId;
@@ -17,13 +17,13 @@ public class SHTableServerGlobalUnitDataData
     public int m_iFuelUnitId_2;
 }
 
-public class SHTableServerGlobalUnitData : SHBaseTable
+public class SHTableServerGlobalUnit : SHBaseTable
 {
-    public Dictionary<int, SHTableServerGlobalUnitDataData> m_dicDatas = new Dictionary<int, SHTableServerGlobalUnitDataData>();
+    public Dictionary<int, SHTableServerGlobalUnitData> m_dicDatas = new Dictionary<int, SHTableServerGlobalUnitData>();
 	
-    public SHTableServerGlobalUnitData()
+    public SHTableServerGlobalUnit()
     {
-        m_strIdentity = "ServerGlobalUnitData";
+        m_strIdentity = "ServerGlobalUnit";
     }
     
     public override eErrorCode LoadServerTable(Action<eErrorCode> pCallback)
@@ -31,7 +31,7 @@ public class SHTableServerGlobalUnitData : SHBaseTable
         if (null == pCallback)
             return eErrorCode.Table_LoadFailed;
 
-        Single.Network.GET(SHAPIs.SH_API_GET_UNIT_DATA_TABLE, null, (reply) => 
+        Single.Network.GET(SHAPIs.SH_API_GET_UNIT_TABLE, null, (reply) => 
         {
             if (reply.isSucceed)
             {
@@ -55,7 +55,7 @@ public class SHTableServerGlobalUnitData : SHBaseTable
 
         for (int iLoop = 0; iLoop < pJson.Count; ++iLoop)
         {
-            var pData = new SHTableServerGlobalUnitDataData();
+            var pData = new SHTableServerGlobalUnitData();
             pData.m_iUnitId = GetIntToJson(pJson[iLoop], "unit_id");
             pData.m_iNameStrId = GetIntToJson(pJson[iLoop], "name_str_id");
             pData.m_strIconImage = GetStrToJson(pJson[iLoop], "icon_image");
@@ -68,10 +68,10 @@ public class SHTableServerGlobalUnitData : SHBaseTable
         return eErrorCode.Succeed;
     }
 
-    public SHTableServerGlobalUnitDataData GetData(int iUnitId)
+    public SHTableServerGlobalUnitData GetData(int iUnitId)
     {
         if (false == m_dicDatas.ContainsKey(iUnitId))
-            return new SHTableServerGlobalUnitDataData();
+            return new SHTableServerGlobalUnitData();
 
         return m_dicDatas[iUnitId];
     }

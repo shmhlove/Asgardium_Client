@@ -14,15 +14,14 @@ public partial class SHBusinessLobby : MonoBehaviour
     private async void EnableStorageMenu()
     {
         var pInventory   = await Single.Table.GetTable<SHTableServerUserInventory>();
-        var pUnitTable   = await Single.Table.GetTable<SHTableServerGlobalUnitData>();
+        var pUnitTable   = await Single.Table.GetTable<SHTableServerGlobalUnit>();
         var pStringTable = await Single.Table.GetTable<SHTableClientString>();
 
         // Basic Goods 셋팅
         //m_pUIPanelStorage
         
         // Unit Goods 셋팅
-        var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
-        pInventory.RequestGetUserInventory(pUserInfo.UserId, (reply) => 
+        pInventory.RequestGetUserInventory((reply) => 
         {
             var pUnitData = new List<SHTableGridSlotForUnitData>();
             foreach (var kvp in pInventory.HasUnits)

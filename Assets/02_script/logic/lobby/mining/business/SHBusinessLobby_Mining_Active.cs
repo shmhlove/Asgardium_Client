@@ -68,7 +68,7 @@ public partial class SHBusinessLobby : MonoBehaviour
     {
         var bIsAllOn = true;
         var pSlotDatas = new List<SHActiveFilterUnitData>();
-        var pUnitTable = await Single.Table.GetTable<SHTableServerGlobalUnitData>();
+        var pUnitTable = await Single.Table.GetTable<SHTableServerGlobalUnit>();
 
         foreach (var kvp in pUnitTable.m_dicDatas)
         {
@@ -151,7 +151,7 @@ public partial class SHBusinessLobby : MonoBehaviour
     {
         var pCompanyTable = await Single.Table.GetTable<SHTableServerInstanceMiningActiveCompany>();
         var pStringTable = await Single.Table.GetTable<SHTableClientString>();
-        var pServerGlobalUnitDataTable = await Single.Table.GetTable<SHTableServerGlobalUnitData>();
+        var pServerGlobalUnitDataTable = await Single.Table.GetTable<SHTableServerGlobalUnit>();
         var pActiveMiningQuantityTable = await Single.Table.GetTable<SHTableServerMiningActiveQuantity>();
 
         Func<SHTableServerInstanceMiningActiveCompanyData, SHActiveSlotData> pCreateSlotData =
@@ -229,51 +229,20 @@ public partial class SHBusinessLobby : MonoBehaviour
         }
     }
     
-    private async void RequestSubscribeMiningActiveInfo()
+    private void RequestSubscribeMiningActiveInfo()
     {
-        var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
-        if (false == pUserInfo.IsLogin()) {
-            var pStringTable = await Single.Table.GetTable<SHTableClientString>();
-            Single.BusinessGlobal.ShowAlertUI(pStringTable.GetString("1000"));
-            return;
-        }
-
-        JsonData json = new JsonData
-        {
-            ["user_id"] = pUserInfo.UserId
-        };
-        Single.Network.SendRequestSocket(SHAPIs.SH_SOCKET_REQ_SUBSCRIBE_MINING_ACTIVE_INFO, json, (reply) => { });
+        Single.Network.SendRequestSocket(SHAPIs.SH_SOCKET_REQ_SUBSCRIBE_MINING_ACTIVE_INFO, null, (reply) => { });
     }
 
-    private async void RequestUnsubscribeMiningActiveInfo()
+    private void RequestUnsubscribeMiningActiveInfo()
     {
-        var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
-        if (false == pUserInfo.IsLogin()) {
-            var pStringTable = await Single.Table.GetTable<SHTableClientString>();
-            Single.BusinessGlobal.ShowAlertUI(pStringTable.GetString("1000"));
-            return;
-        }
-        
-        JsonData json = new JsonData
-        {
-            ["user_id"] = pUserInfo.UserId
-        };
-        Single.Network.SendRequestSocket(SHAPIs.SH_SOCKET_REQ_UNSUBSCRIBE_MINING_ACTIVE_INFO, json, (reply) => { });
+        Single.Network.SendRequestSocket(SHAPIs.SH_SOCKET_REQ_UNSUBSCRIBE_MINING_ACTIVE_INFO, null, (reply) => { });
     }
 
-    private async void RequestPurchaseMiningActiveCompany(string strInstanceId)
+    private void RequestPurchaseMiningActiveCompany(string strInstanceId)
     {
-        var pStringTable = await Single.Table.GetTable<SHTableClientString>();
-        var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
-        if (false == pUserInfo.IsLogin())
-        {
-            Single.BusinessGlobal.ShowAlertUI(pStringTable.GetString("1000"));
-            return;
-        }
-
         JsonData json = new JsonData
         {
-            ["user_id"] = pUserInfo.UserId,
             ["active_company_instance_id"] = strInstanceId
         };
         Single.Network.POST(SHAPIs.SH_API_MINING_PURCHASE_ACTIVE, json, async (reply) =>
@@ -307,18 +276,7 @@ public partial class SHBusinessLobby : MonoBehaviour
             }
             else
             {
-                switch (reply.errorCode)
-                {
-                    case eErrorCode.Server_Mining_ZeroSupplyQuantity:
-                        Single.BusinessGlobal.ShowAlertUI(pStringTable.GetString("1010"));
-                        break;
-                    case eErrorCode.Server_Mining_NotEnoughMiningPower:
-                        Single.BusinessGlobal.ShowAlertUI(pStringTable.GetString("1011"));
-                        break;
-                    default:
-                        Single.BusinessGlobal.ShowAlertUI(reply);
-                        break;
-                }
+                Single.BusinessGlobal.ShowAlertUI(reply);
             }
         });
     }
@@ -389,14 +347,9 @@ public partial class SHBusinessLobby : MonoBehaviour
     //////////////////////////////////////////////////////////////////////
     public async void OnClickDebugReset()
     {
-        var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
         var pInventoryInfo = await Single.Table.GetTable<SHTableServerUserInventory>();
 
-        JsonData json = new JsonData
-        {
-            ["user_id"] = pUserInfo.UserId
-        };
-        Single.Network.POST(SHAPIs.SH_API_TEST_RESET_POWER, json, (reply) => 
+        Single.Network.POST(SHAPIs.SH_API_TEST_RESET_POWER, null, (reply) => 
         {
             if (reply.isSucceed)
             {
@@ -411,15 +364,9 @@ public partial class SHBusinessLobby : MonoBehaviour
 
     public async void OnClickDebugUsePower()
     {
-        var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
         var pInventoryInfo = await Single.Table.GetTable<SHTableServerUserInventory>();
 
-        JsonData json = new JsonData
-        {
-            ["user_id"] = pUserInfo.UserId
-        };
-
-        Single.Network.POST(SHAPIs.SH_API_TEST_USE_POWER, json, (reply) => 
+        Single.Network.POST(SHAPIs.SH_API_TEST_USE_POWER, null, (reply) => 
         {
             if (reply.isSucceed)
             {

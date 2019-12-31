@@ -14,18 +14,24 @@ public static class SHAPIs
 
     // Web : User 관련
     public static string SH_API_USER_GET_INVENTORY = "/process/instance_user_inventory";
+
+    // Web : User Upgrade 관련
     public static string SH_API_USER_GET_UPGRADE_INFO = "/process/instance_user_upgrade_info";
+    public static string SH_API_USER_UPGRADE_ACTIVE_POWER = "/process/instance_user_upgrade_active_power";
+    public static string SH_API_USER_UPGRADE_ACTIVE_TIME = "/process/instance_user_upgrade_active_time";
 
     // Web : Mining 관련
     public static string SH_API_MINING_PURCHASE_ACTIVE = "/process/purchase_unit_at_mining_active";
     
     // Web : 테이블 관련
     public static string SH_API_GET_CONFIG_TABLE = "/table/global_config";
-    public static string SH_API_GET_UNIT_DATA_TABLE = "/table/global_unit_data";
+    public static string SH_API_GET_UNIT_TABLE = "/table/global_unit_data";
     public static string SH_API_GET_MINING_ACTIVE_COMPANY_NPC_TABLE = "/table/mining_active_company_npc";
     public static string SH_API_GET_MINING_ACTIVE_COMPANY_TABLE = "/table/instance_mining_active_company";
     public static string SH_API_GET_MINING_ACTIVE_QUANTITY_TABLE = "/table/mining_active_quantity";
     public static string SH_API_GET_MINING_ACTIVE_SUPPLY_TABLE = "/table/mining_active_supply";
+    public static string SH_API_GET_MINING_ACTIVE_MAX_MP_TABLE = "/table/mining_active_max_mp";
+    public static string SH_API_GET_MINING_ACTIVE_RECHARGE_DELAY_TABLE = "/table/mining_active_recharge_delay";
 
     // Socket : 테스트 API
     public static string SH_SOCKET_REQ_TEST = "test_message";

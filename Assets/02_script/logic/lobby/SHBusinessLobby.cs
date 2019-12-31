@@ -55,8 +55,8 @@ public partial class SHBusinessLobby : MonoBehaviour
             else
             {
                 // 유저 데이터 요청
-                pInventory.RequestGetUserInventory(pUserInfo.UserId, (inventoryReply) => { });
-                pUpgrade.RequestGetUserUpgradeInfo(pUserInfo.UserId, (inventoryReply) => { });
+                pInventory.RequestGetUserInventory((reply) => { });
+                pUpgrade.RequestGetUserUpgradeInfo((reply) => { });
 
                 // 소켓 연결 및 이벤트 바인딩
                 Single.Network.ConnectWebSocket();
@@ -185,10 +185,8 @@ public partial class SHBusinessLobby : MonoBehaviour
     [FuncButton]
     public async void OnClickDebugGetMyInventoryInfo()
     {
-        var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
         var pInventoryInfo = await Single.Table.GetTable<SHTableServerUserInventory>();
-        
-        pInventoryInfo.RequestGetUserInventory(pUserInfo.UserId, (reply) => 
+        pInventoryInfo.RequestGetUserInventory((reply) => 
         {
             Single.BusinessGlobal.ShowAlertUI(reply);
         });
@@ -197,10 +195,8 @@ public partial class SHBusinessLobby : MonoBehaviour
     [FuncButton]
     public async void OnClickDebugGetMyUpgradeInfo()
     {
-        var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
         var UpgradeInfo = await Single.Table.GetTable<SHTableServerUserUpgradeInfo>();
-
-        UpgradeInfo.RequestGetUserUpgradeInfo(pUserInfo.UserId, (reply) =>
+        UpgradeInfo.RequestGetUserUpgradeInfo((reply) =>
         {
             Single.BusinessGlobal.ShowAlertUI(reply);
         });

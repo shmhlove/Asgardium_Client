@@ -45,13 +45,9 @@ public class SHTableServerUserInventory : SHBaseTable
         return eErrorCode.Succeed;
     }
 
-    public void RequestGetUserInventory(string strUserId, Action<SHReply> pCallback)
+    public void RequestGetUserInventory(Action<SHReply> pCallback)
     {
-        JsonData json = new JsonData
-        {
-            ["user_id"] = strUserId
-        };
-        Single.Network.POST(SHAPIs.SH_API_USER_GET_INVENTORY, json, (reply) =>
+        Single.Network.POST(SHAPIs.SH_API_USER_GET_INVENTORY, null, (reply) =>
         {
             if (reply.isSucceed)
             {

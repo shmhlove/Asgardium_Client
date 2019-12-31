@@ -17,7 +17,7 @@ public partial class SHBusinessLobby : MonoBehaviour
 
         // 필터링 대상유닛 데이터 생성
         var pUnitDatas = new List<SHActiveFilterUnitData>();
-        var pUnitTable = await Single.Table.GetTable<SHTableServerGlobalUnitData>();
+        var pUnitTable = await Single.Table.GetTable<SHTableServerGlobalUnit>();
         foreach (var kvp in pUnitTable.m_dicDatas)
         {
             var pData = new SHActiveFilterUnitData();

@@ -130,6 +130,50 @@ sudo du -ckx | sort -n
 #  자동실행 시스템
 git 폴링 -> 변경사항체크 후 Pull 및 스크립트 실행 시스템,,, 되려나?? -> contab
 
+-------------------------------------------------------------------------------------------------------------
+# Lunal Console 액션 사용법
+https://github.com/SpaceMadness/lunar-unity-console/wiki/Actions-and-Variables#using-actions-api
+
+``` C#
+using LunarConsolePlugin;
+
+LunarConsole.RegisterAction("My Action 1", Action1);
+LunarConsole.RegisterAction("My Action 2", Action2);
+LunarConsole.RegisterAction("My Action 3", Action3);
+
+// Variables
+[CVarContainer]
+public static class Variables
+{
+    public static readonly CVar myBool = new CVar("My boolean value", true);
+    public static readonly CVar myFloat = new CVar("My float value", 3.14f);
+    public static readonly CVar myInt = new CVar("My integer value", 10);
+    public static readonly CVar myString = new CVar("My string value", "Test");
+}
+
+// Listening For Variable Changes
+Variables.myBool.AddDelegate((value) => {
+	Debug.Log("New value is " + value);
+});
+Variables.myBool.RemoveDelegates(target);
+
+
+// implicit cast to bool
+if (Variables.myBool)
+{
+    ...
+}
+
+// implicit cast to int
+int intValue = 10 * Variables.myInt;
+
+// implicit cast to float
+float intValue = 2 * Variables.myFloat;
+
+// implicit cast to string
+string value = "My value: " + Variables.myString;
+
+```
 --------------------------------------------------------------------------------------------------------------------
 # Json 컨트롤
 ```javascript
@@ -306,6 +350,7 @@ var j = schedule.scheduleJob({ start: startTime, end: endTime, rule: '*/1 * * * 
 });
 ```
 --------------------------------------------------------------------------------------------------------------------
+
 # 할일
 2017-
 * ~~라우터로 API를 추가할 수 있는 구조를 만들자.~~
@@ -505,9 +550,32 @@ var j = schedule.scheduleJob({ start: startTime, end: endTime, rule: '*/1 * * * 
     * ~~클라 : 서버 유저 업그레이드 정보 테이블 얻기~~
     * 클라 : 업그레이드 UI 개발
         마이닝 시간 업그레이드
+        	X 버튼 혹은 Dimmed 클릭시 팝업닫기
+        	@ 업그레이드 시작 버튼 선택시 예외
+        		업그레이드 레벨이 Max에 도달한 경우 : 메시지팝업 출력(이미 최고 레벨에 도달하였습니다.)
+        	@ Upgrade버튼 클릭시
+        		금액이 부족한 경우
+        			메시지팝업 출력(X Close)
+        		알 수 없는 에러가 발생한 경우
+        			메시지팝업 출력(X Close)
+        		업그레이드에 성공한 경우
+        			UI 갱신(X Close)
+
+    "1012": "업그레이드 최고레벨에 도달했습니다.",
+    "1013": "골드가 부족합니다.",
+
         마이닝 파워 업그레이드
         회사 구매
         회사 업그레이드
+	* ~~클라 : 유저 업그레이드 정보 테이블 가져오기~~
+	* ~~서버/클라 : 파워 레벨 테이블 가져오기~~
+	* ~~서버/클라 : 시간 레벨 테이블 가져오기~~
+	* 클라 : Requst 함수 모으기 어떤가? 
+
+	클라에서 UserId를 헤더에 담아주는데 서버에서 그걸 받아쓰도록 하는게 좋을거 같음.
+	AccessToken에 UserId가 없으면 서버에서 로그인 에러를 내려주고,
+	클라에서는 로그인이 필요하다는 에러처리를 공통적으로 하는게 좋아보임.
+
 ---
 * 인증
 	* ~~서버/클라 : JWT 적용~~
@@ -521,7 +589,7 @@ var j = schedule.scheduleJob({ start: startTime, end: endTime, rule: '*/1 * * * 
 	* ~~String 테이블을 만들어야 한다.~~
     * ~~클라 : 로비씬 메뉴와 세부탭 이동 처리방식 변경~~
 	* 클라 : 일시정지 아이디어가 필요하다.
-	* 클라 : 서버데이터 Escape 문제 해결 필요
+	* 클라 : 서버 데이터 Escape 문제 해결 필요
 	* 업데이트에 프로그래스 UI 만들어야 한다.
 	* 글로벌UI에 디버그용 정보출력하는 패널 만들자(씬, 버전, 서비스모드)
 	* ~~클라 클래스들의 역할을 명확히 해야할 필요가 있다....~~
@@ -565,31 +633,21 @@ var j = schedule.scheduleJob({ start: startTime, end: endTime, rule: '*/1 * * * 
 	* 그러면
 	--
 	* 링크를 안한다면 UI 매니져를 통해 오브젝트를 얻어와야한다.
-	* 단점은 깊다.
+	* 단점은 뎁스가 깊다.
 	* 비지니스 > UI매니져 > UI루트 > UI패널 > 기능까지..
 	* 4단계 이상을 거쳐야 1차접근이 가능하다.
 	* 더 깊다면 5~6단계를 거쳐야한다.
-	* 1단계로 접근할 수 있는 방법은... 
-	* 비지니스 Start에서 컨트롤 할 UI 객체를 얻어두는거 혹은 
-	* UI 루트에서 객체를 Get할 수 있는 로직을 만들어 두는것..
-	* UI 루트를 통해 컨트롤 명령을 내리고, UI루트에서 각 UI에 명령을 전달하는것..
+	* 1단계로 접근할 수 있는 방법은... ??
+	* -> 비지니스 Start에서 컨트롤 할 UI 객체를 얻어두는거
+	* -> 혹은 UI 루트에서 객체를 Get할 수 있는 로직을 만들어 두는것..
+	* -> 혹은 UI 루트를 통해 컨트롤 명령을 내리고, UI 루트에서 각 UI에 명령을 전달하는것..
+	* 역방향 인터페이스를 위해 콜백을 넘기는것도 불편하다.
+	* -> 콜백을 UI 루트가 관리해줄 수 있을까?? -> 이것도 종속이 걸릴 수 밖에 없구나..
+	* -> gameObject만 넘기면 되도록 SendMessage를 이용해서 델리게이트 방식으로 사용해보자.
+	* -> 위 방식의 코드 사용해보는 중...
 	--
-	* 서버랑 클라의 에러코드를 동기화해야하나?? 분리하는게 좋은거 같다.
-	* 에러코드가 겹치는 문제는 영역을 분리해서 처리하는게 좋은거 같다.
-	--
-	* 미리 객체를 얻어두는거의 단점은 로드가 걸릴 수 있다는거..
-	* var pUIRoot = await Single.UI.GetRoot<SHUIRoot>();
-	* var pUIPanelXXX = pUIRoot.GetPanel<SHUIPanelXXX>();
-	* var pUIPanelYYY = pUIRoot.GetPanel<SHUIPanelYYY>();
-	* pUIPanelXXX.Controll
-	* pUIPanelYYY.Controll
---
-* ~~UI를 이름으로 관리하는 것에 대해..~~
-	* 파일이름을 관리해야하는게 불편하다.
-	* 그러나 타입으로 가져오면 중복에 대한 문제가 생긴다.
-	* 그러나 타입으로 가져오면 파일이름을 모르기 때문에 동적로드에 대한 문제가 생긴다.
---
-	* 그냥 파일이름으로 가야겠다.
+* 서버랑 클라의 에러코드를 동기화해야하나?? 분리하는게 좋은거 같다.
+	* -> 에러코드가 겹치는 문제는 영역을 분리해서 처리하는게 좋은거 같다.
 --
 * 로컬 테스트시 서버설정이 불편한 점이 있네..
 	* 로컬에 DB를 실행시키고,

@@ -27,12 +27,14 @@ public partial class SHTableData : SHBaseData
 
         // 서버 테이블
         m_dicTables.Add(typeof(SHTableServerGlobalConfig), new SHTableServerGlobalConfig());
-        m_dicTables.Add(typeof(SHTableServerGlobalUnitData), new SHTableServerGlobalUnitData());
+        m_dicTables.Add(typeof(SHTableServerGlobalUnit), new SHTableServerGlobalUnit());
         m_dicTables.Add(typeof(SHTableServerMiningActiveCompanyNPC), new SHTableServerMiningActiveCompanyNPC());
         m_dicTables.Add(typeof(SHTableServerMiningActiveQuantity), new SHTableServerMiningActiveQuantity());
         m_dicTables.Add(typeof(SHTableServerMiningActiveSupply), new SHTableServerMiningActiveSupply());
         m_dicTables.Add(typeof(SHTableServerUserInventory), new SHTableServerUserInventory());
         m_dicTables.Add(typeof(SHTableServerUserUpgradeInfo), new SHTableServerUserUpgradeInfo());
+        m_dicTables.Add(typeof(SHTableServerMiningActiveMaxMP), new SHTableServerMiningActiveMaxMP());
+        m_dicTables.Add(typeof(SHTableServerMiningActiveRechargeDelay), new SHTableServerMiningActiveRechargeDelay());
     }
     
     public override void OnFinalize()

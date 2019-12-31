@@ -37,20 +37,36 @@ public partial class SHBusinessGlobal : SHSingleton<SHBusinessGlobal>
         {
             switch(pReply.error.code)
             {
-                case eErrorCode.Net_Common_HTTP:
+                case (int)eErrorCode.Net_Common_HTTP:
                     // Network Module 에서 처리...
                     return;
-                case eErrorCode.Server_Auth_AlreadySignupUser:
+                case (int)eErrorCode.Common_Need_login:
+                case (int)eErrorCode.Server_Common_InvalidAccessToken:
+                    errorMessage = pStringTable.GetString("1000");
+                    break;
+                case (int)eErrorCode.Server_Auth_AlreadySignupUser:
                     errorMessage = pStringTable.GetString("1003");
                     break;
-                case eErrorCode.Server_Auth_NoSignupUser:
+                case (int)eErrorCode.Server_Auth_NoSignupUser:
                     errorMessage = pStringTable.GetString("1004");
                     break;
-                case eErrorCode.Server_Auth_NoMatchPassword:
+                case (int)eErrorCode.Server_Auth_NoMatchPassword:
                     errorMessage = pStringTable.GetString("1005");
                     break;
-                case eErrorCode.Auth_InvalidEmail:
+                case (int)eErrorCode.Auth_InvalidEmail:
                     errorMessage = pStringTable.GetString("1001");
+                    break;
+                case (int)eErrorCode.Server_Mining_ZeroSupplyQuantity:
+                    errorMessage = pStringTable.GetString("1010");
+                    break;
+                case (int)eErrorCode.Server_Mining_NotEnoughMiningPower:
+                    errorMessage = pStringTable.GetString("1011");
+                    break;
+                case (int)eErrorCode.Server_Upgrade_MaxLevel:
+                    errorMessage = pStringTable.GetString("1012");
+                    break;
+                case (int)eErrorCode.Server_Upgrade_NotEnoughGold:
+                    errorMessage = pStringTable.GetString("1013");
                     break;
                 default:
                     errorMessage = pStringTable.GetString("1002");

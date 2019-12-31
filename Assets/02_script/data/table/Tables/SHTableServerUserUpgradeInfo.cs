@@ -37,13 +37,9 @@ public class SHTableServerUserUpgradeInfo : SHBaseTable
         return eErrorCode.Succeed;
     }
 
-    public void RequestGetUserUpgradeInfo(string strUserId, Action<SHReply> pCallback)
+    public void RequestGetUserUpgradeInfo(Action<SHReply> pCallback)
     {
-        JsonData json = new JsonData
-        {
-            ["user_id"] = strUserId
-        };
-        Single.Network.POST(SHAPIs.SH_API_USER_GET_UPGRADE_INFO, json, (reply) =>
+        Single.Network.POST(SHAPIs.SH_API_USER_GET_UPGRADE_INFO, null, (reply) =>
         {
             if (reply.isSucceed)
             {

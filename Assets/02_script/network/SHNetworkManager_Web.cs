@@ -76,7 +76,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 
         DebugLogOfWebResponse(pReply);
 
-        if (true == (m_bIsConnectWebServer = (eErrorCode.Net_Common_HTTP != pReply.errorCode)))
+        if (true == (m_bIsConnectWebServer = ((int)eErrorCode.Net_Common_HTTP != pReply.errorCode)))
         {
             pRequestData.m_pCallback(pReply);
             m_pWebRequestQueue.Remove(pRequestData);
@@ -139,7 +139,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 
         DebugLogOfWebResponse(pReply);
 
-        if (true == (m_bIsConnectWebServer = (eErrorCode.Net_Common_HTTP != pReply.errorCode)))
+        if (true == (m_bIsConnectWebServer = ((int)eErrorCode.Net_Common_HTTP != pReply.errorCode)))
         {
             StopRetryProcess();
 

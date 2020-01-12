@@ -10,8 +10,8 @@ using LitJson;
 public class SHTableServerUserUpgradeInfo : SHBaseTable
 {
     public string UserId;
-    public long MiningPowerLv;
-    public long ChargeTimeLv;
+    public int MiningPowerLv;
+    public int ChargeTimeLv;
 
     public SHTableServerUserUpgradeInfo()
     {

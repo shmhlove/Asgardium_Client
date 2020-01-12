@@ -61,4 +61,16 @@ public class SHTableServerMiningActiveMaxMP : SHBaseTable
         
         return eErrorCode.Succeed;
     }
+
+    public SHTableServerMiningActiveMaxMPData GetData(int iLevel)
+    {
+        if (m_dicDatas.ContainsKey(iLevel))
+        {
+            return m_dicDatas[iLevel];
+        }
+        else
+        {
+            return null;
+        }
+    }
 }

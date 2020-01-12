@@ -48,11 +48,11 @@ public partial class SHBusinessLobby : MonoBehaviour
         Single.Network.POST(SHAPIs.SH_API_USER_UPGRADE_ACTIVE_TIME, null, callback);
     }
 
-    // 닫힌 회사 구매
-    
     // 마이닝파워 업그레이드 이벤트
     private async void OnEventForUpgradePowerupBtn()
     {
+        // 데이터 체크
+
         var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
         var pPanel = await pUIRoot.GetPanel<SHUIPopupPanelUpgradePower>(SHUIConstant.PANEL_UPGRADE_POWER);
 
@@ -60,7 +60,6 @@ public partial class SHBusinessLobby : MonoBehaviour
         {
             if (false == bClickedUpgradeBtn) {
                 EnableUpgradeMenu();
-                pPanel.Close();
                 return;
             }
             else {

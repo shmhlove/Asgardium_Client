@@ -26,10 +26,11 @@ public class SHUIPopupPanelUpgradePower : SHUIPanel
         }
 
         m_pEventForClickBtn = (Action<bool>)pArgs[0];
-        ResetUpgradeInfo();
     }
 
-    public async void ResetUpgradeInfo()
+    // 어떤 데이터가 필요한지 정리해서 구조체를 만들든 하자.
+    // 그 데이터를 파라미터로 전달받아 UI를 업데이트하자
+    public async void UpdateUI()
     {
         var pInventory = await Single.Table.GetTable<SHTableServerUserInventory>();
         var pUpgradeInfo = await Single.Table.GetTable<SHTableServerUserUpgradeInfo>();
@@ -37,20 +38,6 @@ public class SHUIPopupPanelUpgradePower : SHUIPanel
 
         var pCurInfo = pUpgradePowerTable.GetData(pUpgradeInfo.MiningPowerLv);
         var pNextInfo = pUpgradePowerTable.GetData(pUpgradeInfo.MiningPowerLv + 1);
-
-        // 자.. 테이블이 없을때 어떻게 처리할까?
-        // 비지니스에서 처리한 뒤에 UI를 띄워줘야겠다.
-        // 1. 현재 정보가 없을 때 -> 파라미터 혹은 에러로 인해 없을 때
-        // 2. 다음 정보가 없을 때 -> 파라미터 혹은 에러로 인해 없을 때, Max레벨이라 없을 때
-
-        if (null != pCurInfo)
-        {
-            
-        }
-        else
-        {
-
-        }
 
         // 현재 정보
         // 다음 정보

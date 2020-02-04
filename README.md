@@ -651,6 +651,11 @@ var j = schedule.scheduleJob({ start: startTime, end: endTime, rule: '*/1 * * * 
 	* -> 콜백을 UI 루트가 관리해줄 수 있을까?? -> 이것도 종속이 걸릴 수 밖에 없구나..
 	* -> gameObject만 넘기면 되도록 SendMessage를 이용해서 델리게이트 방식으로 사용해보자.
 	* -> 위 방식의 코드 사용해보는 중...
+	* 자 데이터는 어떻게 넘겨주는게 좋을까?
+	* -> 모델뷰용 데이터 구조체를 만들어서 넘기는게 좋을거 같다.
+	* -> MVP는 View가 Presenter에 알림을 주고, Presenter는 Model을 업데이트하고, Model은 다시 Presenter에 알림을 주고, Presenter는 View를 업데이트한다.(단점 : View와 Presenter의 종속)
+	* -> MVC는 Controller가 Model을 업데이트하고, View에 알림을 주고, View는 Model에 접근한다.(단점 : View와 Model의 종속)
+	* -> MVVM은 View가 ModelView에 알림을 주고, ModelView는 Model을 업데이트하고, Model은 다시 ModelView에 알림을 주는데, View는 ModelView에 바인딩하여 업데이트 처리를 한다.(MVP와 유사한데, View가 ModelView에 바인딩해서 노티를 받을 수 있다는 점이 다르다.)
 	--
 * 서버랑 클라의 에러코드를 동기화해야하나?? 분리하는게 좋은거 같다.
 	* -> 에러코드가 겹치는 문제는 영역을 분리해서 처리하는게 좋은거 같다.

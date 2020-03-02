@@ -51,22 +51,36 @@ public partial class SHBusinessLobby : MonoBehaviour
     // 마이닝파워 업그레이드 버튼 이벤트
     private async void OnEventForUpgradePowerupBtn()
     {
-        // 데이터 업데이트를 먼저하자.
+        var pStringTable = await Single.Table.GetTable<SHTableClientString>();
         var pInventory = await Single.Table.GetTable<SHTableServerUserInventory>();
         var pUpgradeInfo = await Single.Table.GetTable<SHTableServerUserUpgradeInfo>();
         var pUpgradePowerTable = await Single.Table.GetTable<SHTableServerMiningActiveMaxMP>();
+        
+        Func<SHTableServerUserInventory, SHTableServerUserUpgradeInfo, SHTableServerMiningActiveMaxMP, SHTableClientString, string> pMakeData = 
+        (_pInventory, _pUpgradeInfo, _pUpgradePowerTable, _pStringTable) =>
+        {
+            var pCurInfo = _pUpgradePowerTable.GetData(_pUpgradeInfo.MiningPowerLv);
+            var pNextInfo = _pUpgradePowerTable.GetData(_pUpgradeInfo.MiningPowerLv + 1);
 
-        // 예외처리 필요하다.
-        var pCurInfo = pUpgradePowerTable.GetData(pUpgradeInfo.MiningPowerLv);
-        var pNextInfo = pUpgradePowerTable.GetData(pUpgradeInfo.MiningPowerLv + 1);
+            if (null == pCurInfo)
+            {
+                Single.BusinessGlobal.ShowAlertUI(_pStringTable.GetString("1002"));
+                return string.Empty;
+            }
+            pNextInfo = pNextInfo??pCurInfo;
+            
+            var pCurTable = _pUpgradePowerTable.GetData(pCurInfo.m_iLevel);
+            var pNextTable = _pUpgradePowerTable.GetData(pNextInfo.m_iLevel);
 
-        // 자.. 테이블이 없을때 어떻게 처리할까?
-        // 비지니스에서 처리한 뒤에 UI를 띄워줘야겠다.
-        // 1. 현재 정보가 없을 때 -> 파라미터 혹은 에러로 인해 없을 때
-        // 2. 다음 정보가 없을 때 -> 파라미터 혹은 에러로 인해 없을 때, Max레벨이라 없을 때
-
-
-        // 이 후 업그레이드 팝업을 띄우고, 업그레이드 액션에 대한 처리를 한다.
+            JsonData pJson = new JsonData();
+            pJson["curLv"] = pCurTable.m_iLevel;
+            pJson["curMP"] = pCurTable.m_iMaxMP;
+            pJson["nextLv"] = pNextTable.m_iLevel;
+            pJson["nextMP"] = pNextTable.m_iMaxMP;
+            pJson["upgradeCost"] = pNextTable.m_iCostGold;
+            pJson["hasGold"] = _pInventory.Gold;
+            return JsonMapper.ToJson(pJson) ;
+        };
         
         var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
         var pPopupPanel = await pUIRoot.GetPanel<SHUIPopupPanelUpgradePower>(SHUIConstant.PANEL_UPGRADE_POWER);
@@ -84,13 +98,16 @@ public partial class SHBusinessLobby : MonoBehaviour
                         Single.BusinessGlobal.ShowAlertUI(reply);
                     }
                     else {
-                        pPopupPanel.UpdateUI();
+                        pUpgradeInfo.LoadJsonTable(reply.data["upgrade_info"]);
+                        pInventory.LoadJsonTable(reply.data["inventory_info"]);
+                        pPopupPanel.UpdateUI(pMakeData(pInventory, pUpgradeInfo, pUpgradePowerTable, pStringTable));
+                        // @@ 엑티브 업그레이드 갱신 : 함수로 빼서 호출하도록 하자.
                     }
                 });
             }
         };
 
-        pPopupPanel.UpdateUI();
+        pPopupPanel.UpdateUI(pMakeData(pInventory, pUpgradeInfo, pUpgradePowerTable, pStringTable));
         pPopupPanel.Show(pUpgradeAction);
     }
 

@@ -11,6 +11,7 @@ public class SHTableServerUserInventory : SHBaseTable
 {
     public string UserId = string.Empty;
     public long MiningPowerAt = 0;
+    public long Gold = 0;
 	public Dictionary<int, int> HasUnits = new Dictionary<int, int>();
 
     public SHTableServerUserInventory()
@@ -30,7 +31,8 @@ public class SHTableServerUserInventory : SHBaseTable
         
         UserId = GetStrToJson(pJson, "user_id");
         MiningPowerAt = GetLongToJson(pJson, "mining_power_at");
-
+        Gold = GetIntToJson(pJson, "gold");
+        
         HasUnits.Clear();
         JsonData jsonHasUnits = pJson["has_units"];
         for (int iLoop = 0; iLoop < jsonHasUnits.Count; ++iLoop)

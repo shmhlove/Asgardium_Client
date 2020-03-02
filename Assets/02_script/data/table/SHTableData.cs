@@ -104,9 +104,6 @@ public partial class SHTableData : SHBaseData
 
     public T GetTableSync<T>() where T : SHBaseTable
     {
-        // 이 함수는 이미 로드가 되었다는 가정하에 사용하는 함수이다.
-        // 이 함수를 사용하는 곳에서는 항상 null 체크를 해야한다.
-
         if (false == m_dicTables.ContainsKey(typeof(T)))
         {
             return default;

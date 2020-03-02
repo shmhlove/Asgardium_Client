@@ -1,8 +1,11 @@
 ﻿using UnityEngine;
+using UnityEngine.Assertions;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 
+using LitJson;
 
 public class SHUIPopupPanelUpgradePower : SHUIPanel
 {
@@ -28,28 +31,18 @@ public class SHUIPopupPanelUpgradePower : SHUIPanel
         m_pEventForClickBtn = (Action<bool>)pArgs[0];
     }
 
-    // 어떤 데이터가 필요한지 정리해서 구조체를 만들든 하자.
-    // 그 데이터를 파라미터로 전달받아 UI를 업데이트하자
-    public async void UpdateUI()
+    public async void UpdateUI(string jsonString)
     {
-        var pInventory = await Single.Table.GetTable<SHTableServerUserInventory>();
-        var pUpgradeInfo = await Single.Table.GetTable<SHTableServerUserUpgradeInfo>();
-        var pUpgradePowerTable = await Single.Table.GetTable<SHTableServerMiningActiveMaxMP>();
-
-        var pCurInfo = pUpgradePowerTable.GetData(pUpgradeInfo.MiningPowerLv);
-        var pNextInfo = pUpgradePowerTable.GetData(pUpgradeInfo.MiningPowerLv + 1);
-
-        // 현재 정보
-        // 다음 정보
-        // 코스트 정보
-        // 업그레이드 버튼
-
-        // public UILabel m_pLabelCurLv;
-        // public UILabel m_pLabelCurMaxMP;
-        // public UILabel m_pLabelNextLv;
-        // public UILabel m_pLabelNextMaxMP;
-        // public UILabel m_pLabelCost;
-        // public UILabel m_pLabelHasGold
+        Assert.IsFalse(string.IsNullOrEmpty(jsonString));
+        var pStringTable = await Single.Table.GetTable<SHTableClientString>();
+        
+        var pJson = JsonMapper.ToObject(jsonString);
+        m_pLabelCurLv.text = string.Format(pStringTable.GetString("1120002"), (int)pJson["curLv"]);
+        m_pLabelCurMaxMP.text = string.Format(pStringTable.GetString("1120005"), (int)pJson["curMP"]);
+        m_pLabelNextLv.text = string.Format(pStringTable.GetString("1120002"), (int)pJson["nextLv"]);
+        m_pLabelNextMaxMP.text = string.Format(pStringTable.GetString("1120005"), (int)pJson["nextMP"]);
+        m_pLabelCost.text = string.Format("{0:#,###}", (int)pJson["upgradeCost"]);
+        m_pLabelHasGold.text = string.Format(pStringTable.GetString("1120003"), string.Format("{0:#,###}", (int)pJson["hasGold"]));
     }
 
     public void OnClickCloseButton()

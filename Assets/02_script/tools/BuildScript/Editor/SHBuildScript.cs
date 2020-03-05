@@ -15,10 +15,11 @@ class SHBuildScript
     #region Android Build
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     [MenuItem("SHTools/CI/App Build For Android")]
-    static void KOR_AndroidAppBuild()
+    static int KOR_AndroidAppBuild()
     { 
         AppBuild(eNationType.Korea, BuildTarget.Android, eServiceMode.Dev, BuildOptions.Development);
         //AppBuild(eNationType.Korea, BuildTarget.Android, eServiceMode.Live, BuildOptions.None);
+        return 0;
     }
 
     // [MenuItem("SHTools/CI/AssetBundles Packing For Android")]
@@ -39,10 +40,11 @@ class SHBuildScript
     #region iOS Build
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     [MenuItem("SHTools/CI/App Build For iOS")]
-    static void KOR_iOSAppBuild()
+    static int KOR_iOSAppBuild()
     { 
         AppBuild(eNationType.Korea, BuildTarget.iOS, eServiceMode.Dev, BuildOptions.Development);
         //AppBuild(eNationType.Korea, BuildTarget.iOS, eServiceMode.Live, BuildOptions.None);
+        return 0;
     }
 
     // [MenuItem("SHTools/CI/AssetBundles Packing For iOS")]

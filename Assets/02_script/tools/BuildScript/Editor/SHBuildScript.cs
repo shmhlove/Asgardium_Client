@@ -17,9 +17,17 @@ class SHBuildScript
     [MenuItem("SHTools/CI/App Build For Android")]
     static int KOR_AndroidAppBuild()
     { 
-        AppBuild(eNationType.Korea, BuildTarget.Android, eServiceMode.Dev, BuildOptions.Development);
+        try
+        {
+            AppBuild(eNationType.Korea, BuildTarget.Android, eServiceMode.Dev, BuildOptions.None);
+            return 0;
+        }
+        catch(Exception e)
+        {
+            return e.HResult;
+        }
+
         //AppBuild(eNationType.Korea, BuildTarget.Android, eServiceMode.Live, BuildOptions.None);
-        return 0;
     }
 
     // [MenuItem("SHTools/CI/AssetBundles Packing For Android")]

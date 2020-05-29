@@ -15,19 +15,9 @@ class SHBuildScript
     #region Android Build
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     [MenuItem("SHTools/CI/App Build For Android")]
-    static int KOR_AndroidAppBuild()
+    static void KOR_AndroidAppBuild()
     { 
-        try
-        {
-            AppBuild(eNationType.Korea, BuildTarget.Android, eServiceMode.Dev, BuildOptions.None);
-            return 0;
-        }
-        catch(Exception e)
-        {
-            return e.HResult;
-        }
-
-        //AppBuild(eNationType.Korea, BuildTarget.Android, eServiceMode.Live, BuildOptions.None);
+        AppBuild(eNationType.Korea, BuildTarget.Android, eServiceMode.Live, BuildOptions.None);
     }
 
     // [MenuItem("SHTools/CI/AssetBundles Packing For Android")]
@@ -48,11 +38,9 @@ class SHBuildScript
     #region iOS Build
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     [MenuItem("SHTools/CI/App Build For iOS")]
-    static int KOR_iOSAppBuild()
+    static void KOR_iOSAppBuild()
     { 
         AppBuild(eNationType.Korea, BuildTarget.iOS, eServiceMode.Dev, BuildOptions.Development);
-        //AppBuild(eNationType.Korea, BuildTarget.iOS, eServiceMode.Live, BuildOptions.None);
-        return 0;
     }
 
     // [MenuItem("SHTools/CI/AssetBundles Packing For iOS")]
@@ -140,15 +128,22 @@ class SHBuildScript
             {
                 throw new Exception("[SHBuilder] BuildPlayer failure: " + pReport.ToString());
             }
+            else
+            {
+                Debug.LogFormat("** [SHBuilder] Build End({0}) -> {1}", strBuildName, DateTime.Now.ToString("yyyy-MM-dd [ HH:mm:ss ]"));
+            }
 #else
 			string res = BuildPipeline.BuildPlayer(strScenes, strExportPath, eTarget, eOptions);
             if (0 < res.Length)
             {
                 throw new Exception("[SHBuilder] BuildPlayer failure: " + res);
             }
+            else
+            {
+                Debug.LogFormat("** [SHBuilder] Build End({0}) -> {1}", strBuildName, DateTime.Now.ToString("yyyy-MM-dd [ HH:mm:ss ]"));
+            }
 #endif
         }
-        Debug.LogFormat("** [SHBuilder] Build End({0}) -> {1}", strBuildName, DateTime.Now.ToString("yyyy-MM-dd [ HH:mm:ss ]"));
     }
     
     static void PackingAssetBundles(BuildTarget eTarget, eBundlePackType eType)

@@ -136,9 +136,9 @@ class SHBuildScript
             SHUtils.CreateDirectory(strExportPath);
 
 			BuildReport pReport = BuildPipeline.BuildPlayer(strScenes, strExportPath, eTarget, eOptions);
-            if (BuildResult.Failed == pReport.summary.result)
+            if (BuildResult.Succeeded != pReport.result)
             {
-                throw new Exception("[SHBuilder] BuildPlayer failure: BuildPipeline.BuildPlayer");
+                throw new Exception("[SHBuilder] BuildPlayer failure: " + pReport.ToString());
             }
         }
         Debug.LogFormat("** [SHBuilder] Build End({0}) -> {1}", strBuildName, DateTime.Now.ToString("yyyy-MM-dd [ HH:mm:ss ]"));

@@ -134,12 +134,19 @@ class SHBuildScript
 
             string strExportPath = string.Format("{0}/{1}/{2}", SHPath.GetBuild(), SHUtils.GetPlatformStringByEnum(eTarget), strBuildName);
             SHUtils.CreateDirectory(strExportPath);
-
+#if UNITY_2018_1_OR_NEWER
 			BuildReport pReport = BuildPipeline.BuildPlayer(strScenes, strExportPath, eTarget, eOptions);
-            if (BuildResult.Succeeded != pReport.result)
+            if (BuildResult.Succeeded != pReport.summary.result)
             {
                 throw new Exception("[SHBuilder] BuildPlayer failure: " + pReport.ToString());
             }
+#else
+			string res = BuildPipeline.BuildPlayer(strScenes, strExportPath, eTarget, eOptions);
+            if (0 < res.Length)
+            {
+                throw new Exception("[SHBuilder] BuildPlayer failure: " + res);
+            }
+#endif
         }
         Debug.LogFormat("** [SHBuilder] Build End({0}) -> {1}", strBuildName, DateTime.Now.ToString("yyyy-MM-dd [ HH:mm:ss ]"));
     }

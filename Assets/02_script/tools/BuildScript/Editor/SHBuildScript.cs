@@ -18,6 +18,7 @@ class SHBuildScript
     static void KOR_AndroidAppBuild()
     { 
         AppBuild(eNationType.Korea, BuildTarget.Android, eServiceMode.Live, BuildOptions.None);
+        Debug.LogFormat("** [SHBuilder] Complate Android Build");
     }
 
     // [MenuItem("SHTools/CI/AssetBundles Packing For Android")]
@@ -41,6 +42,7 @@ class SHBuildScript
     static void KOR_iOSAppBuild()
     { 
         AppBuild(eNationType.Korea, BuildTarget.iOS, eServiceMode.Dev, BuildOptions.Development);
+        Debug.LogFormat("** [SHBuilder] Complate iOS Build");
     }
 
     // [MenuItem("SHTools/CI/AssetBundles Packing For iOS")]

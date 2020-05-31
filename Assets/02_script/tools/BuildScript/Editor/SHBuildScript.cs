@@ -15,8 +15,15 @@ class SHBuildScript
     [MenuItem("SHTools/CI/App Build For Android")]
     static void KOR_AndroidAppBuild()
     { 
-        AppBuild(eNationType.Korea, BuildTarget.Android, eServiceMode.Dev, BuildOptions.Development);
-        EditorApplication.Exit(0);
+        try
+        {
+            AppBuild(eNationType.Korea, BuildTarget.Android, eServiceMode.Dev, BuildOptions.Development);
+            EditorApplication.Exit(0);
+        }
+        catch(Exception e)
+        {
+            throw e;
+        }
     }
 
     // [MenuItem("SHTools/CI/AssetBundles Packing For Android")]
@@ -39,7 +46,15 @@ class SHBuildScript
     [MenuItem("SHTools/CI/App Build For iOS")]
     static void KOR_iOSAppBuild()
     { 
-        AppBuild(eNationType.Korea, BuildTarget.iOS, eServiceMode.Dev, BuildOptions.Development);
+        try
+        {
+            AppBuild(eNationType.Korea, BuildTarget.iOS, eServiceMode.Dev, BuildOptions.Development);
+            EditorApplication.Exit(0);
+        }
+        catch(Exception e)
+        {
+            throw e;
+        }
     }
 
     // [MenuItem("SHTools/CI/AssetBundles Packing For iOS")]

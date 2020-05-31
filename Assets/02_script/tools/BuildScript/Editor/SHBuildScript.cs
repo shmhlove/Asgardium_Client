@@ -16,6 +16,7 @@ class SHBuildScript
     static void KOR_AndroidAppBuild()
     { 
         AppBuild(eNationType.Korea, BuildTarget.Android, eServiceMode.Dev, BuildOptions.Development);
+        EditorApplication.Exit(0);
     }
 
     // [MenuItem("SHTools/CI/AssetBundles Packing For Android")]

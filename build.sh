@@ -107,10 +107,8 @@ elif [ ${TARGET_PLATFORM} == "Android" ]; then
     echo "Builing... APK"
     eval "\"${UNITY_HOME_PATH}/Unity2018.app/Contents/MacOS/Unity\"" \
     -quit \
-    -quitTimeout 60 \
     -batchmode \
     -nographics \
-    -targetPlatform Android \
     -executeMethod "SHBuildScript.KOR_AndroidAppBuild" \
     -logFile \
     -projectPath ${PROJECT_PATH} | tee -a "${ARCHIVE_PATH}/Android.build.log"

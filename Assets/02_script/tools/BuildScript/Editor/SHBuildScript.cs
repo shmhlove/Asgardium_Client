@@ -10,15 +10,12 @@ using System.Collections.Generic;
 
 class SHBuildScript
 {
-    static string[] SCENES    = FindEnabledEditorScenes();
-
     #region Android Build
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     [MenuItem("SHTools/CI/App Build For Android")]
     static void KOR_AndroidAppBuild()
     { 
-        AppBuild(eNationType.Korea, BuildTarget.Android, eServiceMode.Live, BuildOptions.None);
-        Debug.LogFormat("** [SHBuilder] Complate Android Build");
+        AppBuild(eNationType.Korea, BuildTarget.Android, eServiceMode.Dev, BuildOptions.Development);
     }
 
     // [MenuItem("SHTools/CI/AssetBundles Packing For Android")]
@@ -42,7 +39,6 @@ class SHBuildScript
     static void KOR_iOSAppBuild()
     { 
         AppBuild(eNationType.Korea, BuildTarget.iOS, eServiceMode.Dev, BuildOptions.Development);
-        Debug.LogFormat("** [SHBuilder] Complate iOS Build");
     }
 
     // [MenuItem("SHTools/CI/AssetBundles Packing For iOS")]
@@ -62,7 +58,7 @@ class SHBuildScript
     static void AppBuild(eNationType eNation, BuildTarget eTarget, eServiceMode eMode, BuildOptions eOption)
     {
         PreProcessor(eTarget);
-		BuildApplication(SCENES, eTarget, eOption);
+		BuildApplication(FindEnabledEditorScenes(), eTarget, eOption);
         PostProcessor(eTarget);
     }
     

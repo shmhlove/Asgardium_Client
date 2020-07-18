@@ -107,8 +107,8 @@ public partial class SHBusinessLobby : MonoBehaviour
             }
         };
 
-        pPopupPanel.UpdateUI(pMakeData(pInventory, pUpgradeInfo, pUpgradePowerTable, pStringTable));
         pPopupPanel.Show(pUpgradeAction);
+        pPopupPanel.UpdateUI(pMakeData(pInventory, pUpgradeInfo, pUpgradePowerTable, pStringTable));
     }
 
     // 충전시간 업그레이드 버튼 이벤트

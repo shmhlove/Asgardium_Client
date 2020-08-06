@@ -65,7 +65,6 @@ public partial class SHBusinessLobby : MonoBehaviour
                 // 소켓 연결 및 이벤트 바인딩
                 Single.Network.ConnectWebSocket();
                 Single.Network.AddEventObserver(SystemEvents.connect.ToString(), OnEventForSocketReconnect);
-                //Single.Network.AddEventObserver(SHAPIs.SH_SOCKET_POLLING_MINING_ACTIVE_INFO, OnEventForSocketPollingMiningActiveInfo);
 
                 // UI 초기화
                 var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);

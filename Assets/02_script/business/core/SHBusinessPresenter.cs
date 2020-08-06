@@ -6,60 +6,45 @@ using System.Collections.Generic;
 
 public class SHBusinessPresenter
 {
-    private Dictionary<Type, SHBusinessPresenter> m_dicPresenters = new Dictionary<Type, SHBusinessPresenter>();
+    private readonly Dictionary<Type, SHBusinessPresenter> m_dicPresenters = new Dictionary<Type, SHBusinessPresenter>();
 
     public virtual void OnInitialize()
     {
-        if (null != m_dicPresenters)
+        foreach (var item in m_dicPresenters)
         {
-            foreach (var item in m_dicPresenters)
-            {
-                item.Value.OnInitialize();
-            }
+            item.Value.OnInitialize();
         }
     }
 
     public virtual void OnEnter()
     {
-        if (null != m_dicPresenters)
+        foreach (var item in m_dicPresenters)
         {
-            foreach (var item in m_dicPresenters)
-            {
-                item.Value.OnEnter();
-            }
+            item.Value.OnEnter();
         }
     }
 
     public virtual void OnLeave()
     {
-        if (null != m_dicPresenters)
+        foreach (var item in m_dicPresenters)
         {
-            foreach (var item in m_dicPresenters)
-            {
-                item.Value.OnLeave();
-            }
+            item.Value.OnLeave();
         }
     }
 
     public virtual void OnUpdate()
     {
-        if (null != m_dicPresenters)
+        foreach (var item in m_dicPresenters)
         {
-            foreach (var item in m_dicPresenters)
-            {
-                item.Value.OnUpdate();
-            }
+            item.Value.OnUpdate();
         }
     }
 
     public virtual void OnFinalize()
     {
-        if (null != m_dicPresenters)
+        foreach (var item in m_dicPresenters)
         {
-            foreach (var item in m_dicPresenters)
-            {
-                item.Value.OnFinalize();
-            }
+            item.Value.OnFinalize();
         }
     }
 

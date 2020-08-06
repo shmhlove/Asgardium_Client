@@ -11,66 +11,79 @@ using LitJson;
 
 public class SHBusinessLobby_Mining_Active : SHBusinessPresenter
 {
-    private Timer m_pTimerUpdateActiveCompany = new Timer(1000);
-
+    private readonly Dictionary<string, List<SHActiveSlotData>> m_dicActiveCompanyData = new Dictionary<string, List<SHActiveSlotData>>();
+    private readonly Timer m_pTimerUpdateActiveCompany = new Timer(1000);
+    
     public override void OnInitialize()
     {
         m_pTimerUpdateActiveCompany.Elapsed += OnUpdateTimer;
         m_pTimerUpdateActiveCompany.AutoReset = true;
         m_pTimerUpdateActiveCompany.Enabled = true;
+
+        // 웹소켓 이벤트 바인딩
+        Single.Network.AddEventObserver(SHAPIs.SH_SOCKET_POLLING_MINING_ACTIVE_INFO, OnEventForSocketPollingMiningActiveInfo);
     }
 
     public override void OnEnter()
     {
+        // 마이닝 엑티브 정보를 주기적으로 소켓을 통해 받기위한 구독 등록
         RequestSubscribeMiningActiveInfo();
 
+        // 마이닝 엑티브 회사정보 업데이트
         m_dicActiveCompanyData.Clear();
         UpdateDataForActiveCompany();
+
+        // 필터바 업데이트
         UpdateUIForActiveFilterbar();
 
+        // 마이닝 업데이트 회사 정보 주기적으로 반영
         m_pTimerUpdateActiveCompany.Start();
-        // StopCoroutine("CoroutineForUpdateUIForActiveCompany");
-        // StartCoroutine("CoroutineForUpdateUIForActiveCompany");
     }
 
     public override void OnLeave()
     {
+        // 마이닝 엑티브 정보를 주기적으로 소켓을 통해 받기위한 구독 해제
         RequestUnsubscribeMiningActiveInfo();
         
         m_pTimerUpdateActiveCompany.Stop();
-        // StopCoroutine("CoroutineForUpdateUIForActiveCompany");
     }
-    
-    private Dictionary<string, List<SHActiveSlotData>> m_dicActiveCompanyData = new Dictionary<string, List<SHActiveSlotData>>();
+
+    public override void OnFinalize()
+    {
+        m_pTimerUpdateActiveCompany.Stop();
+        m_pTimerUpdateActiveCompany.Dispose();
+    }
 
     private async void UpdateUIForActiveInformation(Action pCallback)
     {
-        var pInventory = await Single.Table.GetTable<SHTableServerUserInventory>();
-        var pUpgrade = await Single.Table.GetTable<SHTableServerUserUpgradeInfo>();
-        var pServerGlobalConfig = await Single.Table.GetTable<SHTableServerGlobalConfig>();
+        var pInventoryInfo = await Single.Table.GetTable<SHTableServerUserInventory>();
+        var pUpgradeInfo = await Single.Table.GetTable<SHTableServerUserUpgradeInfo>();
+        var pServerConfig = await Single.Table.GetTable<SHTableServerGlobalConfig>();
         
         // 통신시간 갭 때문에 저장된 시간보다 1초정도 앞당겨 준다.
         var Epsilon = 1000;
-        var LastMiningPowerAt = pInventory.MiningPowerAt - Epsilon;
+        var LastMiningPowerAt = pInventoryInfo.MiningPowerAt - Epsilon;
 
         // 남은 시간과 파워갯수 구하기
         var pTimeSpan = (DateTime.UtcNow - SHUtils.GetUctTimeByMillisecond(LastMiningPowerAt));
-        var iCurPowerCount = (int)(pTimeSpan.TotalMilliseconds / (double)pServerGlobalConfig.m_iBasicChargeTime);
-        var fCurLeftTime = (pTimeSpan.TotalMilliseconds % (double)pServerGlobalConfig.m_iBasicChargeTime);
+        var iCurPowerCount = (int)(pTimeSpan.TotalMilliseconds / (double)pServerConfig.m_iBasicChargeTime);
+        var fCurLeftTime = (pTimeSpan.TotalMilliseconds % (double)pServerConfig.m_iBasicChargeTime);
 
         // 파워갯수 출력형태로 구성
-        iCurPowerCount = Math.Min(iCurPowerCount, pServerGlobalConfig.m_iBasicMiningPowerCount);
-        string strCountInfo = string.Format("{0}/{1}", iCurPowerCount, pServerGlobalConfig.m_iBasicMiningPowerCount);
+        iCurPowerCount = Math.Min(iCurPowerCount, pServerConfig.m_iBasicMiningPowerCount);
+        string strCountInfo = string.Format("{0}/{1}", iCurPowerCount, pServerConfig.m_iBasicMiningPowerCount);
 
         // 남은 시간 출력형태로 구성
-        var pLeftTime = TimeSpan.FromMilliseconds(pServerGlobalConfig.m_iBasicChargeTime - fCurLeftTime);
+        var pLeftTime = TimeSpan.FromMilliseconds(pServerConfig.m_iBasicChargeTime - fCurLeftTime);
         var iLeftMinutes = (int)(pLeftTime.TotalSeconds / 60);
         var iLeftSecond = (int)(pLeftTime.TotalSeconds % 60);
-        string strTimer = (iCurPowerCount < pServerGlobalConfig.m_iBasicMiningPowerCount) ? 
+        string strTimer = (iCurPowerCount < pServerConfig.m_iBasicMiningPowerCount) ? 
             string.Format("{0:00}:{1:00}", iLeftMinutes, iLeftSecond) : "--:--";
 
         // UI 업데이트
-        //m_pUIPanelMining.SetActiveInformation(strCountInfo, strTimer);
+        var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
+        var pUIPanel = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
+        pUIPanel.SetActiveInformation(strCountInfo, strTimer);
 
         pCallback();
     }
@@ -91,17 +104,20 @@ public class SHBusinessLobby_Mining_Active : SHBusinessPresenter
                 continue;
             }
 
-            var pData = new SHActiveFilterUnitData();
-            pData.m_iUnitId = kvp.Value.m_iUnitId;
-            pData.m_strIconImage = kvp.Value.m_strIconImage;
-
-            pSlotDatas.Add(pData);
+            pSlotDatas.Add(new SHActiveFilterUnitData
+            {
+                m_iUnitId = kvp.Value.m_iUnitId,
+                m_strIconImage = kvp.Value.m_strIconImage
+            });
         }
 
-        //m_pUIPanelMining.SetActiveFilterbarScrollview(pSlotDatas, bIsAllOn);
+        // UI 업데이트
+        var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
+        var pUIPanel = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
+        pUIPanel.SetActiveFilterbarScrollview(pSlotDatas, bIsAllOn);
     }
 
-    private void UpdateUIForActiveCompany(Action pCallback)
+    private async void UpdateUIForActiveCompany(Action pCallback)
     {
         if (0 == m_dicActiveCompanyData.Count)
         {
@@ -112,7 +128,7 @@ public class SHBusinessLobby_Mining_Active : SHBusinessPresenter
         var pSlotDatas = new List<SHActiveSlotData>();
         foreach (var kvp in m_dicActiveCompanyData)
         {
-            // 유닛 필터링 체크
+            // 유닛 필터링 체크 (UnitId를 분리해내서 해당 UnitId가 필터바에서 체크해제 되었는지 확인)
             var keySplit = kvp.Key.Split('_');
             var bIsOn = SHPlayerPrefs.GetBool(keySplit[1]);
             if (false == ((null == bIsOn) ? true : bIsOn.Value))
@@ -120,7 +136,7 @@ public class SHBusinessLobby_Mining_Active : SHBusinessPresenter
                 continue;
             }
 
-            // 공급량 체크
+            // 공급량 체크 & 서브 아이템 처리
             var pData = kvp.Value.FindAll((p) => { return 0 != p.m_iSupplyQuantity; });
             if ((null != pData) && (0 != pData.Count))
             {
@@ -153,10 +169,14 @@ public class SHBusinessLobby_Mining_Active : SHBusinessPresenter
             return 1;
         });
 
-        //m_pUIPanelMining.SetActiveScrollview(pSlotDatas);
-        
+        // UI 업데이트
+        var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
+        var pUIPanel = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
+        pUIPanel.SetActiveScrollview(pSlotDatas);
+
         pCallback();
     }
+
     private bool? SortConditionForEfficiencyLevel(SHActiveSlotData pValue1, SHActiveSlotData pValue2)
     {
         if (pValue1.m_iEfficiencyLevel == pValue2.m_iEfficiencyLevel)
@@ -180,51 +200,55 @@ public class SHBusinessLobby_Mining_Active : SHBusinessPresenter
 
         return pValue1.m_iSupplyQuantity < pValue2.m_iSupplyQuantity;
     }
+
     private async void UpdateDataForActiveCompany()
     {
-        var pCompanyTable = await Single.Table.GetTable<SHTableServerInstanceMiningActiveCompany>();
+        var pCompanyInfo = await Single.Table.GetTable<SHTableServerInstanceMiningActiveCompany>();
         var pStringTable = await Single.Table.GetTable<SHTableClientString>();
-        var pServerGlobalUnitDataTable = await Single.Table.GetTable<SHTableServerGlobalUnit>();
-        var pActiveMiningQuantityTable = await Single.Table.GetTable<SHTableServerMiningActiveQuantity>();
+        var pUnitTable = await Single.Table.GetTable<SHTableServerGlobalUnit>();
+        var pQuantityTable = await Single.Table.GetTable<SHTableServerMiningActiveQuantity>();
 
-        Func<SHTableServerInstanceMiningActiveCompanyData, SHActiveSlotData> pCreateSlotData =
-        (pData) =>
+        Func<SHTableServerInstanceMiningActiveCompanyData, SHActiveSlotData> pCreateUIData =
+        (pServerData) =>
         {
             return new SHActiveSlotData()
             {
-                m_strGroupId = string.Format("{0}_{1}", pData.m_iEfficiencyLV, pData.m_iUnitId),
-                m_strInstanceId = pData.m_strInstanceId,
-                m_strCompanyName = pStringTable.GetString(pData.m_iNameStrid.ToString()),
-                m_strCompanyIcon = pData.m_strEmblemImage,
-                m_strUnitIcon = pServerGlobalUnitDataTable.GetData(pData.m_iUnitId).m_strIconImage,
-                m_iUnitId = pData.m_iUnitId,
-                m_iUnitQuantity = pActiveMiningQuantityTable.GetData(pData.m_iEfficiencyLV).m_iQuantity,
-                m_iPurchaseCost = pServerGlobalUnitDataTable.GetData(pData.m_iUnitId).m_iWeight,
-                m_iEfficiencyLevel = pData.m_iEfficiencyLV,
-                m_iSupplyQuantity = pData.m_iSupplyCount,
-                m_bIsNPCCompany = pData.m_bIsNPCCompany,
+                m_strGroupId        = string.Format("{0}_{1}", pServerData.m_iEfficiencyLV, pServerData.m_iUnitId),
+                m_strInstanceId     = pServerData.m_strInstanceId,
+                m_strCompanyName    = pStringTable.GetString(pServerData.m_iNameStrid.ToString()),
+                m_strCompanyIcon    = pServerData.m_strEmblemImage,
+                m_strUnitIcon       = pUnitTable.GetData(pServerData.m_iUnitId).m_strIconImage,
+                m_iUnitId           = pServerData.m_iUnitId,
+                m_iUnitQuantity     = pQuantityTable.GetData(pServerData.m_iEfficiencyLV).m_iQuantity,
+                m_iPurchaseCost     = pUnitTable.GetData(pServerData.m_iUnitId).m_iWeight,
+                m_iEfficiencyLevel  = pServerData.m_iEfficiencyLV,
+                m_iSupplyQuantity   = pServerData.m_iSupplyCount,
+                m_bIsNPCCompany     = pServerData.m_bIsNPCCompany,
                 
-                m_pEventPurchaseButton = OnEventForPurchaseMining,
-                m_pEventShowSubUnitsButton = OnEventForShowSubUnits,
+                m_pEventPurchaseButton = OnUIEventForPurchaseMining,
+                m_pEventShowSubUnitsButton = OnUIEventForShowSubUnits,
             };
         };
 
+        // 공급량이 0이 되더라도 UI 리스트에서 제거하지 않기 위해(싱크를 위함)
+        // 회사정보가 없으면 서버 데이터를 기준으로 UI 데이터 생성
+        // 회사정보가 있으면 UI 데이터를 기준으로 서버데이터 참고해서 데이터 갱신
         if (0 == m_dicActiveCompanyData.Count)
         {
-            // 서버 데이터를 기준으로 클라 데이터 신규 셋팅
-            foreach (var kvp in pCompanyTable.m_dicDatas)
+            // 서버 데이터를 기준으로 UI 데이터 생성
+            foreach (var kvp in pCompanyInfo.m_dicDatas)
             {
-                var pData = pCreateSlotData(kvp.Value);
+                var pUIData = pCreateUIData(kvp.Value);
 
-                if (false == m_dicActiveCompanyData.ContainsKey(pData.m_strGroupId))
+                if (false == m_dicActiveCompanyData.ContainsKey(pUIData.m_strGroupId))
                 {
-                    m_dicActiveCompanyData[pData.m_strGroupId] = new List<SHActiveSlotData>();
+                    m_dicActiveCompanyData[pUIData.m_strGroupId] = new List<SHActiveSlotData>();
                 }
 
-                m_dicActiveCompanyData[pData.m_strGroupId].Add(pData);
+                m_dicActiveCompanyData[pUIData.m_strGroupId].Add(pUIData);
             }
 
-            // NPC 회사를 가장 뒤로 보내기
+            // NPC 회사를 가장 뒤로 정렬
             foreach (var kvp in m_dicActiveCompanyData)
             {
                 kvp.Value.Sort((x, y) =>
@@ -247,14 +271,14 @@ public class SHBusinessLobby_Mining_Active : SHBusinessPresenter
             {
                 foreach (var pSlotData in kvp.Value)
                 {
-                    var pTableData = pCompanyTable.GetData(pSlotData.m_strInstanceId);
+                    var pTableData = pCompanyInfo.GetData(pSlotData.m_strInstanceId);
                     if (null == pTableData)
                     {
                         pSlotData.m_iSupplyQuantity = 0;
                     }
                     else
                     {
-                        var pData = pCreateSlotData(pTableData);
+                        var pData = pCreateUIData(pTableData);
                         pSlotData.CopyFrom(pData);
                     }
                 }
@@ -290,6 +314,7 @@ public class SHBusinessLobby_Mining_Active : SHBusinessPresenter
                 var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
                 var pPanel = await pUIRoot.GetPanel<SHUIPopupPanelMiningSubActiveCompany>(SHUIConstant.PANEL_MINING_SUB_ACTIVE_COMPANY);
 
+                // 서브 회사 팝업 UI 업데이트
                 foreach (var kvp in m_dicActiveCompanyData)
                 {
                     var pData = kvp.Value.Find((p) => { return strInstanceId == p.m_strInstanceId; });
@@ -305,6 +330,7 @@ public class SHBusinessLobby_Mining_Active : SHBusinessPresenter
                     }
                 }
 
+                // 메인 회사 UI 업데이트
                 UpdateUIForActiveCompany(() => { });
             }
             else
@@ -314,12 +340,12 @@ public class SHBusinessLobby_Mining_Active : SHBusinessPresenter
         });
     }
 
-    public void OnEventForPurchaseMining(string strInstanceId)
+    public void OnUIEventForPurchaseMining(string strInstanceId)
     {
         RequestPurchaseMiningActiveCompany(strInstanceId);
     }
 
-    public async void OnEventForShowSubUnits(string strGroupId)
+    public async void OnUIEventForShowSubUnits(string strGroupId)
     {
         var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
         var pPanel = await pUIRoot.GetPanel<SHUIPopupPanelMiningSubActiveCompany>(SHUIConstant.PANEL_MINING_SUB_ACTIVE_COMPANY);
@@ -369,6 +395,7 @@ public class SHBusinessLobby_Mining_Active : SHBusinessPresenter
         //         yield return null;
         // }
     }
+
 
     //////////////////////////////////////////////////////////////////////
     // 테스트 코드

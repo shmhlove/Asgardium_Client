@@ -4,7 +4,7 @@
 //  Lunar Unity Mobile Console
 //  https://github.com/SpaceMadness/lunar-unity-console
 //
-//  Copyright 2019 Alex Lementuev, SpaceMadness.
+//  Copyright 2015-2020 Alex Lementuev, SpaceMadness.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -19,19 +19,19 @@
 //  limitations under the License.
 //
 
+
 #import "LUConsolePluginImp.h"
 #import "Lunar-Full.h"
 
 BOOL LUConsoleIsFreeVersion = NO;
 BOOL LUConsoleIsFullVersion = YES;
 
-static NSString * const kScriptMessageSetVariable    = @"console_variable_set";
-static NSString * const kScriptMessageAction         = @"console_action";
+static NSString *const kScriptMessageSetVariable = @"console_variable_set";
+static NSString *const kScriptMessageAction = @"console_action";
 
-@interface LUConsolePluginImp ()
-{
-    __weak LUConsolePlugin * _plugin;
-    LUWindow * _overlayWindow;
+@interface LUConsolePluginImp () {
+    __weak LUConsolePlugin *_plugin;
+    LUWindow *_overlayWindow;
 }
 
 @end
@@ -41,8 +41,7 @@ static NSString * const kScriptMessageAction         = @"console_action";
 - (instancetype)initWithPlugin:(LUConsolePlugin *)plugin
 {
     self = [super init];
-    if (self)
-    {
+    if (self) {
         _plugin = plugin;
         [self registerNotifications];
     }
@@ -56,7 +55,7 @@ static NSString * const kScriptMessageAction         = @"console_action";
 {
     [self registerNotificationName:LUActionControllerDidChangeVariable
                           selector:@selector(actionControllerDidChangeVariableNotification:)];
-    
+
     [self registerNotificationName:LUActionControllerDidSelectAction
                           selector:@selector(actionControllerDidSelectActionNotification:)];
 }
@@ -65,11 +64,10 @@ static NSString * const kScriptMessageAction         = @"console_action";
 {
     LUCVar *variable = [notification.userInfo objectForKey:LUActionControllerDidChangeVariableKeyVariable];
     LUAssert(variable);
-    
-    if (variable)
-    {
+
+    if (variable) {
         NSDictionary *params = @{
-            @"id"    : [NSNumber numberWithInt:variable.actionId],
+            @"id" : [NSNumber numberWithInt:variable.actionId],
             @"value" : variable.value
         };
         [_plugin sendScriptMessageName:kScriptMessageSetVariable params:params];
@@ -80,9 +78,8 @@ static NSString * const kScriptMessageAction         = @"console_action";
 {
     LUAction *action = [notification.userInfo objectForKey:LUActionControllerDidSelectActionKeyAction];
     LUAssert(action);
-    
-    if (action)
-    {
+
+    if (action) {
         NSDictionary *params = @{ @"id" : [NSNumber numberWithInt:action.actionId] };
         [_plugin sendScriptMessageName:kScriptMessageAction params:params];
     }
@@ -90,13 +87,11 @@ static NSString * const kScriptMessageAction         = @"console_action";
 
 - (void)showOverlay
 {
-    if (_overlayWindow == nil)
-    {
-        LUConsoleOverlayControllerSettings *settings = [LUConsoleOverlayControllerSettings settings];
+    if (_overlayWindow == nil) {
         LUConsoleOverlayController *controller = [LUConsoleOverlayController controllerWithConsole:_plugin.console
-                                                                                          settings:settings];
-        
-        CGRect windowFrame = LUGetScreenBounds();
+                                                                                          settings:_plugin.settings.logOverlay];
+
+		CGRect windowFrame = [LUUIHelper safeAreaRect];
         _overlayWindow = [[LUWindow alloc] initWithFrame:windowFrame];
         _overlayWindow.userInteractionEnabled = NO;
         _overlayWindow.rootViewController = controller;
@@ -107,8 +102,7 @@ static NSString * const kScriptMessageAction         = @"console_action";
 
 - (void)hideOverlay
 {
-    if (_overlayWindow != nil)
-    {
+    if (_overlayWindow != nil) {
         _overlayWindow.rootViewController = nil;
         _overlayWindow.hidden = YES;
         _overlayWindow = nil;

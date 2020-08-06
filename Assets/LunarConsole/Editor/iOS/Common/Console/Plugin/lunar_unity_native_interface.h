@@ -4,7 +4,7 @@
 //  Lunar Unity Mobile Console
 //  https://github.com/SpaceMadness/lunar-unity-console
 //
-//  Copyright 2019 Alex Lementuev, SpaceMadness.
+//  Copyright 2015-2020 Alex Lementuev, SpaceMadness.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -19,11 +19,12 @@
 //  limitations under the License.
 //
 
+
 #ifndef __LunarConsole__unity_native_interface__
 #define __LunarConsole__unity_native_interface__
 
 // life cycle
-OBJC_EXTERN void __lunar_console_initialize(const char *targetName, const char *methodName, const char *version, int capacity, int trimCount, const char *gesture, const char *settingsJson);
+OBJC_EXTERN void __lunar_console_initialize(const char *targetName, const char *methodName, const char *version, const char *settingsJson);
 OBJC_EXTERN void __lunar_console_destroy(void);
 
 // show/hide

@@ -4,7 +4,7 @@
 //  Lunar Unity Mobile Console
 //  https://github.com/SpaceMadness/lunar-unity-console
 //
-//  Copyright 2019 Alex Lementuev, SpaceMadness.
+//  Copyright 2015-2020 Alex Lementuev, SpaceMadness.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
+
 
 #import "Lunar-Full.h"
 
@@ -70,7 +71,7 @@ static const NSInteger kSectionCount = 2;
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
     self.filterBar.delegate = self;
-    self.noActionsWarningLabel.text = @"You don't have any actions or variables yet";
+    self.noActionsWarningLabel.text = @"No actions or variables";
 }
 
 #pragma mark -
@@ -334,13 +335,12 @@ static const NSInteger kSectionCount = 2;
 - (void)updateNoActionWarningView
 {
     BOOL hasContent = [self actionCount] > 0 || [self variableCount] > 0;
-    [self setNoActionsWarningViewHidden:hasContent];
+	[self setNoActionsWarningViewHidden:hasContent];
 }
 
 - (void)setNoActionsWarningViewHidden:(BOOL)hidden
 {
-    self.tableView.hidden = !hidden;
-    self.filterBar.hidden = !hidden;
+    self.actionsView.hidden = !hidden;
     self.noActionsWarningView.hidden = hidden;
 }
 

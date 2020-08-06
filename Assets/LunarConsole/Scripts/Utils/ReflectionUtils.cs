@@ -4,7 +4,7 @@
 //  Lunar Unity Mobile Console
 //  https://github.com/SpaceMadness/lunar-unity-console
 //
-//  Copyright 2019 Alex Lementuev, SpaceMadness.
+//  Copyright 2015-2020 Alex Lementuev, SpaceMadness.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
+
 
 ﻿using System;
 using System.Collections.Generic;
@@ -271,8 +272,7 @@ namespace LunarConsolePluginInternal
 
             try
             {
-                var types = assembly.GetTypes();
-                foreach (var type in types)
+                foreach (var type in GetAssemblyTypes(assembly))
                 {
                     if (filter(type))
                     {
@@ -286,6 +286,27 @@ namespace LunarConsolePluginInternal
             }
 
             return list;
+        }
+
+        private static IEnumerable<Type> GetAssemblyTypes(Assembly assembly)
+        {
+            try
+            {
+                return assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException e)
+            {
+                List<Type> result = new List<Type>();
+                Type[] types = e.Types;
+                for (int i = 0; i < types.Length; ++i)
+                {
+                    if (types[i] != null)
+                    {
+                        result.Add(types[i]);
+                    }
+                }
+                return result;
+            }
         }
 
         #endregion

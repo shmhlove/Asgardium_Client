@@ -4,7 +4,7 @@
 //  Lunar Unity Mobile Console
 //  https://github.com/SpaceMadness/lunar-unity-console
 //
-//  Copyright 2019 Alex Lementuev, SpaceMadness.
+//  Copyright 2015-2020 Alex Lementuev, SpaceMadness.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -19,17 +19,14 @@
 //  limitations under the License.
 //
 
-#import <Foundation/Foundation.h>
 
-#ifndef __IPHONE_8_0
-#define __IPHONE_8_0     80000
-#endif
+#import <Foundation/Foundation.h>
 
 #ifndef __IPHONE_9_0
 #define __IPHONE_9_0     90000
 #endif
 
-#define LU_SYSTEM_VERSION_MIN __IPHONE_8_0
+#define LU_SYSTEM_VERSION_MIN __IPHONE_9_0
 
 #define LU_IOS_VERSION_AVAILABLE(sys_ver) lunar_ios_version_available(sys_ver)
 #define LU_IOS_MIN_VERSION_AVAILABLE (LU_IOS_VERSION_AVAILABLE(LU_SYSTEM_VERSION_MIN))

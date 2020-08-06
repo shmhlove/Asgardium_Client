@@ -4,7 +4,7 @@
 //  Lunar Unity Mobile Console
 //  https://github.com/SpaceMadness/lunar-unity-console
 //
-//  Copyright 2019 Alex Lementuev, SpaceMadness.
+//  Copyright 2015-2020 Alex Lementuev, SpaceMadness.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -19,11 +19,13 @@
 //  limitations under the License.
 //
 
+
 #import "LUUtils.h"
 
 #import "LUActionButton.h"
 #import "LUActionController.h"
 #import "LUActionRegistry.h"
+#import "LUButton.h"
 #import "LUConsole.h"
 #import "LUConsoleController.h"
 #import "LUConsoleLogController.h"
@@ -35,22 +37,25 @@
 #import "LUConsoleLogMenuController.h"
 #import "LUConsoleLogTypeButton.h"
 #import "LUConsolePlugin.h"
-#import "LUConsolePluginSettings.h"
 #import "LUConsolePopupController.h"
 #import "LUConsoleResizeController.h"
 #import "LUConsoleSettingsController.h"
 #import "LUCVar.h"
 #import "LUEntry.h"
 #import "LUEntryTableViewCell.h"
+#import "LUEnumPickerViewController.h"
 #import "LUExceptionWarningController.h"
+#import "LULogMessage.h"
 #import "LUPanViewGestureRecognizer.h"
 #import "LUPassTouchView.h"
-#import "LUSwitch.h"
+#import "LUPluginSettings.h"
 #import "LUSlider.h"
+#import "LUSwitch.h"
 #import "LUTableView.h"
 #import "LUTextField.h"
 #import "LUTheme.h"
 #import "LUToggleButton.h"
+#import "LUUIHelper.h"
 #import "LUUnityScriptMessenger.h"
 #import "LUViewController.h"
 #import "LUWindow.h"

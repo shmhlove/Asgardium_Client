@@ -4,7 +4,7 @@
 //  Lunar Unity Mobile Console
 //  https://github.com/SpaceMadness/lunar-unity-console
 //
-//  Copyright 2019 Alex Lementuev, SpaceMadness.
+//  Copyright 2015-2020 Alex Lementuev, SpaceMadness.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
+
 
 #import "LUConsoleLogEntryList.h"
 
@@ -302,7 +303,7 @@
     }
     
     // filter by message
-    return _filterText.length == 0 || [entry.message rangeOfString:_filterText options:NSCaseInsensitiveSearch].location != NSNotFound;
+    return _filterText.length == 0 || [entry.message.text rangeOfString:_filterText options:NSCaseInsensitiveSearch].location != NSNotFound;
 }
 
 #pragma mark -
@@ -316,7 +317,7 @@
     NSUInteger count = _currentEntries.count;
     for (LUConsoleLogEntry *entry in _currentEntries)
     {
-        [text appendString:entry.message];
+        [text appendString:entry.message.text];
         if (entry.type == LUConsoleLogTypeException && entry.hasStackTrace)
         {
             [text appendString:@"\n"];

@@ -4,7 +4,7 @@
 //  Lunar Unity Mobile Console
 //  https://github.com/SpaceMadness/lunar-unity-console
 //
-//  Copyright 2019 Alex Lementuev, SpaceMadness.
+//  Copyright 2015-2020 Alex Lementuev, SpaceMadness.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 //  limitations under the License.
 //
 
+
 #import <UIKit/UIKit.h>
 
 @class LUConsoleResizeController;
@@ -32,5 +33,7 @@
 @interface LUConsoleResizeController : UIViewController
 
 @property (nonatomic, weak) id<LUConsoleResizeControllerDelegate> delegate;
+
+- (instancetype)initWithMaxSize:(CGSize)maxSize topConstraint:(NSLayoutConstraint *)topConstraint leadingConstraint:(NSLayoutConstraint *)leadingConstraint bottomConstraint:(NSLayoutConstraint *)bottomConstraint trailingConstraint:(NSLayoutConstraint *)trailingConstraint;
 
 @end

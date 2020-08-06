@@ -4,7 +4,7 @@
 //  Lunar Unity Mobile Console
 //  https://github.com/SpaceMadness/lunar-unity-console
 //
-//  Copyright 2019 Alex Lementuev, SpaceMadness.
+//  Copyright 2015-2020 Alex Lementuev, SpaceMadness.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -19,12 +19,14 @@
 //  limitations under the License.
 //
 
+
 #import "LUActionControllerBase.h"
 
 @interface LUActionControllerBase ()
 
 @property (nonatomic, weak) IBOutlet UIView       * noActionsWarningView;
 @property (nonatomic, weak) IBOutlet UILabel      * noActionsWarningLabel;
+@property (nonatomic, weak) IBOutlet UIView       * actionsView;
 @property (nonatomic, weak) IBOutlet UITableView  * tableView;
 @property (nonatomic, weak) IBOutlet UISearchBar  * filterBar;
 @property (nonatomic, weak) IBOutlet UIButton     * learnMoreButton;

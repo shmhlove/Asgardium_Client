@@ -4,7 +4,7 @@
 //  Lunar Unity Mobile Console
 //  https://github.com/SpaceMadness/lunar-unity-console
 //
-//  Copyright 2019 Alex Lementuev, SpaceMadness.
+//  Copyright 2015-2020 Alex Lementuev, SpaceMadness.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -19,8 +19,35 @@
 //  limitations under the License.
 //
 
+
 #import <UIKit/UIKit.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+@class LUTextField;
+
+@protocol LUTextFieldInputValidator <NSObject>
+- (BOOL)isTextValid:(NSString *)text;
+@end
+
+@protocol LUTextFieldInputDelegate <NSObject>
+@optional
+- (void)textFieldDidEndEditing:(LUTextField *)textField;
+- (void)textFieldInputDidBecomeInvalid:(LUTextField *)textField;
+@end
 
 @interface LUTextField : UITextField
 
+@property (nonatomic, nullable, strong) id<LUTextFieldInputValidator> textValidator;
+@property (nonatomic, nullable, weak) id<LUTextFieldInputDelegate> textInputDelegate;
+@property (nonatomic, strong) id userData;
+
 @end
+
+@interface LUTextFieldIntegerInputValidator : NSObject<LUTextFieldInputValidator>
+@end
+
+@interface LUTextFieldFloatInputValidator : NSObject<LUTextFieldInputValidator>
+@end
+
+NS_ASSUME_NONNULL_END

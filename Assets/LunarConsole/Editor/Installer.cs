@@ -4,7 +4,7 @@
 //  Lunar Unity Mobile Console
 //  https://github.com/SpaceMadness/lunar-unity-console
 //
-//  Copyright 2019 Alex Lementuev, SpaceMadness.
+//  Copyright 2015-2020 Alex Lementuev, SpaceMadness.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
+
 
 ﻿using UnityEngine;
 using UnityEditor;
@@ -87,10 +88,43 @@ namespace LunarConsoleEditorInternal
             SetLunarConsoleEnabled(false);
         }
 
-        static void SetLunarConsoleEnabled(bool enabled)
+        public static void SetLunarConsoleEnabled(bool enabled)
         {
+            if (LunarConsoleConfig.consoleEnabled == enabled)
+                return;
+
             AndroidPlugin.SetEnabled(enabled);
-            LunarConsolePluginEditorHelper.SetLunarConsoleEnabled(enabled); // then modify preprocessor's define
+
+            string pluginFile = LunarConsolePluginEditorHelper.ResolvePluginFile();
+            if (pluginFile == null)
+            {
+                PrintError(enabled, "can't resolve plugin file");
+                return;
+            }
+
+            string sourceCode = File.ReadAllText(pluginFile);
+
+            string oldToken = "#define " + (enabled ? "LUNAR_CONSOLE_DISABLED" : "LUNAR_CONSOLE_ENABLED");
+            string newToken = "#define " + (enabled ? "LUNAR_CONSOLE_ENABLED" : "LUNAR_CONSOLE_DISABLED");
+
+            string newSourceCode = sourceCode.Replace(oldToken, newToken);
+            if (newSourceCode == sourceCode)
+            {
+                PrintError(enabled, "can't find '" + oldToken + "' token");
+                return;
+            }
+
+            File.WriteAllText(pluginFile, newSourceCode);
+
+            // re-import asset to apply changes
+            AssetDatabase.ImportAsset(FileUtils.GetAssetPath(pluginFile));
+
+            LunarConsoleConfig.consoleEnabled = enabled;
+        }
+
+        static void PrintError(bool flag, string message)
+        {
+            Debug.LogError("Can't " + (flag ? "enable" : "disable") + " Lunar Console: " + message);
         }
     }
 }

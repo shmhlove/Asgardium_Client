@@ -4,7 +4,7 @@
 //  Lunar Unity Mobile Console
 //  https://github.com/SpaceMadness/lunar-unity-console
 //
-//  Copyright 2019 Alex Lementuev, SpaceMadness.
+//  Copyright 2015-2020 Alex Lementuev, SpaceMadness.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@
 //  limitations under the License.
 //
 
-﻿using System;
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -39,6 +40,7 @@ namespace LunarConsoleEditorInternal
         /// </summary>
         public static void TrackPluginVersionUpdate()
         {
+#if !LUNAR_CONSOLE_ANALYTICS_DISABLED
             if (LunarConsoleConfig.consoleEnabled && LunarConsoleConfig.consoleSupported)
             {
                 var lastKnownVersion = EditorPrefs.GetString(kPrefsLastKnownVersion);
@@ -48,10 +50,12 @@ namespace LunarConsoleEditorInternal
                     TrackEvent("Version", "updated_version");
                 }
             }
+#endif
         }
 
         public static void TrackEvent(string category, string action, int value = LunarConsoleAnalytics.kUndefinedValue)
         {
+#if !LUNAR_CONSOLE_ANALYTICS_DISABLED
             if (LunarConsoleConfig.consoleEnabled && LunarConsoleConfig.consoleSupported)
             {
                 var payloadStr = LunarConsoleAnalytics.CreatePayload(category, action, value);
@@ -60,7 +64,7 @@ namespace LunarConsoleEditorInternal
                     Log.d("Event track payload: " + payloadStr);
 
                     LunarConsoleHttpClient downloader = new LunarConsoleHttpClient(LunarConsoleAnalytics.TrackingURL);
-                    downloader.UploadData(payloadStr, delegate(string result, Exception error)
+                    downloader.UploadData(payloadStr, delegate (string result, Exception error)
                     {
                         if (error != null)
                         {
@@ -73,6 +77,7 @@ namespace LunarConsoleEditorInternal
                     });
                 }
             }
+#endif
         }
     }
 }

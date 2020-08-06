@@ -4,7 +4,7 @@
 //  Lunar Unity Mobile Console
 //  https://github.com/SpaceMadness/lunar-unity-console
 //
-//  Copyright 2019 Alex Lementuev, SpaceMadness.
+//  Copyright 2015-2020 Alex Lementuev, SpaceMadness.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -19,15 +19,15 @@
 //  limitations under the License.
 //
 
+
 #import "LUCVarInputTableViewCell.h"
 
 #import "Lunar-Full.h"
 
 @interface LUCVarInputTableViewCell () <LUConsolePopupControllerDelegate, LUCVarEditControllerDelegate>
 
-@property (nonatomic, weak) IBOutlet UITextField * inputField;
-@property (nonatomic, weak) IBOutlet UIButton * resetButton;
-@property (nonatomic, weak) IBOutlet NSLayoutConstraint * resetButtonWidthConstraint;
+@property (nonatomic, weak) IBOutlet UITextField *inputField;
+@property (nonatomic, weak) IBOutlet UIButton *resetButton;
 
 @property (nonatomic, assign) CGFloat resetButtonInitialWidth;
 
@@ -41,11 +41,10 @@
 - (void)setupVariable:(LUCVar *)variable
 {
     [super setupVariable:variable];
-    
-    _resetButtonInitialWidth = _resetButtonWidthConstraint.constant;
-    _inputField.text = variable.value;
+
+    self.inputField.text = variable.value;
     [self updateResetButton];
-    
+
     LU_SET_ACCESSIBILITY_IDENTIFIER(_inputField, @"Variable Input Field");
     LU_SET_ACCESSIBILITY_IDENTIFIER(_resetButton, @"Variable Reset Button");
 }
@@ -79,8 +78,7 @@
 
 - (void)updateResetButton
 {
-    _resetButtonWidthConstraint.constant = self.variable.isDefaultValue ? 0 : _resetButtonInitialWidth;
-    [self layoutIfNeeded];
+    self.resetButton.hidden = self.variable.isDefaultValue;
 }
 
 #pragma mark -
@@ -98,11 +96,11 @@
 {
     LUCVarEditController *controller = [[LUCVarEditController alloc] initWithVariable:self.variable];
     controller.delegate = self;
-    
+
     LUConsolePopupController *popupController = [[LUConsolePopupController alloc] initWithContentController:controller];
     popupController.popupDelegate = self;
     [popupController presentFromController:self.presentingController animated:YES];
-    
+
     return NO;
 }
 

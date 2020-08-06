@@ -4,7 +4,7 @@
 //  Lunar Unity Mobile Console
 //  https://github.com/SpaceMadness/lunar-unity-console
 //
-//  Copyright 2019 Alex Lementuev, SpaceMadness.
+//  Copyright 2015-2020 Alex Lementuev, SpaceMadness.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 //  limitations under the License.
 //
 
+
 ﻿using UnityEngine;
 
 using System;
@@ -28,19 +29,19 @@ namespace LunarConsoleEditorInternal
 {
     static class Log
     {
-        [System.Diagnostics.Conditional("LUNAR_DEVELOPMENT")]
+        [System.Diagnostics.Conditional("LUNAR_CONSOLE_DEVELOPMENT")]
         public static void d(string format, params object[] args)
         {
             Debug.Log(TryFormat(format, args));
         }
 
-        [System.Diagnostics.Conditional("LUNAR_DEVELOPMENT")]
+        [System.Diagnostics.Conditional("LUNAR_CONSOLE_DEVELOPMENT")]
         public static void e(string format, params object[] args)
         {
             Debug.LogError(TryFormat(format, args));
         }
 
-        [System.Diagnostics.Conditional("LUNAR_DEVELOPMENT")]
+        [System.Diagnostics.Conditional("LUNAR_CONSOLE_DEVELOPMENT")]
         public static void e(Exception e, string format, params object[] args)
         {
             Log.e(format, args);

@@ -45,7 +45,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         StartCoroutine(CoroutineCheckStopRetry(() => 
         {
             ClearRetryInfo();
-            Single.BusinessGlobal.CloseIndicator();
+            Single.Global.GetIndicator().Close();
             StopCoroutine("CoroutineRetryProcess");
         }));
     }
@@ -72,7 +72,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 
     private IEnumerator CoroutineRetryProcess()
     {
-        Single.BusinessGlobal.ShowIndicator();
+        Single.Global.GetIndicator().Show();
 
         var strErrorMessage = string.Empty;
         if (Application.internetReachability == NetworkReachability.NotReachable)
@@ -88,7 +88,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
         while (m_iRetryCount++ < m_iMaxRetryCount)
         {
             var strRetryInfo = string.Format(m_pStringTable.GetString("1008"), m_iRetryCount, m_iMaxRetryCount);
-            Single.BusinessGlobal.UpdateIndicatorMessage(string.Format("{0}\n{1}", strRetryInfo, strErrorMessage));
+            Single.Global.GetIndicator().UpdateMessage(string.Format("{0}\n{1}", strRetryInfo, strErrorMessage));
 
             StartCoroutine(CoroutineRetryWebServerProcess());
             ProcessRetryWebSocketConnect();
@@ -115,7 +115,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
             }
         };
 
-        Single.BusinessGlobal.CloseIndicator();
-        Single.BusinessGlobal.ShowAlertUI(pAlertInfo);
+        Single.Global.GetIndicator().Close();
+        Single.Global.GetAlert().Show(pAlertInfo);
     }
 }

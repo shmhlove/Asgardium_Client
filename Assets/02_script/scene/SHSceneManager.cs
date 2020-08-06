@@ -19,7 +19,7 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
         SetDontDestroy();
     }
 
-    public async Task LoadScene(eSceneType eType, LoadSceneMode eMode = LoadSceneMode.Single, bool bIsUseFade = false, Action<SHReply> pCallback = null)
+    public void LoadScene(eSceneType eType, LoadSceneMode eMode = LoadSceneMode.Single, bool bIsUseFade = false, Action<SHReply> pCallback = null)
     {
         if (null == pCallback)
         {
@@ -31,16 +31,16 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
             pCallback(new SHReply(new SHError(eErrorCode.Scene_Already_Loaded, "[LSH] Aleady Loaded Scene")));
             return;
         }
-
+        
         Action LoadScene = () =>
         {
             Single.Coroutine.CachingWait(()=> 
             {
                 SendEventForBeforeLoad(eType);
-                Single.Coroutine.Async(SceneManager.LoadSceneAsync(eType.ToString(), eMode), async (pAsync) => 
+                Single.Coroutine.Async(SceneManager.LoadSceneAsync(eType.ToString(), eMode), (pAsync) => 
                 {
                     if (true == bIsUseFade)
-                        await PlayFadeOut(() => pCallback(new SHReply()));
+                        PlayFadeOut(() => pCallback(new SHReply()));
                     else
                         pCallback(new SHReply());
 
@@ -50,7 +50,7 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
         };
 
         if (true == bIsUseFade)
-            await PlayFadeIn(() => LoadScene());
+            PlayFadeIn(() => LoadScene());
         else
             LoadScene();
     }
@@ -133,15 +133,13 @@ public class SHSceneManager : SHSingleton<SHSceneManager>
         }
     }
 
-    private async Task PlayFadeIn(Action pCallback)
+    private void PlayFadeIn(Action pCallback)
     {
-        var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-        await pUIRoot.ShowFadePanel(pCallback);
+        Single.Global.GetFade().Show(pCallback);
     }
     
-    private async Task PlayFadeOut(Action pCallback)
+    private void PlayFadeOut(Action pCallback)
     {
-        var pUIRoot = await Single.UI.GetRoot<SHUIRootGlobal>(SHUIConstant.ROOT_GLOBAL);
-        await pUIRoot.CloseFadePanel(pCallback);
+        Single.Global.GetFade().Close(pCallback);
     }
 }

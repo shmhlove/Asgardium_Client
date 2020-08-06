@@ -58,7 +58,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 
     private IEnumerator CoroutineSendRequest(SHRequestData pRequestData)
     {
-        Single.BusinessGlobal.ShowIndicator();
+        Single.Global.GetIndicator().Show();
 
         pRequestData.m_eRequestStatus = eRequestStatus.Requesting;
 
@@ -83,7 +83,7 @@ public partial class SHNetworkManager : SHSingleton<SHNetworkManager>
 
             if (0 == m_pWebRequestQueue.Count)
             {
-                Single.BusinessGlobal.CloseIndicator();
+                Single.Global.GetIndicator().Close();
             }
         }
         else

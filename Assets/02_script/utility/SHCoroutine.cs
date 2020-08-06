@@ -143,6 +143,23 @@ public class SHCoroutine : SHSingleton<SHCoroutine>
         pAction.Invoke();
     }
 
+    //yield return IEnumerator : 비동기 작업이 끝날 때 까지 대기
+    //-----------------------------------------------
+    public void Coroutine(IEnumerator pCoroutineFunc, Action pCallback)
+    {
+        if (null == pCallback)
+        {
+            pCallback = () => {};
+        }
+
+        StartCoroutine(InvokeToCoroutine(pCoroutineFunc, pCallback));
+    }
+    private IEnumerator InvokeToCoroutine(IEnumerator pCoroutineFunc, Action pCallback)
+    {
+        yield return pCoroutineFunc;
+
+        pCallback.Invoke();
+    }
 
     //yield return new AsyncOperation : 비동기 작업이 끝날 때 까지 대기 (씬로딩)
     //-----------------------------------------------

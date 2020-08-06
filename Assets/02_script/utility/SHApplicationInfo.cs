@@ -283,11 +283,9 @@ public partial class SHApplicationInfo : SHSingleton<SHApplicationInfo>
             strBuff += string.Format("supportsAccelerometer : {0}\n", SystemInfo.supportsAccelerometer);
             strBuff += string.Format("supportsComputeShaders : {0}\n", SystemInfo.supportsComputeShaders);
             strBuff += string.Format("supportsGyroscope : {0}\n", SystemInfo.supportsGyroscope);
-            strBuff += string.Format("supportsImageEffects : {0}\n", SystemInfo.supportsImageEffects);
             strBuff += string.Format("supportsInstancing : {0}\n", SystemInfo.supportsInstancing);
             strBuff += string.Format("supportsLocationService : {0}\n", SystemInfo.supportsLocationService);
             strBuff += string.Format("supportsRawShadowDepthSampling : {0}\n", SystemInfo.supportsRawShadowDepthSampling);
-            strBuff += string.Format("supportsRenderToCubemap : {0}\n", SystemInfo.supportsRenderToCubemap);
             strBuff += string.Format("supportsShadows : {0}\n", SystemInfo.supportsShadows);
             strBuff += string.Format("supportsSparseTextures : {0}\n", SystemInfo.supportsSparseTextures);
             strBuff += string.Format("supportsVibration : {0}\n", SystemInfo.supportsVibration);

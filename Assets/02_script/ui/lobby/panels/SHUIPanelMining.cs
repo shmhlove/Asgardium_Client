@@ -79,7 +79,7 @@ public class SHUIPanelMining : SHUIPanel
         return m_eCurrentTab;
     }
 
-    private void SetMoveTab(eMiningTabType eType)
+    private void SetChangeTab(eMiningTabType eType)
     {
         m_eCurrentTab = eType;
     }
@@ -87,19 +87,19 @@ public class SHUIPanelMining : SHUIPanel
     public void OnClickActive()
     {
         m_pEventOfChangeTab?.Invoke(eMiningTabType.Active, m_eCurrentTab);
-        SetMoveTab(eMiningTabType.Active);
+        SetChangeTab(eMiningTabType.Active);
     }
 
     public void OnClickPassive()
     {
         m_pEventOfChangeTab?.Invoke(eMiningTabType.Passive, m_eCurrentTab);
-        SetMoveTab(eMiningTabType.Passive);
+        SetChangeTab(eMiningTabType.Passive);
     }
 
     public void OnClickCompany()
     {
         m_pEventOfChangeTab?.Invoke(eMiningTabType.Company, m_eCurrentTab);
-        SetMoveTab(eMiningTabType.Company);
+        SetChangeTab(eMiningTabType.Company);
     }
 
     public void OnClickFilter()

@@ -9,6 +9,8 @@ public class SHUIActiveUpgrade : MonoBehaviour
     public UILabel m_pLabelTimeLv;
     public UILabel m_pLabelPowerLv;
     private List<GameObject> m_pEventObjects = new List<GameObject>();
+    private Action m_pEventToPowerUp;
+    private Action m_pEventToTimeUp;
 
     public void SetPowerLevel(string strValue)
     {
@@ -20,12 +22,14 @@ public class SHUIActiveUpgrade : MonoBehaviour
         m_pLabelTimeLv.text = strValue;
     }
 
-    public void AddEvent(GameObject gameObject)
+    public void AddEventToPowerUp(Action pCallback)
     {
-        if (false == m_pEventObjects.Contains(gameObject))
-        {
-            m_pEventObjects.Add(gameObject);
-        }
+        m_pEventToPowerUp = pCallback;
+    }
+
+    public void AddEventToTimeUp(Action pCallback)
+    {
+        m_pEventToTimeUp = pCallback;
     }
 
     public void OnClickPowerUpButton()

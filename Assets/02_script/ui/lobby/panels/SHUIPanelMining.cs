@@ -30,16 +30,16 @@ public class SHUIPanelMining : SHUIPanel
 
     private eMiningTabType m_eCurrentTab = eMiningTabType.None;
     private Action<eMiningTabType, eMiningTabType> m_pEventOfChangeTab;
-    private Action m_pEventOfFilter;
+    private Action m_pEventOfFilterbar;
 
     public void SetEventForChangeMiningTab(Action<eMiningTabType, eMiningTabType> pCallback)
     {
         m_pEventOfChangeTab = pCallback;
     }
 
-    public void SetEventForClickFilter(Action pCallback)
+    public void SetEventForClickFilterbar(Action pCallback)
     {
-        m_pEventOfFilter = pCallback;
+        m_pEventOfFilterbar = pCallback;
     }
 
     public void SetActiveInformation(string strPower, string strTimer)
@@ -104,6 +104,6 @@ public class SHUIPanelMining : SHUIPanel
 
     public void OnClickFilter()
     {
-        m_pEventOfFilter?.Invoke();
+        m_pEventOfFilterbar?.Invoke();
     }
 }

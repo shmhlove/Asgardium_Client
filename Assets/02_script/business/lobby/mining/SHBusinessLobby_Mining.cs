@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;
 
 using System;
 using System.Threading.Tasks;
@@ -12,10 +11,15 @@ public class SHBusinessLobby_Mining : SHBusinessPresenter
 {
     private SHBusinessPresenter m_pPresenters = new SHBusinessPresenter();
 
-    public override void OnInitialize()
+    public async override void OnInitialize()
     {
         m_pPresenters.Add(new SHBusinessLobby_Mining_Active());
         m_pPresenters.OnInitialize();
+
+        // UI 이벤트 바인딩
+        var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
+        var pUIPanel = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
+        pUIPanel.SetEventForChangeMiningTab(OnUIEventForChangeMiningTab);
     }
 
     public override async void OnEnter()
@@ -23,7 +27,7 @@ public class SHBusinessLobby_Mining : SHBusinessPresenter
         var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
         var pMining = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
 
-        OnEventForChangeMiningTab(pMining.GetCurrentTab(), eMiningTabType.None);
+        OnUIEventForChangeMiningTab(pMining.GetCurrentTab(), eMiningTabType.None);
     }
 
     public override async void OnLeave()
@@ -31,7 +35,7 @@ public class SHBusinessLobby_Mining : SHBusinessPresenter
         var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
         var pMining = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
 
-        OnEventForChangeMiningTab(eMiningTabType.None, pMining.GetCurrentTab());
+        OnUIEventForChangeMiningTab(eMiningTabType.None, pMining.GetCurrentTab());
     }
 
     SHBusinessPresenter GetByMiningTabType(eMiningTabType type)
@@ -40,20 +44,20 @@ public class SHBusinessLobby_Mining : SHBusinessPresenter
         switch(type)
         {
             case eMiningTabType.Active:     return m_pPresenters.Get<SHBusinessLobby_Mining_Active>();
-            case eMiningTabType.Passive:    return m_pPresenters.Get<SHBusinessLobby_Mining_Active>();
-            case eMiningTabType.Company:    return m_pPresenters.Get<SHBusinessLobby_Mining_Active>();
+            case eMiningTabType.Passive:    return m_pPresenters.Get<SHBusinessPresenter>();
+            case eMiningTabType.Company:    return m_pPresenters.Get<SHBusinessPresenter>();
             default:                        return m_pPresenters.Get<SHBusinessPresenter>();
         }
     }
 
-    public void OnEventForChangeMiningTab(eMiningTabType eTo, eMiningTabType eFrom)
+    public void OnUIEventForChangeMiningTab(eMiningTabType eEnter, eMiningTabType eLeave)
     {
-        if (eTo == eFrom)
+        if (eEnter == eLeave)
         {
             return;
         }
 
-        GetByMiningTabType(eTo).OnEnter();
-        GetByMiningTabType(eFrom).OnLeave();
+        GetByMiningTabType(eEnter).OnEnter();
+        GetByMiningTabType(eLeave).OnLeave();
     }
 }

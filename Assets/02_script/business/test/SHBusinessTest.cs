@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
-using UnityEngine.Networking;
 
 using System;
+using System.Timers;
 using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
@@ -272,5 +272,25 @@ public class SHBusinessTest : MonoBehaviour
             logBuff += pData.iLevel.ToString() + ", ";
         }
         Debug.Log(logBuff);
+    }
+
+    private readonly Timer m_pTimerUpdateCompanyUI = new Timer(1000);
+
+    [FuncButton]
+    public void OnClickStartTimerTest()
+    {
+        m_pTimerUpdateCompanyUI.Elapsed += (System.Object source, ElapsedEventArgs e) =>
+        {
+            
+            Debug.LogFormat("Timer Event {0}", e.SignalTime);
+        };
+        m_pTimerUpdateCompanyUI.AutoReset = true;
+        m_pTimerUpdateCompanyUI.Start();
+    }
+
+    [FuncButton]
+    public void OnClickEndTimerTest()
+    {
+        m_pTimerUpdateCompanyUI.Stop();
     }
 }

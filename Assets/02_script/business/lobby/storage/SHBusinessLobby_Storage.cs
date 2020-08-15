@@ -1,17 +1,14 @@
 ﻿using UnityEngine;
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
-
-public partial class SHBusinessLobby : MonoBehaviour
+public partial class SHBusinessLobby_Storage : SHBusinessPresenter
 {
-    private void StartStorage()
-    {
-        AddEnableDelegate(eLobbyMenuType.Storage, EnableStorageMenu);
-        AddDisableDelegate(eLobbyMenuType.Storage, DisableStorageMenu);
-    }
+    public override void OnInitialize() { }
 
-    private async void EnableStorageMenu()
+    public async override void OnEnter()
     {
         var pInventory   = await Single.Table.GetTable<SHTableServerUserInventory>();
         var pUnitTable   = await Single.Table.GetTable<SHTableServerGlobalUnit>();
@@ -21,7 +18,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         //m_pUIPanelStorage
         
         // Unit Goods 셋팅
-        pInventory.RequestGetUserInventory((reply) => 
+        pInventory.RequestGetUserInventory(async (reply) => 
         {
             var pUnitData = new List<SHTableGridSlotForUnitData>();
             foreach (var kvp in pInventory.HasUnits)
@@ -37,20 +34,23 @@ public partial class SHBusinessLobby : MonoBehaviour
 
                 pUnitData.Add(pData);
             }
-
-            m_pUIPanelStorage.SetUnitGoods(pUnitData, OnEventForTransaction);
+            
+            // UI 이벤트 바인딩
+            var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
+            var pUIPanel = await pUIRoot.GetPanel<SHUIPanelStorage>(SHUIConstant.PANEL_STORAGE);
+            pUIPanel.SetUnitGoods(pUnitData, (int iUnitId) =>
+            {
+                Single.Global.GetAlert().Show(string.Format("업데이트 예정(UnitID : {0})", iUnitId));
+            });
         });
 
         // Artifact Goods 셋팅
         //m_pUIPanelStorage
     }
 
-    private void DisableStorageMenu()
-    {
-    }
+    public override void OnLeave() { }
 
-    public void OnEventForTransaction(int iUnitId)
-    {
-        Single.Global.GetAlert().Show(string.Format("업데이트 예정(UnitID : {0})", iUnitId));
-    }
+    public override void OnUpdate() { }
+
+    public override void OnFinalize() { }
 }

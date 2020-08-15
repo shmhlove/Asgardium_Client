@@ -1,24 +1,26 @@
 ﻿using UnityEngine;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 
 using LitJson;
 
-public partial class SHBusinessLobby : MonoBehaviour
+public partial class SHBusinessLobby_Upgrade : SHBusinessPresenter
 {
-    private void StartUpgrade()
+    public async override void OnInitialize()
     {
-        AddEnableDelegate(eLobbyMenuType.Upgrade, EnableUpgradeMenu);
-        AddDisableDelegate(eLobbyMenuType.Upgrade, DisableUpgradeMenu);
+        var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
+        var pUIPanel = await pUIRoot.GetPanel<SHUIPanelUpgrade>(SHUIConstant.PANEL_UPGRADE);
+        pUIPanel.AddEventForPowerUpUpgrade(OnEventForUpgradePowerupBtn);
+        pUIPanel.AddEventForTimeUpUpgrade(OnEventForUpgradeTimeupBtn);
     }
 
-    private async void EnableUpgradeMenu()
+    public async override void OnEnter()
     {
+        // 엑티브 업그레이드 데이터 갱신
         var pUpgrade = await Single.Table.GetTable<SHTableServerUserUpgradeInfo>();
-
-        // 엑티브 업그레이드 갱신
-        pUpgrade.RequestGetUserUpgradeInfo((reply) =>
+        pUpgrade.RequestGetUserUpgradeInfo(async (reply) =>
         {
             if (false == reply.isSucceed)
             {
@@ -26,15 +28,21 @@ public partial class SHBusinessLobby : MonoBehaviour
             }
 
             pUpgrade.LoadJsonTable(reply.data);
-            m_pUIPanelUpgrade.SetActiveUpgradeInfo(pUpgrade.MiningPowerLv, pUpgrade.ChargeTimeLv);
+
+           // UI 업데이트
+            var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
+            var pUIPanel = await pUIRoot.GetPanel<SHUIPanelUpgrade>(SHUIConstant.PANEL_UPGRADE);
+            pUIPanel.SetActiveUpgradeInfo(pUpgrade.MiningPowerLv, pUpgrade.ChargeTimeLv);
         });
-
-        // 열린 회사 업그레이드
+        
+        // 열린 회사 업그레이드 데이터 갱신
     }
 
-    private void DisableUpgradeMenu()
-    {
-    }
+    public override void OnLeave() { }
+
+    public override void OnUpdate() { }
+
+    public override void OnFinalize() { }
 
     // Web요청 : 파워레벨 업그레이드
     private void RequestUpgradePowerLv(Action<SHReply> callback)
@@ -48,7 +56,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         Single.Network.POST(SHAPIs.SH_API_USER_UPGRADE_ACTIVE_TIME, null, callback);
     }
 
-    // 마이닝파워 업그레이드 버튼 이벤트
+    // 마이닝파워 업그레이드 버튼 이벤트 (UI에서 SendMessage로 보내주고 있음..)
     private async void OnEventForUpgradePowerupBtn()
     {
         var pStringTable = await Single.Table.GetTable<SHTableClientString>();
@@ -88,7 +96,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         Action<bool> pUpgradeAction = (bClickedUpgradeBtn) => 
         {
             if (false == bClickedUpgradeBtn) {
-                EnableUpgradeMenu();
+                OnEnter();
                 return;
             }
             else {
@@ -111,7 +119,7 @@ public partial class SHBusinessLobby : MonoBehaviour
         pPopupPanel.UpdateUI(pMakeData(pInventory, pUpgradeInfo, pUpgradePowerTable, pStringTable));
     }
 
-    // 충전시간 업그레이드 버튼 이벤트
+    // 충전시간 업그레이드 버튼 이벤트 (UI에서 SendMessage로 보내주고 있음..)
     private void OnEventForUpgradeTimeupBtn()
     {
         RequestUpgradeTimeLv((reply) => 
@@ -120,7 +128,7 @@ public partial class SHBusinessLobby : MonoBehaviour
                 Single.Global.GetAlert().Show(reply);
             }
             else {
-                EnableUpgradeMenu();
+                OnEnter();
             }
         });
     }

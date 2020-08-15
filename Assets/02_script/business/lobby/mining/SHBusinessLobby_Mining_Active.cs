@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;
 
 using System;
 using System.Timers;
@@ -12,16 +11,48 @@ using LitJson;
 public class SHBusinessLobby_Mining_Active : SHBusinessPresenter
 {
     private readonly Dictionary<string, List<SHActiveSlotData>> m_dicActiveCompanyData = new Dictionary<string, List<SHActiveSlotData>>();
-    private readonly Timer m_pTimerUpdateActiveCompany = new Timer(1000);
     
-    public override void OnInitialize()
+    private readonly Timer m_pTimerUpdateCompanyUI = new Timer(1000);
+    private readonly Timer m_pTimerUpdateInformationUI = new Timer(1000);
+    private bool m_bIsUpdatingCompanyUI = false;
+    private bool m_bIsUpdatingInformationUI = false;
+
+    public async override void OnInitialize()
     {
-        m_pTimerUpdateActiveCompany.Elapsed += OnUpdateTimer;
-        m_pTimerUpdateActiveCompany.AutoReset = true;
-        m_pTimerUpdateActiveCompany.Enabled = true;
+        // 회사 UI 주기적 업데이트 이벤트 등록
+        m_pTimerUpdateCompanyUI.Elapsed += (System.Object source, ElapsedEventArgs e) =>
+        {
+            if (false == m_bIsUpdatingCompanyUI)
+            {
+                m_bIsUpdatingCompanyUI = true;
+                UpdateUIForCompany(() => m_bIsUpdatingCompanyUI = false);  
+            }
+        };
+        m_pTimerUpdateCompanyUI.AutoReset = true;
+
+        // 상단 정보 UI 주기적 업데이트 이벤트 등록
+        m_pTimerUpdateInformationUI.Elapsed += (System.Object source, ElapsedEventArgs e) =>
+        {
+            if (false == m_bIsUpdatingInformationUI)
+            {
+                m_bIsUpdatingInformationUI = true;
+                UpdateUIForInformation(() => m_bIsUpdatingInformationUI = false);  
+            }
+        };
+        m_pTimerUpdateInformationUI.AutoReset = true;
+
+        // 필터바 UI 이벤트 바인딩
+        var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
+        var pUIPanel = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
+        pUIPanel.SetEventForClickFilterbar(OnUIEventForMiningFilterbar);
 
         // 웹소켓 이벤트 바인딩
-        Single.Network.AddEventObserver(SHAPIs.SH_SOCKET_POLLING_MINING_ACTIVE_INFO, OnEventForSocketPollingMiningActiveInfo);
+        Single.Network.AddEventObserver(SHAPIs.SH_SOCKET_POLLING_MINING_ACTIVE_INFO, async (SHReply pReply) =>
+        {
+            var pCompanyTable = await Single.Table.GetTable<SHTableServerInstanceMiningActiveCompany>();
+            pCompanyTable.LoadJsonTable(pReply.data);
+            UpdateDataForCompany();
+        });
     }
 
     public override void OnEnter()
@@ -31,13 +62,14 @@ public class SHBusinessLobby_Mining_Active : SHBusinessPresenter
 
         // 마이닝 엑티브 회사정보 업데이트
         m_dicActiveCompanyData.Clear();
-        UpdateDataForActiveCompany();
+        UpdateDataForCompany();
 
         // 필터바 업데이트
-        UpdateUIForActiveFilterbar();
+        UpdateUIForFilterbar();
 
         // 마이닝 업데이트 회사 정보 주기적으로 반영
-        m_pTimerUpdateActiveCompany.Start();
+        m_pTimerUpdateCompanyUI.Start();
+        m_pTimerUpdateInformationUI.Start();
     }
 
     public override void OnLeave()
@@ -45,16 +77,19 @@ public class SHBusinessLobby_Mining_Active : SHBusinessPresenter
         // 마이닝 엑티브 정보를 주기적으로 소켓을 통해 받기위한 구독 해제
         RequestUnsubscribeMiningActiveInfo();
         
-        m_pTimerUpdateActiveCompany.Stop();
+        m_pTimerUpdateCompanyUI.Stop();
+        m_pTimerUpdateInformationUI.Stop();
     }
 
     public override void OnFinalize()
     {
-        m_pTimerUpdateActiveCompany.Stop();
-        m_pTimerUpdateActiveCompany.Dispose();
+        m_pTimerUpdateCompanyUI.Stop();
+        m_pTimerUpdateCompanyUI.Dispose();
+        m_pTimerUpdateInformationUI.Stop();
+        m_pTimerUpdateInformationUI.Dispose();
     }
 
-    private async void UpdateUIForActiveInformation(Action pCallback)
+    private async void UpdateUIForInformation(Action pCallback)
     {
         var pInventoryInfo = await Single.Table.GetTable<SHTableServerUserInventory>();
         var pUpgradeInfo = await Single.Table.GetTable<SHTableServerUserUpgradeInfo>();
@@ -88,7 +123,7 @@ public class SHBusinessLobby_Mining_Active : SHBusinessPresenter
         pCallback();
     }
 
-    private async void UpdateUIForActiveFilterbar()
+    private async void UpdateUIForFilterbar()
     {
         var bIsAllOn = true;
         var pSlotDatas = new List<SHActiveFilterUnitData>();
@@ -117,7 +152,7 @@ public class SHBusinessLobby_Mining_Active : SHBusinessPresenter
         pUIPanel.SetActiveFilterbarScrollview(pSlotDatas, bIsAllOn);
     }
 
-    private async void UpdateUIForActiveCompany(Action pCallback)
+    private async void UpdateUIForCompany(Action pCallback)
     {
         if (0 == m_dicActiveCompanyData.Count)
         {
@@ -152,8 +187,30 @@ public class SHBusinessLobby_Mining_Active : SHBusinessPresenter
 
         var m_pSortFilters = new List<Func<SHActiveSlotData, SHActiveSlotData, bool?>>
         {
-            SortConditionForEfficiencyLevel,
-            SortConditionForUnitID
+            // EfficiencyLevel 기준 정렬
+            (SHActiveSlotData pValue1, SHActiveSlotData pValue2) =>
+            {
+                if (pValue1.m_iEfficiencyLevel == pValue2.m_iEfficiencyLevel)
+                    return null;
+
+                return pValue1.m_iEfficiencyLevel < pValue2.m_iEfficiencyLevel;
+            },
+            // UnitId 기준 정렬
+            (SHActiveSlotData pValue1, SHActiveSlotData pValue2) =>
+            {
+                if (pValue1.m_iUnitId == pValue2.m_iUnitId)
+                    return null;
+
+                return pValue1.m_iUnitId > pValue2.m_iUnitId;
+            },
+            // SupplyQuantity 기준 정렬
+            // (SHActiveSlotData pValue1, SHActiveSlotData pValue2) =>
+            // {
+            //     if (pValue1.m_iSupplyQuantity == pValue2.m_iSupplyQuantity)
+            //         return null;
+            // 
+            //     return pValue1.m_iSupplyQuantity < pValue2.m_iSupplyQuantity;
+            // },
         };
         pSlotDatas.Sort((x, y) =>
         {
@@ -177,31 +234,7 @@ public class SHBusinessLobby_Mining_Active : SHBusinessPresenter
         pCallback();
     }
 
-    private bool? SortConditionForEfficiencyLevel(SHActiveSlotData pValue1, SHActiveSlotData pValue2)
-    {
-        if (pValue1.m_iEfficiencyLevel == pValue2.m_iEfficiencyLevel)
-            return null;
-
-        return pValue1.m_iEfficiencyLevel < pValue2.m_iEfficiencyLevel;
-    }
-
-    private bool? SortConditionForUnitID(SHActiveSlotData pValue1, SHActiveSlotData pValue2)
-    {
-        if (pValue1.m_iUnitId == pValue2.m_iUnitId)
-            return null;
-
-        return pValue1.m_iUnitId > pValue2.m_iUnitId;
-    }
-
-    private bool? SortConditionForSupplyQuantity(SHActiveSlotData pValue1, SHActiveSlotData pValue2)
-    {
-        if (pValue1.m_iSupplyQuantity == pValue2.m_iSupplyQuantity)
-            return null;
-
-        return pValue1.m_iSupplyQuantity < pValue2.m_iSupplyQuantity;
-    }
-
-    private async void UpdateDataForActiveCompany()
+    private async void UpdateDataForCompany()
     {
         var pCompanyInfo = await Single.Table.GetTable<SHTableServerInstanceMiningActiveCompany>();
         var pStringTable = await Single.Table.GetTable<SHTableClientString>();
@@ -331,7 +364,7 @@ public class SHBusinessLobby_Mining_Active : SHBusinessPresenter
                 }
 
                 // 메인 회사 UI 업데이트
-                UpdateUIForActiveCompany(() => { });
+                UpdateUIForCompany(() => { });
             }
             else
             {
@@ -360,43 +393,44 @@ public class SHBusinessLobby_Mining_Active : SHBusinessPresenter
         }
     }
 
-    private async void OnEventForSocketPollingMiningActiveInfo(SHReply pReply)
+    private async void OnUIEventForMiningFilterbar()
     {
-        var pCompanyTable = await Single.Table.GetTable<SHTableServerInstanceMiningActiveCompany>();
-        pCompanyTable.LoadJsonTable(pReply.data);
-        UpdateDataForActiveCompany();
+        // 필터링 UI 오픈 처리
+        var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
+        var pPanel = await pUIRoot.GetPanel<SHUIPopupPanelMiningActiveUnitFilter>(SHUIConstant.PANEL_MINING_FILTER);
+
+        // 필터링 대상유닛 데이터 생성
+        var pUnitDatas = new List<SHActiveFilterUnitData>();
+        var pUnitTable = await Single.Table.GetTable<SHTableServerGlobalUnit>();
+        foreach (var kvp in pUnitTable.m_dicDatas)
+        {
+            var pData = new SHActiveFilterUnitData();
+            pData.m_iUnitId = kvp.Value.m_iUnitId;
+            pData.m_strIconImage = kvp.Value.m_strIconImage;
+
+            var bIsOn = SHPlayerPrefs.GetBool(kvp.Value.m_iUnitId.ToString());
+            pData.m_bIsOn = (null == bIsOn) ? true : bIsOn.Value;
+
+            pUnitDatas.Add(pData);
+        }
+
+        // 필터링 UI가 닫힐때 PlayerPreb에 셋팅하고, UI를 업데이트 한다.
+        Action<List<SHActiveFilterUnitData>> pCloseEvent = (pDatas) =>
+        {
+            foreach (var pData in pDatas)
+            {
+                SHPlayerPrefs.SetBool(pData.m_iUnitId.ToString(), pData.m_bIsOn);
+            }
+
+            UpdateUIForCompany(() => { });
+            UpdateUIForFilterbar();
+        };
+
+        // 필터링 UI Open
+        pPanel.Show(pUnitDatas, pCloseEvent);
     }
     
-    private IEnumerator CoroutineForUpdateUIForActiveInformation()
-    {
-        while (true)
-        {
-            // if (m_pUIPanelMining)
-            // {
-            //     bool isDone = false;
-            //     UpdateUIForActiveInformation(() => isDone = true);
-
-            //     while (false == isDone)
-            //         yield return null;
-            // }
-            
-            yield return null;
-        }
-    }
-
-    private void OnUpdateTimer(System.Object source, ElapsedEventArgs e)
-    {
-        //if (m_pUIPanelMining)
-        // {
-        //     bool isDone = false;
-        //     UpdateUIForActiveCompany(() => isDone = true);
-            
-        //     while (false == isDone)
-        //         yield return null;
-        // }
-    }
-
-
+    
     //////////////////////////////////////////////////////////////////////
     // 테스트 코드
     //////////////////////////////////////////////////////////////////////

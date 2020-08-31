@@ -12,13 +12,12 @@ public partial class SHBusinessLobby_Upgrade : SHBusinessPresenter
     {
         var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
         var pUIPanel = await pUIRoot.GetPanel<SHUIPanelUpgrade>(SHUIConstant.PANEL_UPGRADE);
-        pUIPanel.AddEventForPowerUpUpgrade(OnEventForUpgradePowerupBtn);
-        pUIPanel.AddEventForTimeUpUpgrade(OnEventForUpgradeTimeupBtn);
+        pUIPanel.AddEventForPowerUpUpgrade(OnEventForUpgradePowerBtn);
+        pUIPanel.AddEventForTimeUpUpgrade(OnEventForUpgradeTimeBtn);
     }
 
     public async override void OnEnter()
     {
-        // 엑티브 업그레이드 데이터 갱신
         var pUpgrade = await Single.Table.GetTable<SHTableServerUserUpgradeInfo>();
         pUpgrade.RequestGetUserUpgradeInfo(async (reply) =>
         {
@@ -32,10 +31,10 @@ public partial class SHBusinessLobby_Upgrade : SHBusinessPresenter
            // UI 업데이트
             var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
             var pUIPanel = await pUIRoot.GetPanel<SHUIPanelUpgrade>(SHUIConstant.PANEL_UPGRADE);
-            pUIPanel.SetActiveUpgradeInfo(pUpgrade.MiningPowerLv, pUpgrade.ChargeTimeLv);
+            pUIPanel.SetUpgradeInfo(pUpgrade.MiningPowerLv, pUpgrade.ChargeTimeLv);
         });
         
-        // 열린 회사 업그레이드 데이터 갱신
+        // @@ Active 회사 업그레이드 데이터 갱신
     }
 
     public override void OnLeave() { }
@@ -56,30 +55,27 @@ public partial class SHBusinessLobby_Upgrade : SHBusinessPresenter
         Single.Network.POST(SHAPIs.SH_API_USER_UPGRADE_ACTIVE_TIME, null, callback);
     }
 
-    // 마이닝파워 업그레이드 버튼 이벤트 (UI에서 SendMessage로 보내주고 있음..)
-    private async void OnEventForUpgradePowerupBtn()
+    // 마이닝파워 업그레이드 버튼 이벤트
+    private async void OnEventForUpgradePowerBtn()
     {
         var pStringTable = await Single.Table.GetTable<SHTableClientString>();
         var pInventory = await Single.Table.GetTable<SHTableServerUserInventory>();
         var pUpgradeInfo = await Single.Table.GetTable<SHTableServerUserUpgradeInfo>();
-        var pUpgradePowerTable = await Single.Table.GetTable<SHTableServerMiningActiveMaxMP>();
+        var pPowerTable = await Single.Table.GetTable<SHTableServerMiningActiveMaxMP>();
         
         Func<SHTableServerUserInventory, SHTableServerUserUpgradeInfo, SHTableServerMiningActiveMaxMP, SHTableClientString, string> pMakeData = 
-        (_pInventory, _pUpgradeInfo, _pUpgradePowerTable, _pStringTable) =>
+        (_pInventory, _pUpgradeInfo, _pPowerTable, _pStringTable) =>
         {
-            var pCurInfo = _pUpgradePowerTable.GetData(_pUpgradeInfo.MiningPowerLv);
-            var pNextInfo = _pUpgradePowerTable.GetData(_pUpgradeInfo.MiningPowerLv + 1);
+            var pCurTable = _pPowerTable.GetData(_pUpgradeInfo.MiningPowerLv);
+            var pNextTable = _pPowerTable.GetData(_pUpgradeInfo.MiningPowerLv + 1);
 
-            if (null == pCurInfo)
+            if (null == pCurTable)
             {
                 Single.Global.GetAlert().Show(_pStringTable.GetString("1002"));
                 return string.Empty;
             }
-            pNextInfo = pNextInfo??pCurInfo;
+            pNextTable = pNextTable??pCurTable;
             
-            var pCurTable = _pUpgradePowerTable.GetData(pCurInfo.m_iLevel);
-            var pNextTable = _pUpgradePowerTable.GetData(pNextInfo.m_iLevel);
-
             JsonData pJson = new JsonData();
             pJson["curLv"] = pCurTable.m_iLevel;
             pJson["curMP"] = pCurTable.m_iMaxMP;
@@ -87,7 +83,7 @@ public partial class SHBusinessLobby_Upgrade : SHBusinessPresenter
             pJson["nextMP"] = pNextTable.m_iMaxMP;
             pJson["upgradeCost"] = pNextTable.m_iCostGold;
             pJson["hasGold"] = _pInventory.Gold;
-            return JsonMapper.ToJson(pJson) ;
+            return JsonMapper.ToJson(pJson);
         };
         
         var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
@@ -96,7 +92,6 @@ public partial class SHBusinessLobby_Upgrade : SHBusinessPresenter
         Action<bool> pUpgradeAction = (bClickedUpgradeBtn) => 
         {
             if (false == bClickedUpgradeBtn) {
-                OnEnter();
                 return;
             }
             else {
@@ -108,19 +103,20 @@ public partial class SHBusinessLobby_Upgrade : SHBusinessPresenter
                     else {
                         pUpgradeInfo.LoadJsonTable(reply.data["upgrade_info"]);
                         pInventory.LoadJsonTable(reply.data["inventory_info"]);
-                        pPopupPanel.UpdateUI(pMakeData(pInventory, pUpgradeInfo, pUpgradePowerTable, pStringTable));
-                        // @@ 엑티브 업그레이드 갱신 : 함수로 빼서 호출하도록 하자.
+                        pPopupPanel.UpdateUI(pMakeData(pInventory, pUpgradeInfo, pPowerTable, pStringTable));
                     }
+
+                    OnEnter();
                 });
             }
         };
 
         pPopupPanel.Show(pUpgradeAction);
-        pPopupPanel.UpdateUI(pMakeData(pInventory, pUpgradeInfo, pUpgradePowerTable, pStringTable));
+        pPopupPanel.UpdateUI(pMakeData(pInventory, pUpgradeInfo, pPowerTable, pStringTable));
     }
 
     // 충전시간 업그레이드 버튼 이벤트 (UI에서 SendMessage로 보내주고 있음..)
-    private void OnEventForUpgradeTimeupBtn()
+    private void OnEventForUpgradeTimeBtn()
     {
         RequestUpgradeTimeLv((reply) => 
         {

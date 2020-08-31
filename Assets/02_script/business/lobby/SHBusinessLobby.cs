@@ -23,16 +23,11 @@ public partial class SHBusinessLobby : MonoBehaviour
         m_pPresenters.Add(new SHBusinessLobby_Storage());
         m_pPresenters.Add(new SHBusinessLobby_Upgrade());
 
-        // 테이블 정보 얻기
-        var pConfigTable = await Single.Table.GetTable<SHTableClientConfig>();
-        var pUserInfo    = await Single.Table.GetTable<SHTableUserInfo>();
-        var pInventory   = await Single.Table.GetTable<SHTableServerUserInventory>();
-        var pUpgrade     = await Single.Table.GetTable<SHTableServerUserUpgradeInfo>();
-        
         // 개발용 : 로그인 체크 후 테스트 계정으로 로그인 시켜주기
         // 이 코드에 진입하기 위해서는 로그인 이후 진입된다.
         // 즉, 로그인이 되어 있다면 실제 유저의 정보가 넘어오기 때문에 실제 배포시에도 이 코드는 유지해도 된다.
         ////////////////////////////////////////////////////////////////////////////////////
+        var pUserInfo = await Single.Table.GetTable<SHTableUserInfo>();
         pUserInfo.RequestLoginForDevelop(async (signinReply) =>
         {
             if (false == signinReply.isSucceed)
@@ -45,20 +40,22 @@ public partial class SHBusinessLobby : MonoBehaviour
             else
             {
                 // 유저 데이터 요청 (인벤토리와 업그레이드 정보)
+                var pInventory = await Single.Table.GetTable<SHTableServerUserInventory>();
                 pInventory.RequestGetUserInventory((reply) => { });
+                var pUpgrade = await Single.Table.GetTable<SHTableServerUserUpgradeInfo>();
                 pUpgrade.RequestGetUserUpgradeInfo((reply) => { });
 
                 // 소켓 연결 및 이벤트 바인딩
                 Single.Network.ConnectWebSocket();
                 Single.Network.AddEventObserver(SystemEvents.connect.ToString(), OnSocketEventForReconnect);
+                
+                // Presenter 초기화
+                m_pPresenters.OnInitialize();
 
                 // Lobby MainMenu UI 이벤트 바인딩
                 var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
                 var pMenubar = await pUIRoot.GetPanel<SHUIPanelMenubar>(SHUIConstant.PANEL_MENUBAR);
                 pMenubar.SetEventForChangeLobbyMenu(OnUIEventForChangeLobbyMenu);
-                
-                // Presenter 초기화
-                m_pPresenters.OnInitialize();
 
                 // 초기화면설정 : Mining 탭 으로 초기화
                 pMenubar.ExecuteClick(eLobbyMenuType.Mining);
@@ -76,16 +73,16 @@ public partial class SHBusinessLobby : MonoBehaviour
         ////////////////////////////////////////////////////////////////////////////////////
     }
 
-    SHBusinessPresenter GetByMenuType(eLobbyMenuType type)
+    SHBusinessPresenter GetPresenter(eLobbyMenuType type)
     {
         switch(type)
         {
-            case eLobbyMenuType.Mining:     return m_pPresenters.Get<SHBusinessLobby_Mining>();
-            case eLobbyMenuType.Storage:    return m_pPresenters.Get<SHBusinessLobby_Storage>();
-            case eLobbyMenuType.Market:     return m_pPresenters.Get<SHBusinessPresenter>();
-            case eLobbyMenuType.Upgrade:    return m_pPresenters.Get<SHBusinessLobby_Upgrade>();
-            case eLobbyMenuType.Menu:       return m_pPresenters.Get<SHBusinessPresenter>();
-            default:                        return m_pPresenters.Get<SHBusinessPresenter>();
+            case eLobbyMenuType.Mining:  return m_pPresenters.Get<SHBusinessLobby_Mining>();
+            case eLobbyMenuType.Storage: return m_pPresenters.Get<SHBusinessLobby_Storage>();
+            case eLobbyMenuType.Market:  return m_pPresenters.Get<SHBusinessPresenter>();
+            case eLobbyMenuType.Upgrade: return m_pPresenters.Get<SHBusinessLobby_Upgrade>();
+            case eLobbyMenuType.Menu:    return m_pPresenters.Get<SHBusinessPresenter>();
+            default:                     return m_pPresenters.Get<SHBusinessPresenter>();
         }
     }
 
@@ -96,8 +93,8 @@ public partial class SHBusinessLobby : MonoBehaviour
             return;
         }
 
-        GetByMenuType(eEnter).OnEnter();
-        GetByMenuType(eLeave).OnLeave();
+        GetPresenter(eEnter).OnEnter();
+        GetPresenter(eLeave).OnLeave();
     }
 
     private async void OnSocketEventForReconnect(SHReply pReply)

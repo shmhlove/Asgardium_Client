@@ -16,7 +16,6 @@ public class SHBusinessLobby_Mining : SHBusinessPresenter
         m_pPresenters.Add(new SHBusinessLobby_Mining_Active());
         m_pPresenters.OnInitialize();
 
-        // UI 이벤트 바인딩
         var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
         var pUIPanel = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
         pUIPanel.SetEventForChangeMiningTab(OnUIEventForChangeMiningTab);
@@ -26,7 +25,6 @@ public class SHBusinessLobby_Mining : SHBusinessPresenter
     {
         var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
         var pMining = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
-
         OnUIEventForChangeMiningTab(pMining.GetCurrentTab(), eMiningTabType.None);
     }
 
@@ -34,13 +32,11 @@ public class SHBusinessLobby_Mining : SHBusinessPresenter
     {
         var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
         var pMining = await pUIRoot.GetPanel<SHUIPanelMining>(SHUIConstant.PANEL_MINING);
-
         OnUIEventForChangeMiningTab(eMiningTabType.None, pMining.GetCurrentTab());
     }
 
-    SHBusinessPresenter GetByMiningTabType(eMiningTabType type)
+    SHBusinessPresenter GetPresenter(eMiningTabType type)
     {
-        
         switch(type)
         {
             case eMiningTabType.Active:     return m_pPresenters.Get<SHBusinessLobby_Mining_Active>();
@@ -57,7 +53,7 @@ public class SHBusinessLobby_Mining : SHBusinessPresenter
             return;
         }
 
-        GetByMiningTabType(eEnter).OnEnter();
-        GetByMiningTabType(eLeave).OnLeave();
+        GetPresenter(eEnter).OnEnter();
+        GetPresenter(eLeave).OnLeave();
     }
 }

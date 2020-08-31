@@ -9,7 +9,7 @@ public class SHUIPanelUpgrade : SHUIPanel
     public SHUIActiveUpgrade m_pActiveUpgrade;
 
     // 엑티브 업그레이드
-    public void SetActiveUpgradeInfo(long lPowerLv, long lTimeLv)
+    public void SetUpgradeInfo(long lPowerLv, long lTimeLv)
     {
         m_pActiveUpgrade.SetPowerLevel(lPowerLv.ToString());
         m_pActiveUpgrade.SetTimeLevel(lTimeLv.ToString());

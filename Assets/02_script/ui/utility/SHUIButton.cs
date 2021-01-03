@@ -13,6 +13,8 @@ public class SHUIButton : UIButton
 
     public void ExecuteClick()
     {
-        base.OnClick();
+        current = this;
+        EventDelegate.Execute(onClick);
+        current = null;
     }
 }

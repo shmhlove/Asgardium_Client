@@ -12,6 +12,11 @@ using System.Diagnostics;
 
 public static partial class SHUtils
 {
+    public const long MilliPerDay = 8640000;
+    public const long MilliPerHour = 360000;
+    public const long MilliPerMinute = 60000;
+    public const long MilliPerSecond = 1000;
+
     public static double GetElapsedSecond(DateTime pTime)
     {
         return ((DateTime.Now - pTime).TotalMilliseconds / 1000.0);

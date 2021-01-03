@@ -12,8 +12,8 @@ public class SHBusinessLobby_Mining_Active : SHBusinessPresenter
 {
     private readonly Dictionary<string, List<SHActiveSlotData>> m_dicActiveCompanyData = new Dictionary<string, List<SHActiveSlotData>>();
     
-    private readonly Timer m_pTimerUpdateCompanyUI = new Timer(1000);
-    private readonly Timer m_pTimerUpdateInformationUI = new Timer(1000);
+    private readonly Timer m_pTimerUpdateCompanyUI = new Timer(SHUtils.MilliPerSecond);
+    private readonly Timer m_pTimerUpdateInformationUI = new Timer(SHUtils.MilliPerSecond);
     private bool m_bIsUpdatingCompanyUI = false;
     private bool m_bIsUpdatingInformationUI = false;
 
@@ -132,7 +132,7 @@ public class SHBusinessLobby_Mining_Active : SHBusinessPresenter
         foreach (var kvp in pUnitTable.m_dicDatas)
         {
             var bIsOn = SHPlayerPrefs.GetBool(kvp.Value.m_iUnitId.ToString());
-            bIsOn = (null == bIsOn) ? true : bIsOn.Value;
+            bIsOn = (null == bIsOn) || bIsOn.Value;
             if (false == bIsOn)
             {
                 bIsAllOn = false;

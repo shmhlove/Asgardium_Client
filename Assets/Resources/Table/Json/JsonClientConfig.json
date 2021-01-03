@@ -1,29 +1,29 @@
 
 [
-    {
-      // 웹서버 정보
-      //"ServerHost": "https://13.124.43.70:3001",
-      "ServerHost": "https://localhost:3001",
-      "MaxRetryRequestCount": 5,
-      
-      // 점검 정보
-      "ServerConfigURL": "",
-      "ServiceMode": "Dev",
-      "Version": "1.0.1",
-      
-      // 구글 사이닝 정보
-      "AOS_KeyStoreName": "GoogleKeyStore/asgardium.keystore",
-      "AOS_KeyStorePass": "lee35235",
-      "AOS_KeyAliasName": "asgardium",
-      "AOS_KeyAliasPass": "lee35235",
-      
-      // 애플 사이닝 정보
-      "IOS_TeamID": "T8263VR796",
-      
-      // 파이어베이스 정보
-      "FB_StorageBaseURL": "gs://kings-adventure-22251209.appspot.com/",
-      
-      // 클라이언트 기본 정보
-      "FrameRate": 60
-    }
+  {
+    // 서버 정보
+    //"ServerHost": "https://13.209.41.174:3001",
+    "ServerHost": "https://localhost:3001",
+    "MaxRetryRequestCount": 5,
+
+    // 점검 정보
+    "ServerConfigURL": "",
+    "ServiceMode": "Dev",
+    "Version": "1.0.1",
+
+    // 구글 사이닝 정보
+    "AOS_KeyStoreName": "GoogleKeyStore/asgardium.keystore",
+    "AOS_KeyStorePass": "lee35235",
+    "AOS_KeyAliasName": "asgardium",
+    "AOS_KeyAliasPass": "lee35235",
+
+    // 애플 사이닝 정보
+    "IOS_TeamID": "T8263VR796",
+
+    // 파이어베이스 정보
+    "FB_StorageBaseURL": "gs://kings-adventure-22251209.appspot.com/",
+
+    // 클라이언트 기본 정보
+    "FrameRate": 60
+  }
 ]

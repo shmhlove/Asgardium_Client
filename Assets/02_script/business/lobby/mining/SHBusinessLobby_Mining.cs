@@ -48,6 +48,11 @@ public class SHBusinessLobby_Mining : SHBusinessPresenter
 
     public void OnUIEventForChangeMiningTab(eMiningTabType eEnter, eMiningTabType eLeave)
     {
+        if (eEnter == eLeave)
+        {
+            return;
+        }
+
         GetPresenter(eEnter).OnEnter();
         GetPresenter(eLeave).OnLeave();
     }

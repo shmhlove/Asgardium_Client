@@ -15,24 +15,13 @@ public partial class SHBusinessLobby : MonoBehaviour
     private void Awake()
     {
         Single.AppInfo.CreateSingleton();
-        Single.Network.CreateSingleton();
     }
 
     private async void Start()
     {
-        // 필요한 데이터 선 로딩 (async로 동작하기에 초기에 로드를 안해두면 오동작.ㅠ 초기로드 안해도 오동작 안하도록 해야하는디.. 아직 코드가 어렵다.)
-        var pClientConfig = await Single.Table.GetTable<SHTableClientConfig>();
-
-        // 하위 Presenter 설정
         m_pPresenters.Add(new SHBusinessLobby_Mining());
         m_pPresenters.Add(new SHBusinessLobby_Storage());
         m_pPresenters.Add(new SHBusinessLobby_Upgrade());
-        m_pPresenters.OnInitialize();
-
-        // Lobby MainMenu UI 이벤트 바인딩
-        var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
-        var pMenubar = await pUIRoot.GetPanel<SHUIPanelMenubar>(SHUIConstant.PANEL_MENUBAR);
-        pMenubar.SetEventForChangeLobbyMenu(OnUIEventForChangeLobbyMenu);
 
         // 개발용 : 로그인 체크 후 테스트 계정으로 로그인 시켜주기
         // 이 코드에 진입하기 위해서는 로그인 이후 진입된다.
@@ -59,6 +48,14 @@ public partial class SHBusinessLobby : MonoBehaviour
                 // 소켓 연결 및 이벤트 바인딩
                 Single.Network.ConnectWebSocket();
                 Single.Network.AddEventObserver(SystemEvents.connect.ToString(), OnSocketEventForReconnect);
+                
+                // Presenter 초기화
+                m_pPresenters.OnInitialize();
+
+                // Lobby MainMenu UI 이벤트 바인딩
+                var pUIRoot = await Single.UI.GetRoot<SHUIRootLobby>(SHUIConstant.ROOT_LOBBY);
+                var pMenubar = await pUIRoot.GetPanel<SHUIPanelMenubar>(SHUIConstant.PANEL_MENUBAR);
+                pMenubar.SetEventForChangeLobbyMenu(OnUIEventForChangeLobbyMenu);
 
                 // 초기화면설정 : Mining 탭 으로 초기화
                 pMenubar.ExecuteClick(eLobbyMenuType.Mining);
@@ -91,6 +88,11 @@ public partial class SHBusinessLobby : MonoBehaviour
 
     private void OnUIEventForChangeLobbyMenu(eLobbyMenuType eEnter, eLobbyMenuType eLeave)
     {
+        if (eEnter == eLeave)
+        {
+            return;
+        }
+
         GetPresenter(eEnter).OnEnter();
         GetPresenter(eLeave).OnLeave();
     }

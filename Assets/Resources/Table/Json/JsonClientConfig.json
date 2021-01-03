@@ -2,8 +2,8 @@
 [
   {
     // 서버 정보
-    //"ServerHost": "https://13.209.41.174:3001",
-    "ServerHost": "https://localhost:3001",
+    "ServerHost": "https://13.209.41.174:3001",
+    //"ServerHost": "https://localhost:3001",
     "MaxRetryRequestCount": 5,
 
     // 점검 정보

@@ -23,6 +23,12 @@ public partial class SHBusinessLobby : MonoBehaviour
         m_pPresenters.Add(new SHBusinessLobby_Storage());
         m_pPresenters.Add(new SHBusinessLobby_Upgrade());
 
+        // configuration 로드가 된 상태여야한다...
+        // 이 코드 영 안좋네..
+        // 계속 데이터 로드 쪽 async때문에 문제 생기노..
+        // 실시간 동적로드가 이래 힘드네.
+        var pConfigTable = await Single.Table.GetTable<SHTableClientConfig>();
+
         // 개발용 : 로그인 체크 후 테스트 계정으로 로그인 시켜주기
         // 이 코드에 진입하기 위해서는 로그인 이후 진입된다.
         // 즉, 로그인이 되어 있다면 실제 유저의 정보가 넘어오기 때문에 실제 배포시에도 이 코드는 유지해도 된다.

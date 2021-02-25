@@ -9,7 +9,7 @@ using LitJson;
 
 public class SHBusinessLobby_Mining : SHBusinessPresenter
 {
-    private SHBusinessPresenter m_pPresenters = new SHBusinessPresenter();
+    private readonly SHBusinessPresenter m_pPresenters = new SHBusinessPresenter();
 
     public async override void OnInitialize()
     {

@@ -86,7 +86,7 @@ public partial class SHResourceData : SHBaseData
             m_pLoadOkayTrigger = () =>
             {
                 // 테이블 데이터를 먼저 로드하고 리소스 로드할 수 있도록 트리거 설정
-                return Single.Data.IsLoadDone(eDataType.Table);
+                return Single.Data.IsLoaded(eDataType.Table);
             },
         };
     }

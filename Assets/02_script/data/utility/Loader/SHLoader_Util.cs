@@ -6,27 +6,27 @@ using System.Collections.Generic;
 
 public partial class SHLoader
 {
-    void CoroutineToLoadProcess()
+    void CoroutineToRun()
     {
-        LoadCall();
+        Load();
 
         if (false == IsRemainLoadFiles())
             return;
 
-        Single.Coroutine.NextUpdate(CoroutineToLoadProcess);
+        Single.Coroutine.NextUpdate(CoroutineToRun);
     }
     
-    void CoroutineToLoadProgressEvent()
+    void CoroutineToProgressEvent()
     {
-        CallEventForProgress();
+        SendEventForProgress();
 
-        if (true == IsLoadDone())
+        if (true == IsLoaded())
             return;
 
-        Single.Coroutine.NextUpdate(CoroutineToLoadProgressEvent);
+        Single.Coroutine.NextUpdate(CoroutineToProgressEvent);
     }
 
-    void LoadCall()
+    void Load()
     {
         var pDataInfo = m_pProgress.DequeueWaitingDataInfo();
         if (null == pDataInfo)
@@ -38,7 +38,7 @@ public partial class SHLoader
             return;
         }
         
-        pDataInfo.LoadCall(OnEventForLoadStart, OnEventForLoadDone);
+        pDataInfo.Load(OnEventForLoadStart, OnEventForLoadDone);
     }
 
     void AddLoadDatas(List<Dictionary<string, SHLoadData>> pLoadData)
@@ -69,40 +69,34 @@ public partial class SHLoader
             return;
         }
 
-        CallEventForProgress();
-        CallEventForDone();
+        SendEventForProgress();
+        SendEventForDone();
     }
     
-    void CallEventForProgress()
+    void SendEventForProgress()
     {
-        if (null == EventForProgress)
-            return;
-
-        EventForProgress(m_pProgress.GetLoadingInfo());
+        EventForProgress?.Invoke(m_pProgress.GetLoadingInfo());
     }
 
-    void CallEventForDone()
+    void SendEventForDone()
     {
-        if (null == EventForDone)
-            return;
-
-        EventForDone(m_pProgress.GetLoadingInfo());
+        EventForDone?.Invoke(m_pProgress.GetLoadingInfo());
     }
     
     // 로드가 완료되었는가?(성공/실패유무가 아님)
-    public bool IsLoadDone()
+    public bool IsLoaded()
     {
         return m_pProgress.IsDone();
     }
 
     // 특정 파일이 로드완료되었는가?(성공/실패유무가 아님)
-    public bool IsLoadDone(string strFileName)
+    public bool IsLoaded(string strFileName)
     {
         return m_pProgress.IsDone(strFileName);
     }
 
     // 특정 타입이 로드완료되었는가?(성공/실패유무가 아님)
-    public bool IsLoadDone(eDataType eType)
+    public bool IsLoaded(eDataType eType)
     {
         return m_pProgress.IsDone(eType);
     }

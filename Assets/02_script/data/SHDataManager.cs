@@ -36,45 +36,36 @@ public class SHDataManager : SHSingleton<SHDataManager>
         Resources.FrameMove();
     }
     
-    public async Task Load(eSceneType eType, Action<SHLoadingInfo> pDone, Action<SHLoadingInfo> pProgress)
+    public async Task Load(eSceneType eType, Action<SHLoadingInfo> pDoneCallback, Action<SHLoadingInfo> pProgressCallback)
     {
         OnEventForLoadStart();
 
         await GetLoadList(eType, (pLoadList) => 
         {
-            m_pLoader.Process(pLoadList, (pLoadInfo) => 
+            m_pLoader.Run(pLoadList, (pDoneInfo) => 
             {
-                if (null != pDone)
-                {
-                    pDone(pLoadInfo);
-                }
-                
+                pDoneCallback?.Invoke(pDoneInfo);
                 OnEventForLoadDone();
-            }, pProgress);
+            }, (pProgressInfo) => 
+            {
+                pProgressCallback?.Invoke(pProgressInfo);
+            });
         });
     }
     
-    public async Task Patch(Action<SHLoadingInfo> pDone, Action<SHLoadingInfo> pProgress)
+    public bool IsLoaded()
     {
-        await GetPatchList((pPatchList) => 
-        {
-            m_pLoader.Process(pPatchList, pDone, pProgress);
-        });
+        return m_pLoader.IsLoaded();
     }
     
-    public bool IsLoadDone()
+    public bool IsLoaded(string strFileName)
     {
-        return m_pLoader.IsLoadDone();
+        return m_pLoader.IsLoaded(strFileName);
     }
     
-    public bool IsLoadDone(string strFileName)
+    public bool IsLoaded(eDataType eType)
     {
-        return m_pLoader.IsLoadDone(strFileName);
-    }
-    
-    public bool IsLoadDone(eDataType eType)
-    {
-        return m_pLoader.IsLoadDone(eType);
+        return m_pLoader.IsLoaded(eType);
     }
     
     private async Task GetLoadList(eSceneType eType, Action<List<Dictionary<string, SHLoadData>>> pCallback)
@@ -83,15 +74,6 @@ public class SHDataManager : SHSingleton<SHDataManager>
         {
             await Table.GetLoadList(eType),
             await Resources.GetLoadList(eType)
-        });
-    }
-    
-    private async Task GetPatchList(Action<List<Dictionary<string, SHLoadData>>> pCallback)
-    {
-        pCallback(new List<Dictionary<string, SHLoadData>>()
-        {
-            await Table.GetPatchList(),
-            await Resources.GetPatchList()
         });
     }
     

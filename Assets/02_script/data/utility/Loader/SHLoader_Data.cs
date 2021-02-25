@@ -5,25 +5,12 @@ using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 
-// public class : 로드 데이터
-/* Summary
- * --------------------------------------------------------------------------------------
- * SHLoadData는 로드할 데이터에 대한 정보.
- * --------------------------------------------------------------------------------------
- * 데이터 로드부에서 SHLoadData를 구성하여 로더에 Push 해두면, 
- * 로드 타이밍이 왔을때 로더가 데이터 로드부에 SHLoadData를 전달해준다.
- * 이때 데이터 로드부에서는 자신이 구성한 SHLoadData를 바탕으로 데이터를 로드하면 된다.
- * --------------------------------------------------------------------------------------
- * 데이터로드부 -SHLoadData-> Push -> 로더
- * 로더 -SHLoadData-> Load -> 데이터로드부
- * --------------------------------------------------------------------------------------
- */
 public class SHLoadData
 {
     public eDataType            m_eDataType;          // 로드할 데이터 타입
     public string               m_strName;            // 로드할 데이터 이름
-    public Func<bool>           m_pLoadOkayTrigger;   // 트리거 람다 : 로드 타이밍을 데이터 로드부에서 결정할 수 있도록 트리거 람다를 등록할 수 있다.
-    public Action                                     // 로드 콜백 : 로드 타이밍이 왔을때 콜이 될 람다
+    public Func<bool>           m_pLoadOkayTrigger;   // 트리거 람다 : 로드 타이밍을 SHLoader를 사용하는 곳에서 결정할 수 있도록 트리거 람다를 등록할 수 있다.
+    public Action                                     // 로드 람다 : 실제 로드해야 할 타이밍에 호출될 람다.
     <   SHLoadData, 
         Action<string, SHLoadStartInfo>,
         Action<string, SHLoadEndInfo>
@@ -72,7 +59,7 @@ public class SHLoadStartInfo
  * --------------------------------------------------------------------------------------
  * 데이터를 성공적으로 로드하였는지에 대한 정보를 로더에게 알려주면
  * 로더는 모든 데이터의 결과를 종합하여 최종적으로 데이터 로드가 성공했는지를 기록한다.
- * 이 기록으로 데이터 로드를 재시작 할 것인지 다음 스텝으로 게임을 진행 시킬 것인지 결정할 수 있다.
+ * 이 기록으로 데이터 로드를 재시작 할 것인지 게임을 진행 시킬 것인지 결정할 수 있다.
  * --------------------------------------------------------------------------------------
  */
 public class SHLoadEndInfo
@@ -90,7 +77,7 @@ public class SHLoadEndInfo
 // public class : 로드 데이터 상태
 /* Summary
  * --------------------------------------------------------------------------------------
- * 로드할 데이터에 대한 상태 정보로 로드 시작부터 종료까지 모든 상태를 기록한다.
+ * 로드할 데이터에 대한 현재 상태 정보
  * --------------------------------------------------------------------------------------
  */
 public class SHLoadDataStateInfo
@@ -123,7 +110,7 @@ public class SHLoadDataStateInfo
         return m_pLoadDataInfo.m_pLoadOkayTrigger();
     }
 
-    public void LoadCall(Action<string, SHLoadStartInfo> OnEventStart, Action<string, SHLoadEndInfo> OnEventDone)
+    public void Load(Action<string, SHLoadStartInfo> OnEventStart, Action<string, SHLoadEndInfo> OnEventDone)
     {
         if (null == m_pLoadDataInfo)
             return;
@@ -164,9 +151,9 @@ public class SHLoadDataStateInfo
 // public class : 데이터 로딩 중 정보
 /* Summary
  * --------------------------------------------------------------------------------------
- * 로딩 중인 현재 데이터와 진행상태 정보입니다.
+ * 로딩 전체 진행상태 정보
  * --------------------------------------------------------------------------------------
- * 유저 클래스에서는 이 정보데이터를 Progress 혹은 Done 이벤트 콜백으로 프레임마다 받을 수 있습니다.
+ * 유저 클래스에서는 이 정보를 ProgressCallback 혹은 DoneCallback 으로 프레임마다 받을 수 있다.
  * --------------------------------------------------------------------------------------
  */
 public class SHLoadingInfo
@@ -208,10 +195,10 @@ public class SHLoadingInfo
 // public class : 로더
 /* Summary
  * --------------------------------------------------------------------------------------
- * 로딩 플로우를 전체적으로 관리하는 클래스
+ * 로딩 Public 클래스
  * --------------------------------------------------------------------------------------
  * Loader를 통해 SHLoadData 리스트를 등록하면 
- * 순차적으로 로드콜을 받을 수 있고, 프로그래스 정보를 이벤트로 받을 수 있습니다.
+ * 순차적으로 로드 콜을 받을 수 있고, 프로그래스 정보를 이벤트로 받을 수 있다.
  * --------------------------------------------------------------------------------------
  */
 public partial class SHLoader

@@ -49,10 +49,9 @@ public class SHLoadProgress
             if (null == kvp.Value)
                 return;
 
-            var pLoadData = GetLoadDataInfo(kvp.Key);
-            if (null != pLoadData)
+            if (null != GetLoadDataInfo(kvp.Key))
             {
-                Debug.LogErrorFormat("[LSH] 데이터 로드 중 중복파일 발견!!!(FileName : {0})", kvp.Key);
+                Debug.LogErrorFormat("[LSH] 중복파일 발견!!!(FileName : {0})", kvp.Key);
             }
             else
             {
@@ -157,7 +156,7 @@ public class SHLoadProgress
             fProgress += (GetLoadDoneCount() / GetTotalCount());
         }
         
-        // 100분률로 변경 후 반환
+        // 백분률로 변경 후 반환
         return (fProgress * 100.0f);
     }
 

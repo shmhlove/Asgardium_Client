@@ -6,43 +6,43 @@ using System.Collections.Generic;
 
 public partial class SHLoader
 {
-    public void Process(SHLoadData pLoadInfo,
-        Action<SHLoadingInfo> pDone = null, Action<SHLoadingInfo> pProgress = null)
+    public void Run(SHLoadData pLoadInfo,
+        Action<SHLoadingInfo> pDoneCallback = null, Action<SHLoadingInfo> pProgressCallback = null)
     {
-        Process(new Dictionary<string, SHLoadData>()
+        Run(new Dictionary<string, SHLoadData>()
         {
             { pLoadInfo.m_strName, pLoadInfo}
         }, 
-        pDone, pProgress);
+        pDoneCallback, pProgressCallback);
     }
 
-    public void Process(Dictionary<string, SHLoadData> pLoadList,
-        Action<SHLoadingInfo> pDone = null, Action<SHLoadingInfo> pProgress = null)
+    public void Run(Dictionary<string, SHLoadData> pLoadList,
+        Action<SHLoadingInfo> pDoneCallback = null, Action<SHLoadingInfo> pProgressCallback = null)
     {
-        Process(new List<Dictionary<string, SHLoadData>>()
+        Run(new List<Dictionary<string, SHLoadData>>()
         {
             pLoadList
         }, 
-        pDone, pProgress);
+        pDoneCallback, pProgressCallback);
     }
 
-    public void Process(List<Dictionary<string, SHLoadData>> pLoadList,
-        Action<SHLoadingInfo> pDone = null, Action<SHLoadingInfo> pProgress = null)
+    public void Run(List<Dictionary<string, SHLoadData>> pLoadList,
+        Action<SHLoadingInfo> pDoneCallback = null, Action<SHLoadingInfo> pProgressCallback = null)
     {
         Initialize();
         
         AddLoadDatas(pLoadList);
-        AddLoadEvent(pDone, pProgress);
+        AddLoadEvent(pDoneCallback, pProgressCallback);
         
         if (false == IsRemainLoadFiles())
         {
-            CallEventForDone();
+            SendEventForDone();
             return;
         }
 
         m_pProgress.LoadStart();
 
-        CoroutineToLoadProgressEvent();
-        CoroutineToLoadProcess();
+        CoroutineToProgressEvent();
+        CoroutineToRun();
     }
 }
